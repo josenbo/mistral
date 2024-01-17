@@ -1,5 +1,4 @@
 using Serilog;
-using vigocfg.Settings;
 
 namespace vigocfg;
 

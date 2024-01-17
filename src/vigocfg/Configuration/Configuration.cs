@@ -1,4 +1,4 @@
-namespace vigocfg.Settings;
+namespace vigocfg;
 
 public record Configuration(
     StagingEnvironmentEnum StagingEnvironment, 

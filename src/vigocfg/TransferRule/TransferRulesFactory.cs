@@ -48,7 +48,7 @@ internal static class TransferRulesFactory
             FileEncodingEnum.ISO_8859_1, 
             EnvironmentHelper.DefaultLineEnding, 
             true, 
-            FilePermissionValue.FromSymbolicNotation("u+x"));
+            FilePermission.SpecifySymbolic("u+x"));
 
         var targetAscii = targetDefaults with { FileEncoding = FileEncodingEnum.Ascii };
         
@@ -79,7 +79,7 @@ internal static class TransferRulesFactory
             FileEncodingEnum.ISO_8859_1, 
             EnvironmentHelper.DefaultLineEnding, 
             true, 
-            UndefinedFilePermission);
+            DefaultFilePermission);
 
         var targetAscii = targetDefaults with { FileEncoding = FileEncodingEnum.Ascii };
         
@@ -107,7 +107,7 @@ internal static class TransferRulesFactory
             FileEncodingEnum.ISO_8859_1, 
             EnvironmentHelper.DefaultLineEnding, 
             true, 
-            FilePermissionValue.FromSymbolicNotation("u+x"));
+            FilePermission.SpecifySymbolic("u+x"));
 
         var targetAscii = targetDefaults with { FileEncoding = FileEncodingEnum.Ascii };
         
@@ -142,7 +142,7 @@ internal static class TransferRulesFactory
             FileEncodingEnum.Ascii, 
             EnvironmentHelper.DefaultLineEnding, 
             true, 
-            UndefinedFilePermission);
+            DefaultFilePermission);
 
         var targetIso8859X1 = targetDefaults with { FileEncoding = FileEncodingEnum.ISO_8859_1 };
         
@@ -169,7 +169,7 @@ internal static class TransferRulesFactory
         var rules = new List<TransferRule>();
 
         var sourceDefaults = new SourceFileProperties(FileTypeEnum.TextFile, FileEncodingEnum.UTF_8);
-        var targetDefaults = new TargetFileProperties(FileEncodingEnum.UTF_8, EnvironmentHelper.DefaultLineEnding, true, UndefinedFilePermission);
+        var targetDefaults = new TargetFileProperties(FileEncodingEnum.UTF_8, EnvironmentHelper.DefaultLineEnding, true, DefaultFilePermission);
 
         AppendMatchName(rules, "crontab", string.Empty, sourceDefaults, targetDefaults);
         AppendSkipAll(rules);
@@ -263,7 +263,7 @@ internal static class TransferRulesFactory
             FileEncodingEnum.Undefined,
             LineEndingEnum.Undefined,
             false,
-            UndefinedFilePermission);
+            DefaultFilePermission);
     }
 
     // ReSharper disable once UnusedMember.Local
@@ -281,7 +281,7 @@ internal static class TransferRulesFactory
             FileEncodingEnum.Undefined,
             LineEndingEnum.Undefined,
             false,
-            UndefinedFilePermission);
+            DefaultFilePermission);
     }
 
     private static void AppendSkipAll(ICollection<TransferRule> rules)
@@ -298,7 +298,7 @@ internal static class TransferRulesFactory
             FileEncodingEnum.Undefined,
             LineEndingEnum.Undefined,
             false,
-            UndefinedFilePermission);
+            DefaultFilePermission);
     }
     
     private static void AppendRule(
@@ -313,7 +313,7 @@ internal static class TransferRulesFactory
         FileEncodingEnum targetEncoding, 
         LineEndingEnum targetLineEnding, 
         bool appendFinalNewline, 
-        FilePermissionValue targetFilePermission)
+        FilePermission targetFilePermission)
     {
         nameToMatch = Guard.Against.NullOrWhiteSpace(nameToMatch, nameof(nameToMatch)).Trim();
         nameReplacement = isAllowRule ? nameReplacement.Trim() : string.Empty;
@@ -357,7 +357,7 @@ internal static class TransferRulesFactory
         {
             sourceFileType = FileTypeEnum.Undefined;
             sourceEncoding = FileEncodingEnum.Undefined;
-            targetFilePermission = UndefinedFilePermission;
+            targetFilePermission = DefaultFilePermission;
             targetEncoding = FileEncodingEnum.Undefined;
             targetLineEnding = LineEndingEnum.Undefined;
             appendFinalNewline = false;
@@ -384,6 +384,6 @@ internal static class TransferRulesFactory
     #endregion
     
     private static bool _isInitialized;
-    private static readonly FilePermissionValueUndefined UndefinedFilePermission = FilePermissionValue.Undefined;
+    private static readonly FilePermissionDefault DefaultFilePermission = FilePermission.UseDefault;
     private static readonly Dictionary<(string username, string foldername), List<TransferRule>> DictRules = new();
 }

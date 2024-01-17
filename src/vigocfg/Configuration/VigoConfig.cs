@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using vigocfg.Settings;
 
 namespace vigocfg;
 
@@ -44,7 +43,7 @@ public class VigoConfig : IVigoConfig
             FileEncodingEnum.UTF_8,
             EnvironmentHelper.DefaultLineEnding, 
             true, 
-            FilePermissionValue.Undefined);
+            FilePermission.UseDefault);
 
         _databaseScripts = new DatabaseScripts(
             FileSystemEnv.SourceRepositoryFlyway,

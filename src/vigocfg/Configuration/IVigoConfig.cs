@@ -8,9 +8,3 @@ public interface IVigoConfig
     IDatabaseScripts DatabaseScripts { get; }
     IStagingEnvironment StagingEnvironment { get; }
 }
-
-public interface IStagingEnvironment
-{
-    string Key { get; }
-    string Name { get; }
-}

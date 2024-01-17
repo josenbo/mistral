@@ -4,5 +4,5 @@ internal record TargetFileProperties(
     FileEncodingEnum FileEncoding,
     LineEndingEnum LineEnding,
     bool AppendFinalNewline,
-    FilePermissionValue FilePermission
+    FilePermission FilePermission
 );

@@ -25,7 +25,7 @@ internal class TargetFileForDatabase : TargetFile
         DatabaseObjectTypeEnum databaseObjectType,
         FileTypeEnum sourceFileType, 
         FileEncodingEnum sourceEncoding, 
-        FilePermissionValue targetFilePermission, 
+        FilePermission targetFilePermission, 
         FileEncodingEnum targetEncoding, 
         LineEndingEnum targetLineEnding, 
         bool appendFinalNewline, 
@@ -36,7 +36,7 @@ internal class TargetFileForDatabase : TargetFile
         DatabaseObjectType = Guard.Against.InvalidInput(databaseObjectType, nameof(databaseObjectType), t => t.IsDefinedAndValid());
     }
     
-    public void Deconstruct(out FileInfo target, out FileInfo source, out string schemaName, out DatabaseObjectTypeEnum databaseObjectType, out FileTypeEnum sourceFileType, out FileEncodingEnum sourceEncoding, out FilePermissionValue targetFilePermission, out FileEncodingEnum targetEncoding, out LineEndingEnum targetLineEnding, out bool appendFinalNewline, out bool copyAndTransformComplete, out IEnumerable<string> tags)
+    public void Deconstruct(out FileInfo target, out FileInfo source, out string schemaName, out DatabaseObjectTypeEnum databaseObjectType, out FileTypeEnum sourceFileType, out FileEncodingEnum sourceEncoding, out FilePermission targetFilePermission, out FileEncodingEnum targetEncoding, out LineEndingEnum targetLineEnding, out bool appendFinalNewline, out bool copyAndTransformComplete, out IEnumerable<string> tags)
     {
         target = Target;
         source = Source;

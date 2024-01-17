@@ -7,7 +7,7 @@ public interface IDatabaseScripts
     bool CleanTargetFolder { get; }
     FileTypeEnum SourceFileType { get; }
     FileEncodingEnum SourceEncoding { get; }
-    FilePermissionValue TargetFilePermission { get; }
+    FilePermission TargetFilePermission { get; }
     FileEncodingEnum TargetEncoding { get; }
     LineEndingEnum TargetLineEnding { get; }
     bool TargetAppendFinalNewline { get; }

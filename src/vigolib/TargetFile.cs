@@ -11,7 +11,7 @@ internal abstract class TargetFile
     internal IEnumerable<string> Tags => _tags;
     internal FileTypeEnum SourceFileType { get; }
     internal FileEncodingEnum SourceEncoding { get; }
-    internal FilePermissionValue TargetFilePermission { get; }
+    internal FilePermission TargetFilePermission { get; }
     internal FileEncodingEnum TargetEncoding { get; }
     internal LineEndingEnum TargetLineEnding { get; }
     internal bool AppendFinalNewline { get; }
@@ -24,7 +24,7 @@ internal abstract class TargetFile
         FileInfo target, 
         FileTypeEnum sourceFileType, 
         FileEncodingEnum sourceEncoding, 
-        FilePermissionValue targetFilePermission, 
+        FilePermission targetFilePermission, 
         FileEncodingEnum targetEncoding, 
         LineEndingEnum targetLineEnding, 
         bool appendFinalNewline, 

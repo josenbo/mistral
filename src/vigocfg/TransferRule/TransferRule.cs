@@ -12,7 +12,7 @@ internal record TransferRule(
     bool IsAllowRule,
     FileTypeEnum SourceFileType,
     FileEncodingEnum SourceEncoding,
-    FilePermissionValue TargetFilePermission,
+    FilePermission TargetFilePermission,
     FileEncodingEnum TargetEncoding,
     LineEndingEnum TargetLineEnding,
     bool AppendFinalNewline

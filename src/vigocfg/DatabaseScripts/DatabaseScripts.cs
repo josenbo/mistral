@@ -9,7 +9,7 @@ internal class DatabaseScripts : IDatabaseScripts
     public bool CleanTargetFolder { get; }
     public FileTypeEnum SourceFileType { get; }
     public FileEncodingEnum SourceEncoding { get; }
-    public FilePermissionValue TargetFilePermission { get; }
+    public FilePermission TargetFilePermission { get; }
     public FileEncodingEnum TargetEncoding { get; }
     public LineEndingEnum TargetLineEnding { get; }
     public bool TargetAppendFinalNewline { get; }

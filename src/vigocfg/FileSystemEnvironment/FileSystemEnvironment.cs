@@ -1,5 +1,3 @@
-using vigocfg.Settings;
-
 namespace vigocfg;
 
 internal class FileSystemEnvironment : IFileSystemEnvironment

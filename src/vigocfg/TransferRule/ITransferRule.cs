@@ -13,7 +13,7 @@ public interface ITransferRule
     bool IsAllowRule { get; }
     FileTypeEnum SourceFileType { get; }
     FileEncodingEnum SourceEncoding { get; }
-    FilePermissionValue TargetFilePermission { get; }
+    FilePermission TargetFilePermission { get; }
     FileEncodingEnum TargetEncoding { get; }
     LineEndingEnum TargetLineEnding { get; }
     bool AppendFinalNewline { get; }
