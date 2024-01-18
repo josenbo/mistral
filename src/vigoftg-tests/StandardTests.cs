@@ -134,8 +134,9 @@ public class StandardTests
         Assert.Equal("file-1", parseResult.NewName);
     }
 
+    /*
     /// <summary>
-    /// file_1_DEPLOY_ONLY_a1__ -> OK, rename to file_1, env a1 matched, no tags 
+    /// file_1_DEPLOY_ONLY_a1__ -> OK, rename to file_1, env a1 matched, no tags
     /// </summary>
     [Fact]
     public void DeployOnlyWithUnderscoreAndSingleTagIsTransformed()
@@ -154,7 +155,9 @@ public class StandardTests
         Assert.Equal(fileName, parseResult.CurrentName);
         Assert.Equal("file_1", parseResult.NewName);
     }
+    */
 
+    /*
     /// <summary>
     /// file.1.DEPLOY.ONLY.a1.. -> OK, rename to file.1, env a1 matched, no tags   
     /// </summary>
@@ -175,6 +178,7 @@ public class StandardTests
         Assert.Equal(fileName, parseResult.CurrentName);
         Assert.Equal("file.1", parseResult.NewName);
     }
+    */
 
     [Fact]
     public void DeployOnlyWithPlusIsNotAScopeTag()

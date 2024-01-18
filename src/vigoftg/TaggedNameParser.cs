@@ -157,18 +157,20 @@ internal static partial class TaggedNameParser
 	    
         return parseResult;
     }
-
-    public static char[] Delimiters => new[] { '-', '_', '~', '.' };
+    
+    public static char[] Delimiters { get; } = DelimChars.ToCharArray();
 
     public static bool IsValidTagNameSyntax(string tagName)
     {
         return TagPhraseSegment.RexTagName.IsMatch(tagName);
     }
 
+    private const string DelimChars = "-~";
+
     private static readonly Regex RexTaggedRegion = RexTaggedRegionPartial();
     private static readonly Regex RexSyntaxRules = RexSyntaxRulesPartial();
 
-    [GeneratedRegex(@"(?'sepc'[-_~.])(?'words'[a-zA-Z][a-zA-Z0-9]{0,40}([-_~.][a-zA-Z0-9]{1,40}){1,80})\k<sepc>\k<sepc>", RegexOptions.ExplicitCapture)]
+    [GeneratedRegex("(?'sepc'[" + DelimChars + "])(?'words'[a-zA-Z][a-zA-Z0-9]{0,40}([" + DelimChars + @"][a-zA-Z0-9]{1,40}){1,80})\k<sepc>\k<sepc>", RegexOptions.ExplicitCapture)]
     private static partial Regex RexTaggedRegionPartial();
     
     [GeneratedRegex("^((Tx{1,100})|((SD|DO)x{1,100}(Ex{1,100})?(Tx{1,100})?)|(Tx{1,100}(SD|DO)x{1,100}(Ex{1,100})?))$", RegexOptions.ExplicitCapture)]
