@@ -1,3 +1,4 @@
+
 namespace vigocfg;
 
 public interface IDatabaseScripts

@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="FileFeatures\" />
+      <Folder Include="FileProp\" />
     </ItemGroup>
     
 </Project>
