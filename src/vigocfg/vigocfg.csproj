@@ -17,5 +17,9 @@
     <ItemGroup>
         <InternalsVisibleTo Include="vigocfg-tests" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="FileFeatures\" />
+    </ItemGroup>
     
 </Project>
