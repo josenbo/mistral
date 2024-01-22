@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 
-namespace vigocfg;
+namespace vigobase;
 
 /// <summary>
 /// Signaling that the default file permissions shall be changed as specified using octal notation

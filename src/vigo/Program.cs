@@ -1,4 +1,8 @@
-﻿using Serilog;
+﻿
+Console.WriteLine("vigo console application needs to be re-enabled after the refactorings");
+
+/*
+using Serilog;
 using Serilog.Events;
 using vigocfg;
 using vigoftg;
@@ -11,7 +15,7 @@ if (ok)
     try
     {
         var config = (IVigoConfig)new VigoConfig(null);
-        var nameParser = ConfigureNameParser(new NameParser(), config); 
+        var nameParser = ConfigureNameParser(new NameParserFactory(), config); 
         var job = (IVigoJob)new VigoJob(config, nameParser);
 
         var jobResult = job.Run();
@@ -29,11 +33,11 @@ Environment.ExitCode = ok ? 0 : 1;
 
 return;
 
-INameParser ConfigureNameParser(NameParser nameParser, IVigoConfig config)
+INameParser ConfigureNameParser(NameParserFactory factory, IVigoConfig config)
 {
-    nameParser.AddCaseSensitiveTags(config.NameParserConfig.CaseSensitiveFilterTags);
-    nameParser.AddCaseInsensitiveTags(config.NameParserConfig.CaseInsensitiveFilterTags);
-    return nameParser;
+    factory.AddTags(config.NameParserConfig.CaseSensitiveFilterTags);
+    factory.AddTags(config.NameParserConfig.CaseInsensitiveFilterTags);
+    return factory.Build();
 }
 
 bool ConfigureLogging(LogEventLevel? consoleLogEventLevel)
@@ -62,3 +66,5 @@ bool ConfigureLogging(LogEventLevel? consoleLogEventLevel)
         return false;
     }    
 }
+
+*/

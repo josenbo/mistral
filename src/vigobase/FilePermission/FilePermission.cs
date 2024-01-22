@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
-namespace vigocfg;
+namespace vigobase;
 
 /// <summary>
 /// Specification of desired file permissions.

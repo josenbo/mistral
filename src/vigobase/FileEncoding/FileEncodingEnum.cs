@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace vigocfg;
+namespace vigobase;
 
 [PublicAPI]
 public enum FileEncodingEnum

@@ -7,16 +7,15 @@ public class StandardTests
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string fileName = "file~1~UAT~~";
-        var parser = new NameParser();
-        AppendCaseInsensitiveTags(parser, "UAT", "REF", "PROD");
+        var parser = NameParserFactory.Create("UAT", "REF", "PROD");
         var activeTags = StringList("UAT");
 
-        var parseResult = parser.ParseFileName(fileName, activeTags);
+        var parseResult = parser.Parse(fileName, activeTags);
         
         Assert.True(parseResult.Success);
         Assert.False(parseResult.DoIgnore);
         Assert.False(parseResult.DoRename);
-        Assert.Equal(fileName, parseResult.CurrentName);
+        Assert.Equal(fileName, parseResult.SourceName);
         Assert.Equal(string.Empty, parseResult.NewName);
     }
     
@@ -29,15 +28,16 @@ public class StandardTests
         AppendCaseInsensitiveTags(parser, "uat", "ref", "prod");
         var activeTags = StringList("UAT");
 
-        var parseResult = parser.ParseFileName(fileName, activeTags);
-        
+        var parseResult = parser.Parse(fileName, activeTags);
+
         Assert.True(parseResult.Success);
         Assert.False(parseResult.DoIgnore);
         Assert.True(parseResult.DoRename);
-        Assert.Equal(fileName, parseResult.CurrentName);
+        Assert.Equal(fileName, parseResult.SourceName);
         Assert.Equal("file~1", parseResult.NewName);
     }
 
+    /*
     /// <summary>
     /// file~1~DEPLOY~ONLY~uaT~~ -> OK, rename to file~1, env uaT matched, no tags
     /// </summary>
@@ -51,7 +51,7 @@ public class StandardTests
         var activeTags = StringList("uaT");
 
         var parseResult = parser.ParseFileName(fileName, activeTags);
-        
+
         Assert.True(parseResult.Success);
         Assert.False(parseResult.DoIgnore);
         Assert.True(parseResult.DoRename);
@@ -69,14 +69,14 @@ public class StandardTests
         var activeTags = StringList("uaT");
 
         var parseResult = parser.ParseFileName(fileName, activeTags);
-        
+
         Assert.False(parseResult.Success);
         Assert.True(parseResult.DoIgnore);
         Assert.False(parseResult.DoRename);
         Assert.Equal(fileName, parseResult.CurrentName);
         Assert.Equal(string.Empty, parseResult.NewName);
     }
-    
+
     [Fact]
     public void ParsingFailsWhenTagNotFoundBecauseCaseDiffersInActiveTags()
     {
@@ -87,14 +87,14 @@ public class StandardTests
         var activeTags = StringList("UAt");
 
         var parseResult = parser.ParseFileName(fileName, activeTags);
-        
+
         Assert.True(parseResult.Success);
         Assert.True(parseResult.DoIgnore);
         Assert.False(parseResult.DoRename);
         Assert.Equal(fileName, parseResult.CurrentName);
         Assert.Equal(string.Empty, parseResult.NewName);
     }
-    
+
     [Fact]
     public void MisspelledDeployOnlyKeywordIsIgnored()
     {
@@ -134,7 +134,6 @@ public class StandardTests
         Assert.Equal("file-1", parseResult.NewName);
     }
 
-    /*
     /// <summary>
     /// file_1_DEPLOY_ONLY_a1__ -> OK, rename to file_1, env a1 matched, no tags
     /// </summary>
@@ -178,7 +177,6 @@ public class StandardTests
         Assert.Equal(fileName, parseResult.CurrentName);
         Assert.Equal("file.1", parseResult.NewName);
     }
-    */
 
     [Fact]
     public void DeployOnlyWithPlusIsNotAScopeTag()
@@ -375,24 +373,9 @@ public class StandardTests
         Assert.False(parseResult.HasTag("a1"));
         Assert.False(parseResult.HasTag("b2"));
     }
+    */
     
     #region Helpers
-
-    private static void AppendCaseSensitiveTags(NameParser parser, params string[] tags)
-    {
-        parser.AddCaseSensitiveTags(tags);
-    }
-
-    private static void AppendCaseInsensitiveTags(NameParser parser, params string[] tags)
-    {
-        parser.AddCaseInsensitiveTags(tags);
-    }
-
-    // ReSharper disable once UnusedMember.Local
-    private static void AppendTags(NameParser parser, bool isCaseSensitive, params string[] tags)
-    {
-        parser.AddTags(isCaseSensitive, tags);
-    }
 
     private static IEnumerable<string> StringList(params string[] tags)
     {

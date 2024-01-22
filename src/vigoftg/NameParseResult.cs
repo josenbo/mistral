@@ -4,14 +4,10 @@ namespace vigoftg;
 
 internal class NameParseResult : INameParseResult
 {
-	// ReSharper disable once RedundantDefaultMemberInitializer
-	public bool Success { get; private set; } = false;
-	public bool DoIgnore { get; private set; } = true;
-
-	// ReSharper disable once RedundantDefaultMemberInitializer
-	public bool DoRename { get; private set; } = false;
-	public string CurrentName { get; }
-	public string NewName { get; private set; } = string.Empty;
+	public bool CanDeploy { get; private set; } = false;
+	public string SourceName { get; }
+	
+	public string TargetName { get; private set; } = string.Empty;
 
 	public IEnumerable<string> Tags => _additionalTagsFoundInName.Values;
 
@@ -21,10 +17,10 @@ internal class NameParseResult : INameParseResult
 	{
 		_configuration = configuration;
 		_activeTagsDict = activeTagsDict;
-		CurrentName = name;
+		SourceName = name;
 
 		Log.Debug("Parsing the name {Name} with the active tags {ActiveTagList}",
-			CurrentName, 
+			SourceName, 
 			_activeTagsDict.Values);
 		
 		Parse();
@@ -34,7 +30,7 @@ internal class NameParseResult : INameParseResult
 	{
 		try
 		{
-			var parseResult = TaggedNameParser.ParseTaggedName(CurrentName);
+			var parseResult = TaggedNameParser.ParseTaggedName(SourceName);
 
 			if (!parseResult.HasTags)
 			{
@@ -43,7 +39,7 @@ internal class NameParseResult : INameParseResult
 				DoRename = false;
 				NewName = string.Empty;
 				
-				Log.Debug("There were no tags in the name {Name}", CurrentName);
+				Log.Debug("There were no tags in the name {Name}", SourceName);
 				
 				return;
 			}
@@ -61,7 +57,7 @@ internal class NameParseResult : INameParseResult
 				NewName = parseResult.NewName;
 				
 				Log.Debug("There were only additional tags in the name {Name}, but no scope tags. Additional tags = {AdditionalTags}", 
-					CurrentName, 
+					SourceName, 
 					_additionalTagsFoundInName.Values);
 				
 				return;
@@ -84,7 +80,7 @@ internal class NameParseResult : INameParseResult
 				NewName = parseResult.NewName;
 				
 				Log.Debug("The name {Name} is tagged and will be renamed to {NewName}. The {TagMeaning} tags where {TagsList} with the exception of {ExceptedTagsList}. This matched the active tags {ActiveTagsList}",
-					CurrentName,
+					SourceName,
 					NewName,
 					parseResult.IsInclusive ? "inclusive" : "exclusive",
 					parseResult.PrimaryTags,
@@ -100,7 +96,7 @@ internal class NameParseResult : INameParseResult
 				NewName = string.Empty;
 				
 				Log.Debug("The name {Name} is tagged but out of scope. The {TagMeaning} tags where {TagsList} with the exception of {ExceptedTagsList}. This did not match the active tags {ActiveTagsList}",
-					CurrentName,
+					SourceName,
 					parseResult.IsInclusive ? "inclusive" : "exclusive",
 					parseResult.PrimaryTags,
 					parseResult.SecondaryTags,
@@ -132,7 +128,7 @@ internal class NameParseResult : INameParseResult
     {
 	    var (ok, tagname) = _configuration.CheckTagExistenceAndGetTagName(tag);
 	    if (!ok || tagname is null)
-		    throw new NameParserException($"Found the unrecognized tag {tag} in the name {CurrentName}");
+		    throw new NameParserException($"Found the unrecognized tag {tag} in the name {SourceName}");
 
 	    return _activeTagsDict.ContainsKey(tagname);
     }

@@ -1,7 +1,7 @@
 using System.Text;
 using JetBrains.Annotations;
 
-namespace vigocfg;
+namespace vigobase;
 
 [PublicAPI]
 public static class FileEncodingEnumHelper

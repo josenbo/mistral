@@ -24,7 +24,9 @@ internal class Configuration
         if (_caseSensitiveTags.ContainsKey(trimmedTag) ||
             _caseInsensitiveTags.ContainsKey(trimmedTag))
         {
-            Log.Error("The tag {TagName} is already in use", tag);
+            Log.Error("Failed to add the case {Sensitivity} tag {TagName}. There is already another tag with the same name", 
+                isCaseSensitive ? "sensitive" : "insensitive",
+                tag);
             return false;
         }
 		

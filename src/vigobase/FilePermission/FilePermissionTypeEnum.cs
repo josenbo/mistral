@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace vigocfg;
+namespace vigobase;
 
 /// <summary>
 /// Tell if and how a file permission is specified

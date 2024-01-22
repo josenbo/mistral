@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace vigocfg;
+namespace vigobase;
 
 /// <summary>
 /// Provide extension methods and static helper methods for the file permission type

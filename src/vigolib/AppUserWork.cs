@@ -59,7 +59,7 @@ internal class AppUserWork: IWork
             
             if (!fileStore.SourceFolder.Exists)
             {
-                Log.Error("Missing source folder {Foldername} for {UserName}. Path: {SourcePath}",
+                Log.Error("Missing source folder {FolderName} for {UserName}. Path: {SourcePath}",
                     fileStore.SourceFolder.Name,
                     _appUser.UserName,
                     fileStore.SourceFolder.FullName);
@@ -76,7 +76,7 @@ internal class AppUserWork: IWork
             {
                 if (!fileStore.CreateTargetFolder)
                 {
-                    Log.Error("Target folder {Foldername} for {UserName} is required to exist. Path: {TargetPath}",
+                    Log.Error("Target folder {FolderName} for {UserName} is required to exist. Path: {TargetPath}",
                         fileStore.TargetFolder.Name,
                         _appUser.UserName,
                         fileStore.TargetFolder.FullName);
@@ -86,14 +86,14 @@ internal class AppUserWork: IWork
 
                 if (!fileStore.TargetFolder.CreateFolderIfMissing())
                 {
-                    Log.Error("Target folder {Foldername} for {UserName} could not be created. Path: {TargetPath}",
+                    Log.Error("Target folder {FolderName} for {UserName} could not be created. Path: {TargetPath}",
                         fileStore.TargetFolder.Name,
                         _appUser.UserName,
                         fileStore.TargetFolder.FullName);
             
                     return false;
                 }
-                else Log.Debug("Created target folder {Foldername} for {UserName}",
+                else Log.Debug("Created target folder {FolderName} for {UserName}",
                     fileStore.TargetFolder.Name,
                     _appUser.UserName);
 

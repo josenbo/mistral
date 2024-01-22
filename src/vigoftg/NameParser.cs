@@ -1,43 +1,26 @@
 using Ardalis.GuardClauses;
-using JetBrains.Annotations;
 using Serilog;
 
 namespace vigoftg;
 
-[PublicAPI]
-public class NameParser : INameParser
+internal class NameParser : INameParser
 {
-    public bool AddCaseSensitiveTag(string tag)
+    internal NameParser(Configuration configuration)
     {
-        return AddTag(true, tag);
+        _configuration = configuration;
+    }
+    
+    public INameParseResult Parse(string name, params string[] activeTags)
+    {
+        return ParseFileName(name, activeTags);
     }
 
-    public bool AddCaseSensitiveTags(IEnumerable<string> tags)
+    public INameParseResult Parse(string name, IEnumerable<string> activeTags)
     {
-        return AddTags(true, tags);
+        return ParseFileName(name, activeTags);
     }
 
-    public bool AddCaseInsensitiveTag(string tag)
-    {
-        return AddTag(false, tag);	
-    }
-
-    public bool AddCaseInsensitiveTags(IEnumerable<string> tags)
-    {
-        return AddTags(false, tags);
-    }
-
-    public bool AddTag(bool isCaseSensitive, string tag)
-    {
-        return _configuration.AddTag(isCaseSensitive, tag);
-    }
-
-    public bool AddTags(bool isCaseSensitive, IEnumerable<string> tags)
-    {
-        return tags.All(tag => _configuration.AddTag(isCaseSensitive, tag));
-    }
-
-    public INameParseResult ParseFileName(string name, IEnumerable<string> activeTags)
+    private INameParseResult ParseFileName(string name, IEnumerable<string> activeTags)
     {
         var sanitizedFileName = Guard.Against.NullOrWhiteSpace(name).Trim();
         var activeTagsDict = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -56,16 +39,6 @@ public class NameParser : INameParser
 
         return new NameParseResult(_configuration, sanitizedFileName, activeTagsDict);
     }
-    
-    INameParseResult INameParser.Parse(string name, params string[] activeTags)
-    {
-        return ParseFileName(name, activeTags);
-    }
 
-    INameParseResult INameParser.Parse(string name, IEnumerable<string> activeTags)
-    {
-        return ParseFileName(name, activeTags);
-    }
-
-    private readonly Configuration _configuration = new();
+    private readonly Configuration _configuration;
 }
