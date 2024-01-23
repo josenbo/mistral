@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using vigobase;
 
 namespace vigoftg;
 
@@ -14,35 +14,35 @@ internal class TagPhraseSegment
     {
         Content = content;
 		
-        if (content.Equals("SKIP", StringComparison.Ordinal))
+        if (content.Equals("SKIP", StringComparison.InvariantCultureIgnoreCase))
         {
             IsTag = false;
             IsKeyword = true;
             SyntaxChar = 'S';
             IsValid = true;
         }
-        else if (content.Equals("DEPLOY", StringComparison.Ordinal))
+        else if (content.Equals("DEPLOY", StringComparison.InvariantCultureIgnoreCase))
         {
             IsTag = false;
             IsKeyword = false;
             SyntaxChar = 'D';
             IsValid = true;
         }
-        else if (content.Equals("ONLY", StringComparison.Ordinal))
+        else if (content.Equals("ONLY", StringComparison.InvariantCultureIgnoreCase))
         {
             IsTag = false;
             IsKeyword = true;
             SyntaxChar = 'O';
             IsValid = true;
         }
-        else if (content.Equals("EXCEPT", StringComparison.Ordinal))
+        else if (content.Equals("EXCEPT", StringComparison.InvariantCultureIgnoreCase))
         {
             IsTag = false;
             IsKeyword = true;
             SyntaxChar = 'E';
             IsValid = true;
         }
-        else if (content.Equals("TAGS", StringComparison.Ordinal))
+        else if (content.Equals("TAGS", StringComparison.InvariantCultureIgnoreCase))
         {
             IsTag = false;
             IsKeyword = true;
@@ -54,9 +54,15 @@ internal class TagPhraseSegment
             IsTag = true;
             IsKeyword = false;
             SyntaxChar = 'x';
-            IsValid = RexTagName.IsMatch(content);
+            try
+            {
+                var namedTag = new NamedTag(content);
+                IsValid = true;
+            }
+            catch (ArgumentException)
+            {
+                IsValid = false;
+            }
         }
     }
-	
-    internal static readonly Regex RexTagName = new Regex(@"^[a-zA-Z][a-zA-Z0-9]{0,50}([-_][a-zA-Z0-9]{1,50}){0,100}$", RegexOptions.ExplicitCapture);
 }

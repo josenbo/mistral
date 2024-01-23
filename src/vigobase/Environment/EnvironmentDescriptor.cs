@@ -1,4 +1,6 @@
-﻿namespace vigobase;
+﻿using System.Text;
+
+namespace vigobase;
 
 internal class EnvironmentDescriptor(string name) : IEnvironmentDescriptor
 {
@@ -13,9 +15,37 @@ internal class EnvironmentDescriptor(string name) : IEnvironmentDescriptor
                EnvironmentGroups.Any(t => t == tag);
     }
 
-    public bool HasAnyTag(IEnumerable<NamedTag> tags)
+    public bool HasAnyOfTheseTags(IEnumerable<NamedTag> tags)
     {
         return tags.Any(HasTag);
+    }
+    
+    public bool HasNoneOfTheseTags(IEnumerable<NamedTag> tags)
+    {
+        return tags.All(t => !HasTag(t));
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder($"[Environment: {EnvironmentName.Name}");
+        
+        if (0 < EnvironmentAliases.Count)
+        {
+            sb.Append(", Aliases: {")
+              .Append(string.Join(',', EnvironmentAliases))
+              .Append('}');
+        }
+        
+        if (0 < EnvironmentGroups.Count)
+        {
+            sb.Append(", Groups: {")
+              .Append(string.Join(',', EnvironmentGroups))
+              .Append('}');
+        }
+
+        sb.Append(']');
+
+        return sb.ToString();
     }
 
     internal readonly List<NamedTag> EnvironmentAliases = [];

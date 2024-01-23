@@ -8,10 +8,6 @@ internal class NameParserException : Exception
     {
     }
 
-    protected NameParserException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
-
     public NameParserException(string? message) : base(message)
     {
     }

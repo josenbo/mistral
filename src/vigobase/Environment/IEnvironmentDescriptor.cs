@@ -6,5 +6,7 @@ public interface IEnvironmentDescriptor
     IEnumerable<NamedTag> Aliases { get; }
     IEnumerable<NamedTag> Groups { get; }
     bool HasTag(NamedTag tag);
-    bool HasAnyTag(IEnumerable<NamedTag> tags);
+    bool HasAnyOfTheseTags(IEnumerable<NamedTag> tags);
+    bool HasNoneOfTheseTags(IEnumerable<NamedTag> tags);
+    string ToString();
 }

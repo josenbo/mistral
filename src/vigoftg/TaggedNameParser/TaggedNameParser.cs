@@ -1,6 +1,8 @@
+using System.Collections.Immutable;
 using System.Text;
 using System.Text.RegularExpressions;
 using Serilog;
+using vigobase;
 
 namespace vigoftg;
 
@@ -18,9 +20,9 @@ internal static partial class TaggedNameParser
             false,
             originalName, 
             false, 
-            Array.Empty<string>(), 
-            Array.Empty<string>(), 
-            Array.Empty<string>());
+            Array.Empty<NamedTag>(), 
+            Array.Empty<NamedTag>(), 
+            Array.Empty<NamedTag>());
 
         if (string.IsNullOrWhiteSpace(originalName))
         {
@@ -56,7 +58,7 @@ internal static partial class TaggedNameParser
             !match.Groups["words"].Success
            )
         {
-            Log.Warning("{ClassName}.{MethodName} Parsing the name seemded to be successful but the result violates basic assumptions",
+            Log.Warning("{ClassName}.{MethodName} Parsing the name seemed to be successful, but the result violates basic assumptions",
                 nameof(NameParseResult),
                 nameof(ParseTaggedName));
 		    
@@ -66,7 +68,7 @@ internal static partial class TaggedNameParser
         var separatorChar = match.Groups["sepc"].Value[0];
         var chainedTags = match.Groups["words"].Value;
 
-        Log.Debug("{Parameter} = {Value}", nameof(separatorChar), separatorChar);
+        // Log.Debug("{Parameter} = {Value}", nameof(separatorChar), separatorChar);
         Log.Debug("{Parameter} = {Value}", nameof(chainedTags), chainedTags);
 	    
         var tagPhraseSegments = chainedTags.Split(separatorChar)
@@ -81,6 +83,27 @@ internal static partial class TaggedNameParser
 
         if (!RexSyntaxRules.IsMatch(sbSyntaxString.ToString()))
         {
+            if (3 < tagPhraseSegments.Count ||
+                (1 < tagPhraseSegments.Count &&
+                 tagPhraseSegments.Select(e => e.Content)
+                     .Any(s => s.Equals("skip", StringComparison.InvariantCultureIgnoreCase) ||
+                               s.Equals("deploy", StringComparison.InvariantCultureIgnoreCase) ||
+                               s.Equals("only", StringComparison.InvariantCultureIgnoreCase) ||
+                               s.Equals("except", StringComparison.InvariantCultureIgnoreCase) ||
+                               s.Equals("tags", StringComparison.InvariantCultureIgnoreCase) ||
+                               s.Equals("tag", StringComparison.InvariantCultureIgnoreCase))))
+            {
+                Log.Error("{ClassName}.{MethodName} Candidate tag list violates syntax and was rejected. It resembles so closely valid syntax, that this is considered an error. Name = {Name}, Separator = {Separator}, TagChain = {TagChain}, SyntaxString = {SyntaxString}",
+                    nameof(NameParseResult),
+                    nameof(ParseTaggedName),			    
+                    originalName,
+                    separatorChar,
+                    chainedTags,
+                    sbSyntaxString.ToString());
+                                
+                throw new NameParserException($"The name \"{originalName}\" has no recognizable tags, but it matches so closely that this is considered an error");
+            }
+
             Log.Warning("{ClassName}.{MethodName} Candidate tag list violates syntax and was rejected. Name = {Name}, Separator = {Separator}, TagChain = {TagChain}, SyntaxString = {SyntaxString}",
                 nameof(NameParseResult),
                 nameof(ParseTaggedName),			    
@@ -88,7 +111,7 @@ internal static partial class TaggedNameParser
                 separatorChar,
                 chainedTags,
                 sbSyntaxString.ToString());
-		    
+            
             return noTagsFoundResult;
         }
 	    
@@ -151,26 +174,21 @@ internal static partial class TaggedNameParser
             primaryTags.Count > 0,
             cleanName, 
             isInclusive, 
-            primaryTags,
-            secondaryTags,
-            additionalTags);
+            primaryTags.Select(s => new NamedTag(s)).ToImmutableList(),
+            secondaryTags.Select(s => new NamedTag(s)).ToImmutableList(),
+            additionalTags.Select(s => new NamedTag(s)).ToImmutableList());
 	    
         return parseResult;
     }
     
     public static char[] Delimiters { get; } = DelimChars.ToCharArray();
 
-    public static bool IsValidTagNameSyntax(string tagName)
-    {
-        return TagPhraseSegment.RexTagName.IsMatch(tagName);
-    }
-
-    private const string DelimChars = "-~";
+    private const string DelimChars = "~";
 
     private static readonly Regex RexTaggedRegion = RexTaggedRegionPartial();
     private static readonly Regex RexSyntaxRules = RexSyntaxRulesPartial();
 
-    [GeneratedRegex("(?'sepc'[" + DelimChars + "])(?'words'[a-zA-Z][a-zA-Z0-9]{0,40}([" + DelimChars + @"][a-zA-Z0-9]{1,40}){1,80})\k<sepc>\k<sepc>", RegexOptions.ExplicitCapture)]
+    [GeneratedRegex("(?'sepc'[" + DelimChars + "])(?'words'[a-zA-Z][-_.a-zA-Z0-9]{2,39}([" + DelimChars + @"][a-zA-Z][-_.a-zA-Z0-9]{2,39}){1,80})\k<sepc>\k<sepc>", RegexOptions.ExplicitCapture)]
     private static partial Regex RexTaggedRegionPartial();
     
     [GeneratedRegex("^((Tx{1,100})|((SD|DO)x{1,100}(Ex{1,100})?(Tx{1,100})?)|(Tx{1,100}(SD|DO)x{1,100}(Ex{1,100})?))$", RegexOptions.ExplicitCapture)]
