@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoscope", "vigoscope\vigo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoscope-tests", "vigoscope-tests\vigoscope-tests.csproj", "{4761DF93-830A-409E-ADA1-F948D71676EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoconfig", "vigoconfig\vigoconfig.csproj", "{0F0E6362-4685-4A7A-8513-919C73F76E4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoconfig-tests", "vigoconfig-tests\vigoconfig-tests.csproj", "{11B20042-9E5F-4F0C-B97C-3889F5D7A5C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +46,13 @@ Global
 		{4761DF93-830A-409E-ADA1-F948D71676EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4761DF93-830A-409E-ADA1-F948D71676EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4761DF93-830A-409E-ADA1-F948D71676EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F0E6362-4685-4A7A-8513-919C73F76E4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F0E6362-4685-4A7A-8513-919C73F76E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F0E6362-4685-4A7A-8513-919C73F76E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F0E6362-4685-4A7A-8513-919C73F76E4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11B20042-9E5F-4F0C-B97C-3889F5D7A5C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11B20042-9E5F-4F0C-B97C-3889F5D7A5C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11B20042-9E5F-4F0C-B97C-3889F5D7A5C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11B20042-9E5F-4F0C-B97C-3889F5D7A5C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
