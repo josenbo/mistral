@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using vigobase;
 
 namespace vigocfg;
 
@@ -6,10 +7,10 @@ namespace vigocfg;
 public class VigoConfig : IVigoConfig
 {
     public IFileSystemEnvironment FileSystemEnv { get; }
-    public INameParserConfig NameParserConfig { get; } = new NameParserConfig();
+    // public INameParserConfig NameParserConfig { get; } = new NameParserConfig();
     public IEnumerable<IAppUser> AppUsers => _appUsers;
-    public IDatabaseScripts DatabaseScripts => _databaseScripts;
-    public IStagingEnvironment StagingEnvironment { get; } = new StagingEnvironmentImpl();
+    // public IDatabaseScripts DatabaseScripts => _databaseScripts;
+    // public IStagingEnvironment StagingEnvironment { get; } = new StagingEnvironmentImpl();
 
     public VigoConfig(Configuration? environmentSettings)
     {
@@ -22,10 +23,10 @@ public class VigoConfig : IVigoConfig
                 throw new ArgumentException("Need to provide environment settings as there is no default", nameof(environmentSettings));
         }
 
-        EnvironmentHelper.Staging = environmentSettings.StagingEnvironment;
+        // EnvironmentHelper.Staging = environmentSettings.StagingEnvironment;
         
-        if (environmentSettings.DefaultLineEndingOrNullForPlatformDefault.HasValue)
-            EnvironmentHelper.DefaultLineEnding = environmentSettings.DefaultLineEndingOrNullForPlatformDefault.Value;
+        // if (environmentSettings.DefaultLineEndingOrNullForPlatformDefault.HasValue)
+        //     EnvironmentHelper.DefaultLineEnding = environmentSettings.DefaultLineEndingOrNullForPlatformDefault.Value;
         
         FileSystemEnv = new FileSystemEnvironment(environmentSettings);
 
@@ -45,14 +46,14 @@ public class VigoConfig : IVigoConfig
             true, 
             FilePermission.UseDefault);
 
-        _databaseScripts = new DatabaseScripts(
-            FileSystemEnv.SourceRepositoryFlyway,
-            FileSystemEnv.TargetFolderFlyway,
-            true,
-            sourceFileProperties,
-            targetFileProperties);
+        // _databaseScripts = new DatabaseScripts(
+        //     FileSystemEnv.SourceRepositoryFlyway,
+        //     FileSystemEnv.TargetFolderFlyway,
+        //     true,
+        //     sourceFileProperties,
+        //     targetFileProperties);
     }
 
     private readonly List<AppUser> _appUsers;
-    private readonly DatabaseScripts _databaseScripts;
+    // private readonly DatabaseScripts _databaseScripts;
 }

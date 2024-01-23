@@ -1,6 +1,6 @@
 using vigobase;
 
-namespace vigoftg;
+namespace vigoscope;
 
 internal class TagPhraseSegment
 {

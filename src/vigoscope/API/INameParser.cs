@@ -1,4 +1,4 @@
-namespace vigoftg;
+namespace vigoscope;
 
 public interface INameParser
 {

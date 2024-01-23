@@ -1,7 +1,9 @@
+using vigobase;
+
 namespace vigocfg;
 
 public record Configuration(
-    StagingEnvironmentEnum StagingEnvironment, 
+    // StagingEnvironmentEnum StagingEnvironment, 
     bool IsLegacyHost, 
     LineEndingEnum? DefaultLineEndingOrNullForPlatformDefault, 
     DirectoryInfo SourceRepositoryRoot,

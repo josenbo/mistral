@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using vigobase;
 
-namespace vigoftg;
+namespace vigoscope;
 
 internal class NameParseResult : INameParseResult
 {

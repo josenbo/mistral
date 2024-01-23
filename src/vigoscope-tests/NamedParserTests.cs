@@ -1,6 +1,4 @@
-using vigobase;
-
-namespace vigoftg_tests;
+namespace vigoscope_tests;
 
 public class NamedParserTests
 {

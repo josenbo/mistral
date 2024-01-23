@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Ardalis.GuardClauses;
+using vigobase;
 
 namespace vigocfg;
 

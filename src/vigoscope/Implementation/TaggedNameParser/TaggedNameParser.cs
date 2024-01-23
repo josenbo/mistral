@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Serilog;
 using vigobase;
 
-namespace vigoftg;
+namespace vigoscope;
 
 internal static partial class TaggedNameParser
 {

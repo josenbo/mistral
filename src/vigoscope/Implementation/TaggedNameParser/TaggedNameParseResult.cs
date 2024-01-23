@@ -2,7 +2,7 @@
 
 using vigobase;
 
-namespace vigoftg;
+namespace vigoscope;
 
 internal record TaggedNameParseResult(
     string CurrentName, 

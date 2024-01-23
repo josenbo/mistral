@@ -1,8 +1,7 @@
 using Ardalis.GuardClauses;
-using Serilog;
 using vigobase;
 
-namespace vigoftg;
+namespace vigoscope;
 
 internal class NameParser : INameParser
 {

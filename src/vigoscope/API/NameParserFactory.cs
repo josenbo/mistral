@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using vigobase;
 
-namespace vigoftg;
+namespace vigoscope;
 
 [PublicAPI]
 public static class NameParserFactory

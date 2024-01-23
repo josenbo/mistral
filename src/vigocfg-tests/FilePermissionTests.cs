@@ -1,4 +1,6 @@
-﻿namespace vigocfg_tests;
+﻿using vigobase;
+
+namespace vigocfg_tests;
 
 public class FilePermissionTests
 {

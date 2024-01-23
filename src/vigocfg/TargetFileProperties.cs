@@ -1,4 +1,6 @@
 
+using vigobase;
+
 namespace vigocfg;
 
 internal record TargetFileProperties(

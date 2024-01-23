@@ -1,6 +1,4 @@
-using System.Runtime.Serialization;
-
-namespace vigoftg;
+namespace vigoscope;
 
 internal class NameParserException : Exception
 {
