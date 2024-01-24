@@ -1,12 +1,8 @@
-﻿
-Console.WriteLine("vigo console application needs to be re-enabled after the refactorings");
-
-/*
-using Serilog;
+﻿using Serilog;
 using Serilog.Events;
-using vigocfg;
-using vigoftg;
-using vigolib;
+using vigo;
+
+// Console.WriteLine("vigo console application needs to be re-enabled after the refactorings");
 
 var ok = ConfigureLogging(LogEventLevel.Information);
 
@@ -14,13 +10,10 @@ if (ok)
 {
     try
     {
-        var config = (IVigoConfig)new VigoConfig(null);
-        var nameParser = ConfigureNameParser(new NameParserFactory(), config); 
-        var job = (IVigoJob)new VigoJob(config, nameParser);
-
-        var jobResult = job.Run();
+        var job = (IJob)new ArchiveJob();
+        Log.Information("Running the job {JobClass}", job);
         
-        ok = jobResult.Success;
+        ok = job.Run();
     }
     catch (Exception e)
     {
@@ -33,12 +26,6 @@ Environment.ExitCode = ok ? 0 : 1;
 
 return;
 
-INameParser ConfigureNameParser(NameParserFactory factory, IVigoConfig config)
-{
-    factory.AddTags(config.NameParserConfig.CaseSensitiveFilterTags);
-    factory.AddTags(config.NameParserConfig.CaseInsensitiveFilterTags);
-    return factory.Build();
-}
 
 bool ConfigureLogging(LogEventLevel? consoleLogEventLevel)
 {
@@ -55,7 +42,7 @@ bool ConfigureLogging(LogEventLevel? consoleLogEventLevel)
             var logFile = new FileInfo(Path.Combine(envLogFolder, "vigo.log"));
             loggerConfiguration.WriteTo.File(logFile.FullName, restrictedToMinimumLevel: LogEventLevel.Debug, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2);
         }
-        
+
         Log.Logger = loggerConfiguration.CreateLogger();
 
         return true;
@@ -64,7 +51,5 @@ bool ConfigureLogging(LogEventLevel? consoleLogEventLevel)
     {
         Console.WriteLine($"Could not configure logging: {e.Message}");
         return false;
-    }    
+    }
 }
-
-*/

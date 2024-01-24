@@ -19,19 +19,19 @@ environment. So we need one *cronjob-myuser* file for
 production and another one for development and test. So we 
 name the two files like this:
 
-**cronjob-myuser<span style="background-color:yellow">~DEPLOY~ONLY~production~~</span>**
+**cronjob-myuser<span style="background-color:yellow;color:blue">~DEPLOY~ONLY~production~~</span>**
 
 and 
 
-**cronjob-myuser<span style="background-color:yellow">~DEPLOY~ONLY~development~test~~</span>**
+**cronjob-myuser<span style="background-color:yellow;color:blue">~DEPLOY~ONLY~development~test~~</span>**
 
 When you ask the library to check a file name, it will 
 look for delimiters, keywords and tags. If none are found, 
 it will just return the original file name. If they are 
-present and valid, it will return the cleansed file name 
-along with information on whether the file can be deployed 
-in the current environment. When syntax rules are violated, 
-it will throw an exception.
+present and the syntax is valid, it will return the cleansed 
+file name along with information on whether the file can be 
+deployed in the current environment. When syntax rules are 
+violated, it will throw an exception.
 
 
 
