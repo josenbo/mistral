@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Formats.Tar;
 using System.IO.Compression;
 using System.Text;
@@ -12,47 +13,44 @@ public class Tarball(string basePath, string? additionalRootFolder = null)
     {
         Log.Debug("Adding the file {TheFile} to the tarball", file);
         
-        if (file.DirectoryName is null ||
-            !file.DirectoryName.StartsWith(_basePath, StringComparison.Ordinal))
-        {
-            Log.Error("The file {TheFile} cannot be added to the tarball, because it lies outside the base path {TheBasePath}",
-                file,
-                _basePath);
-            throw new ArgumentException("The file cannot be added to the tarball, because it lies outside the base path", nameof(file));
-        }
-
-        var relativePath = _additionalRootFolder + Path.GetRelativePath(_basePath, file.DirectoryName);
-        var parentFolders = relativePath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries);
-
-        var sb = new StringBuilder(file.FullName.Length);
-        var pf = new List<TarItemFolder>();
+        var sb = new StringBuilder(file.FullName.Length + _additionalRootFolder.Length + 10);
+        var parentFolderSequence = new List<TarItemFolder>();
         var currentFolder = _anchor;
         var first = true;
         
-        foreach (var parentFolder in parentFolders)
+        foreach (var parentFolder in BuildTarballPathFolderSequence(file.DirectoryName))
         {
             if (first)
-            {
-                sb.Append('/');
                 first = false;
-            }
+            else
+                sb.Append(TarPathSeparator);
+
             sb.Append(parentFolder);
 
             if (!currentFolder.Folders.TryGetValue(parentFolder, out var folder))
             {
-                folder = new TarItemFolder(parentFolder, pf, sb.ToString());
+                var relativePathAndFolderName = sb.ToString();
+                Log.Debug("Adding folder entry {FolderName} with path {RelativePathAndName}", 
+                    parentFolder, 
+                    relativePathAndFolderName);
+                folder = new TarItemFolder(parentFolder, parentFolderSequence, relativePathAndFolderName);
                 currentFolder.Folders.Add(parentFolder, folder);
                 _contents.Add(folder);
             }
 
             currentFolder = folder;
 
-            pf.Add(currentFolder);
+            parentFolderSequence.Add(currentFolder);
         }
         
-        sb.Append('/').Append(file.Name);
+        sb.Append(TarPathSeparator).Append(file.Name);
 
-        var tarItemFile = new TarItemFile(file, file.Name, pf, sb.ToString())
+        var relativePathAndFileName = sb.ToString();
+        Log.Debug("Adding file entry {FileName} with path {RelativePathAndName}", 
+            file.Name, 
+            relativePathAndFileName);
+
+        var tarItemFile = new TarItemFile(file, file.Name, parentFolderSequence, sb.ToString())
         {
             ModificationTime = DateTimeOffset.FromFileTime(file.LastWriteTime.ToFileTimeUtc())
         };
@@ -61,6 +59,57 @@ public class Tarball(string basePath, string? additionalRootFolder = null)
         _contents.Add(tarItemFile);
 
         return tarItemFile;
+    }
+
+    public bool GetFolder(string relativeFolderPath, bool createIfNotExists, [NotNullWhen(true)] out TarItemFolder? tarItemFolder) 
+    {
+        if (createIfNotExists)
+            Log.Debug("Getting the folder {TheFolderPath} creating any missing folders along the way", relativeFolderPath);
+        else 
+            Log.Debug("Looking for the folder {TheFolderPath}", relativeFolderPath);
+        
+        var sb = new StringBuilder(relativeFolderPath.Length + _additionalRootFolder.Length + 10);
+        var parentFolderSequence = new List<TarItemFolder>();
+        var currentFolder = _anchor;
+        var first = true;
+        
+        foreach (var parentFolder in BuildTarballPathFolderSequenceFromRelativeFolderPath(relativeFolderPath))
+        {
+            if (first)
+                first = false;
+            else
+                sb.Append(TarPathSeparator);
+
+            sb.Append(parentFolder);
+
+            if (!currentFolder.Folders.TryGetValue(parentFolder, out var folder))
+            {
+                var relativePathAndFolderName = sb.ToString();
+
+                if (!createIfNotExists)
+                {
+                    Log.Debug("Could not find {TheFolderPath} because {RelativePathAndFolderName} does not exist", 
+                        relativeFolderPath, 
+                        relativePathAndFolderName);
+                    tarItemFolder = null;
+                    return false;
+                }
+                
+                Log.Debug("Adding folder entry {FolderName} with path {RelativePathAndName}", 
+                    parentFolder, 
+                    relativePathAndFolderName);
+                folder = new TarItemFolder(parentFolder, parentFolderSequence, relativePathAndFolderName);
+                currentFolder.Folders.Add(parentFolder, folder);
+                _contents.Add(folder);
+            }
+
+            currentFolder = folder;
+
+            parentFolderSequence.Add(currentFolder);
+        }
+
+        tarItemFolder = currentFolder;
+        return true;
     }
     
     public bool Save(FileInfo archiveFile)
@@ -73,12 +122,64 @@ public class Tarball(string basePath, string? additionalRootFolder = null)
         using var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
         using var tarWriter = new TarWriter(gzipStream);
         
-        foreach (var content in _contents.OrderBy(ti => ti.RelativePathAndName))
+        foreach (var content in OrderedAndFilteredContents)
         {
             content.SaveToTarball(tarWriter);
         }
 
         return true;
+    }
+
+    public IEnumerable<TarItem> OrderedAndFilteredContents => _contents
+        .Where(ti => !ti.AncestorOrItemIsHidden)
+        .OrderBy(ti => ti.RelativePathAndName);
+
+    private List<string> BuildTarballPathFolderSequenceFromRelativeFolderPath(string relativeFolderPath)
+    {
+        var retval = new List<string>();
+        
+        if (!string.IsNullOrEmpty(_additionalRootFolder))
+            retval.Add(_additionalRootFolder);
+        
+        var names = relativeFolderPath.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
+        
+        var first = (0 < names.Length && names[0] == ".") ? 1 : 0;
+            
+        for (var i = first; i < names.Length; i++)
+        {
+            retval.Add(names[i]);    
+        }
+
+        return retval;
+    }
+    
+    private List<string> BuildTarballPathFolderSequence(string? rootedPath)
+    {
+        if (rootedPath is null ||
+            !rootedPath.StartsWith(_basePath, StringComparison.Ordinal))
+        {
+            Log.Error("The path {RootedPath} lies outside the base path {TheBasePath}",
+                rootedPath,
+                _basePath);
+            throw new ArgumentException("The path lies outside the base path", nameof(rootedPath));
+        }
+
+        var retval = new List<string>();
+        
+        if (!string.IsNullOrEmpty(_additionalRootFolder))
+            retval.Add(_additionalRootFolder);
+        
+        var relativePath = Path.GetRelativePath(_basePath, rootedPath);
+        var names = relativePath.Split(PathSeparators, StringSplitOptions.RemoveEmptyEntries);
+        
+        var first = (0 < names.Length && names[0] == ".") ? 1 : 0;
+            
+        for (var i = first; i < names.Length; i++)
+        {
+            retval.Add(names[i]);    
+        }
+
+        return retval;
     }
     
     private readonly List<TarItem> _contents = [];
@@ -86,6 +187,7 @@ public class Tarball(string basePath, string? additionalRootFolder = null)
     private readonly string _basePath  = Guard.Against.InvalidInput(basePath, nameof(basePath), s => !string.IsNullOrWhiteSpace(s) && Directory.Exists(s));
     private readonly string _additionalRootFolder = string.IsNullOrWhiteSpace(additionalRootFolder) 
         ? string.Empty 
-        : additionalRootFolder + "/";
+        : additionalRootFolder;
     private static readonly char[] PathSeparators = ['\\', '/'];
+    private static readonly char TarPathSeparator = '/';
 }

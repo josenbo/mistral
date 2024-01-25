@@ -20,8 +20,8 @@ public class TarItemFolder : TarItem
             UserName = "root",
             Gid = 0,
             GroupName = "root",
-            Mode = (UnixFileMode)0b_111_111_101,
-            ModificationTime = DateTimeOffset.Now
+            Mode = (UnixFileMode)0b_111_101_101,
+            ModificationTime = ModificationTime
         };
         tarWriter.WriteEntry(entry);
     }

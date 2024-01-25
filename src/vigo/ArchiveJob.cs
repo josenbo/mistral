@@ -15,6 +15,11 @@ public class ArchiveJob : IJob
         {
             tarball.AddFile(fi); 
         }
+
+        tarball.GetFolder("Folder_1", true, out _);
+        tarball.GetFolder("Folder_2/Folder_2_2", true, out _);
+        tarball.GetFolder("b/c/d/ende", true, out _);
+        tarball.GetFolder("b/c/x/q/ende", true, out _);
         
         tarball.Save(new FileInfo(archiveFilePath));
 

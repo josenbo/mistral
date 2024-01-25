@@ -17,8 +17,8 @@ public class TarItemFile : TarItem
             UserName = "root",
             Gid = 0,
             GroupName = "root",
-            Mode = (UnixFileMode)0b_110_110_100,
-            ModificationTime = DateTimeOffset.Now
+            Mode = (UnixFileMode)0b_110_100_000,
+            ModificationTime = ModificationTime
         };
         using var fileStream = _fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
         entry.DataStream = fileStream;
