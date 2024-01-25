@@ -10,7 +10,7 @@ if (ok)
 {
     try
     {
-        var job = (IJob)new ArchiveJob();
+        var job = (IJob)new DeployfileFlowJob();
         Log.Information("Running the job {JobClass}", job);
         
         ok = job.Run();
