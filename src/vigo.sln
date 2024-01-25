@@ -9,10 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigobase", "vigobase\vigoba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigobase-tests", "vigobase-tests\vigobase-tests.csproj", "{2DCAC2D7-DDB5-41E7-9C3B-0F843F52841A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoscope", "vigoscope\vigoscope.csproj", "{88294C42-4B22-4457-BA41-6377C8554504}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoscope-tests", "vigoscope-tests\vigoscope-tests.csproj", "{4761DF93-830A-409E-ADA1-F948D71676EE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoconfig", "vigoconfig\vigoconfig.csproj", "{0F0E6362-4685-4A7A-8513-919C73F76E4A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoconfig-tests", "vigoconfig-tests\vigoconfig-tests.csproj", "{11B20042-9E5F-4F0C-B97C-3889F5D7A5C0}"
@@ -42,14 +38,6 @@ Global
 		{2DCAC2D7-DDB5-41E7-9C3B-0F843F52841A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DCAC2D7-DDB5-41E7-9C3B-0F843F52841A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DCAC2D7-DDB5-41E7-9C3B-0F843F52841A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{88294C42-4B22-4457-BA41-6377C8554504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88294C42-4B22-4457-BA41-6377C8554504}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88294C42-4B22-4457-BA41-6377C8554504}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88294C42-4B22-4457-BA41-6377C8554504}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4761DF93-830A-409E-ADA1-F948D71676EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4761DF93-830A-409E-ADA1-F948D71676EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4761DF93-830A-409E-ADA1-F948D71676EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4761DF93-830A-409E-ADA1-F948D71676EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F0E6362-4685-4A7A-8513-919C73F76E4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0F0E6362-4685-4A7A-8513-919C73F76E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F0E6362-4685-4A7A-8513-919C73F76E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
