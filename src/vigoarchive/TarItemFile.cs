@@ -1,4 +1,5 @@
 ﻿using System.Formats.Tar;
+using System.Text;
 
 namespace vigoarchive;
 
@@ -20,8 +21,16 @@ public class TarItemFile : TarItem
             Mode = (UnixFileMode)0b_110_100_000,
             ModificationTime = ModificationTime
         };
-        using var fileStream = _fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
-        entry.DataStream = fileStream;
+        //using var fileStream = _fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+        //entry.DataStream = fileStream;
+        //tarWriter.WriteEntry(entry);
+
+        using var stream = new MemoryStream();
+        using var sw = new StreamWriter(stream);
+        sw.Write("Hi there, Tar!");
+        sw.Flush();
+        stream.Position = 0;
+        entry.DataStream = stream;
         tarWriter.WriteEntry(entry);
     }
 

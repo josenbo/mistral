@@ -1,4 +1,6 @@
 ﻿using vigoarchive;
+using vigobase;
+using vigoconfig;
 
 namespace vigo;
 
@@ -7,11 +9,10 @@ internal class TarballBuilder
     public void Build()
     {
         var tarball = new Tarball(_configuration.RepositoryRoot.FullName, _configuration.AdditionalTarRootFolder);
-        
-        foreach (var di in EnumerateDirectoriesWithDeploymentConfiguration(_configuration.RepositoryRoot, _configuration.DeploymentConfigFileName))
-        {
-            
-        }
+        var defaults = GetDeploymentDefaults(_configuration.DeploymentConfigFileName);
+        var rules = new DeploymentRules(_configuration.RepositoryRoot, defaults);
+
+        ProcessDirectory(rules, tarball);
         
         tarball.Save(_configuration.Tarball);
     }
@@ -20,30 +21,38 @@ internal class TarballBuilder
     {
         _configuration = configuration;
     }
-    
-    private static IEnumerable<DirectoryInfo> EnumerateDirectoriesWithDeploymentConfiguration(DirectoryInfo baseDir, string deploymentConfigFileName)
+
+    private static void ProcessDirectory(DeploymentRules rules, Tarball tarball)
     {
-        foreach (var fi in baseDir.EnumerateFiles(deploymentConfigFileName, SearchOption.AllDirectories))
+        if (rules.DirectoryHasDeploymentRules)
         {
-            if (fi.Directory is not null && CanProcessFilesInPath(fi.Directory))
+            foreach (var fi in rules.CurrentDirectory.EnumerateFiles())
             {
-                yield return fi.Directory;
+                if (rules.DeployFile(fi))
+                    tarball.AddFile(fi);
             }
         }
-    }
 
-    private static bool CanProcessFilesInPath(DirectoryInfo? directoryInfo)
-    {
-        var cd = directoryInfo;
-        
-        while (cd is not null)
+        foreach (var di in rules.CurrentDirectory.EnumerateDirectories())
         {
-            if (cd.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
-                return false;
-            cd = cd.Parent;
+            if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
+                continue;
+            ProcessDirectory(new DeploymentRules(di, rules.CurrentDefaults), tarball);
         }
-
-        return true;
+    }
+    
+    private static DeploymentDefaults GetDeploymentDefaults(string deploymentConfigFileName)
+    {
+        return new DeploymentDefaults(
+            DeploymentConfigFileName: deploymentConfigFileName,
+            FileModeDefault: (UnixFileMode)0b_110_110_100,
+            DirectoryModeDefault: (UnixFileMode)0b_110_110_100,
+            SourceFileEncodingDefault: FileEncodingEnum.UTF_8,
+            TargetFileEncodingDefault: FileEncodingEnum.UTF_8,
+            LineEndingDefault: LineEndingEnum.LF,
+            TrailingNewlineDefault: true,
+            FileTypeDefault: FileTypeEnum.TextFile    
+        );
     }
 
     private readonly Configuration _configuration;
