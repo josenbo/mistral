@@ -2,54 +2,38 @@
 using Serilog.Events;
 using vigo;
 
-// Console.WriteLine("vigo console application needs to be re-enabled after the refactorings");
-
-var ok = ConfigureLogging(LogEventLevel.Information);
-
-if (ok)
+try
 {
-    try
-    {
-        var job = (IJob)new DeployfileFlowJob();
-        Log.Information("Running the job {JobClass}", job);
-        
-        ok = job.Run();
-    }
-    catch (Exception e)
-    {
-        Log.Error(e, "program aborted");
-        ok = false;
-    }
-}
+    var config = ConfigurationBuilder.ActiveConfiguration;
 
-Environment.ExitCode = ok ? 0 : 1;
+    ConfigureLogging(config.Logfile, config.LogLevel);
+
+    var builder = new TarballBuilder(config);
+    
+    builder.Build();
+    
+    Environment.ExitCode = 0;
+}
+catch (Exception e)
+{
+    Log.Error(e, "program aborted");
+    Console.Error.WriteLine("Fatal: the program terminates prematurely due to an error it could not handle");
+    Environment.ExitCode = 1;
+}
 
 return;
 
 
-bool ConfigureLogging(LogEventLevel? consoleLogEventLevel)
+void ConfigureLogging(FileInfo? logfile, LogEventLevel logLevelFile, LogEventLevel logLevelConsole = LogEventLevel.Warning)
 {
-    try
+    var loggerConfiguration = new LoggerConfiguration()
+        .MinimumLevel.Debug()
+        .WriteTo.Console(restrictedToMinimumLevel: logLevelConsole);
+
+    if (logfile is not null)
     {
-        var loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console(restrictedToMinimumLevel: consoleLogEventLevel ?? LogEventLevel.Information);
-
-        var envLogFolder = Environment.GetEnvironmentVariable("VIGO_LOG_FOLDER");
-
-        if (!string.IsNullOrWhiteSpace(envLogFolder) && Directory.Exists(envLogFolder))
-        {
-            var logFile = new FileInfo(Path.Combine(envLogFolder, "vigo.log"));
-            loggerConfiguration.WriteTo.File(logFile.FullName, restrictedToMinimumLevel: LogEventLevel.Debug, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2);
-        }
-
-        Log.Logger = loggerConfiguration.CreateLogger();
-
-        return true;
+        loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 4);
     }
-    catch (Exception e)
-    {
-        Console.WriteLine($"Could not configure logging: {e.Message}");
-        return false;
-    }
+
+    Log.Logger = loggerConfiguration.CreateLogger();
 }
