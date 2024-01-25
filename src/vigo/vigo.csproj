@@ -10,7 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\vigoarchive\vigoarchive.csproj" />
     <ProjectReference Include="..\vigobase\vigobase.csproj" />
-    <ProjectReference Include="..\vigoflow-deployfile\vigoflow-deployfile.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
