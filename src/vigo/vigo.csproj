@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Ardalis.GuardClauses" Version="4.3.0" />
+    <PackageReference Include="Ardalis.GuardClauses" Version="4.4.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\vigoarchive\vigoarchive.csproj" />
     <ProjectReference Include="..\vigobase\vigobase.csproj" />
+    <ProjectReference Include="..\vigoflow-deployfile\vigoflow-deployfile.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

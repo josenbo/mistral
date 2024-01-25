@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoarchive", "vigoarchive\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoarchive-tests", "vigoarchive-tests\vigoarchive-tests.csproj", "{A318281E-C1B7-4AD1-B574-F870F99AE5C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoflow-deployfile", "vigoflow-deployfile\vigoflow-deployfile.csproj", "{57A81963-E17D-4F57-A472-0D75502222B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigoflow-deployfile-tests", "vigoflow-deployfile-tests\vigoflow-deployfile-tests.csproj", "{C1CEEF94-826C-4E2B-BE2D-D89E19EB937E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +58,13 @@ Global
 		{A318281E-C1B7-4AD1-B574-F870F99AE5C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A318281E-C1B7-4AD1-B574-F870F99AE5C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A318281E-C1B7-4AD1-B574-F870F99AE5C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57A81963-E17D-4F57-A472-0D75502222B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57A81963-E17D-4F57-A472-0D75502222B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57A81963-E17D-4F57-A472-0D75502222B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57A81963-E17D-4F57-A472-0D75502222B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1CEEF94-826C-4E2B-BE2D-D89E19EB937E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1CEEF94-826C-4E2B-BE2D-D89E19EB937E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1CEEF94-826C-4E2B-BE2D-D89E19EB937E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1CEEF94-826C-4E2B-BE2D-D89E19EB937E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

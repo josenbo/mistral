@@ -1,4 +1,4 @@
-﻿namespace vigobase.Exceptions;
+﻿namespace vigobase;
 
 public abstract class VigoException : Exception
 {
