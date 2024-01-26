@@ -3,18 +3,7 @@ using Serilog;
 
 namespace vigobase;
 
-public record FileTransformDescription(
-    FileTypeEnum FileType,
-    FileInfo SourceFile,
-    FileEncodingEnum SourceFileEncoding,
-    FileInfo TargetFile,
-    FileEncodingEnum TargetFileEncoding,
-    FilePermission FilePermission,
-    LineEndingEnum LineEnding,
-    bool FixTrailingNewline
-);
-
-public class DeploymentTransformation
+internal class DeploymentTransformation : IDeploymentTransformationReadWrite, IDeploymentTransformationReadOnly
 {
     public FileInfo SourceFile { get; }
     public string? DifferentTargetFileName
@@ -82,8 +71,13 @@ public class DeploymentTransformation
     }
 
     public bool FixTrailingNewline { get; set; }
-    
-    public DeploymentTransformation(FileInfo sourceFile, DeploymentDefaults defaults)
+
+    IDeploymentTransformationReadOnly IDeploymentTransformationReadWrite.GetReadOnlyInterface()
+    {
+        return this;
+    }
+
+    internal DeploymentTransformation(FileInfo sourceFile, DeploymentDefaults defaults)
     {
         _targetFile = SourceFile = sourceFile;
         FileType = defaults.FileTypeDefault;
