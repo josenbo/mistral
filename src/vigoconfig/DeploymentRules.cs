@@ -1,4 +1,6 @@
-﻿namespace vigoconfig;
+﻿using vigobase;
+
+namespace vigoconfig;
 
 public class DeploymentRules
 {

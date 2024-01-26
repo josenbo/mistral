@@ -1,6 +1,4 @@
-﻿using vigobase;
-
-namespace vigoconfig;
+﻿namespace vigobase;
 
 public record DeploymentDefaults(
     string DeploymentConfigFileName,
