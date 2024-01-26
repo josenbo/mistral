@@ -173,6 +173,9 @@ public class FilePermissionTests
         Assert.IsType<FilePermissionSymbolic>(FilePermission.SpecifySymbolic("a-w"));
         Assert.IsType<FilePermissionSymbolic>(FilePermission.SpecifySymbolic("ugo=rwx"));
         Assert.IsType<FilePermissionSymbolic>(FilePermission.SpecifySymbolic("ugo=rwx,a-w,go+rx"));
+        Assert.IsType<FilePermissionSymbolic>(FilePermission.SpecifySymbolic("="));
+        Assert.IsType<FilePermissionSymbolic>(FilePermission.SpecifySymbolic("+x"));
+        Assert.IsType<FilePermissionSymbolic>(FilePermission.SpecifySymbolic("o="));
     }
 
     [Fact]

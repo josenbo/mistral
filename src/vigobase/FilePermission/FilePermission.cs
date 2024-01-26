@@ -17,6 +17,32 @@ public abstract partial record FilePermission
     public abstract FilePermissionTypeEnum FilePermissionType { get; }
     
     /// <summary>
+    /// Apply the specified Permissions on the default
+    /// unix file mode and return the calculated value  
+    /// </summary>
+    /// <param name="defaultUnixFileMode">
+    /// A default for the file mode. It is the callers
+    /// responsibility to provide different defaults
+    /// for file and directory permissions. 
+    /// </param>
+    /// <returns>The combination of the given default and the specified permission</returns>
+    /// <example>
+    /// Define a default 644 file mode and a symbolic
+    /// permission to give the user execute rights.
+    /// Computing the unix file mode from these values
+    /// will add UnixFileMode.UserExecute and result to 744.  
+    /// <code>
+    /// var defaultFileMode = UnixFileMode.UserRead |
+    ///                       UnixFileMode.UserWrite |
+    ///                       UnixFileMode.GroupRead |
+    ///                       UnixFileMode.OtherRead;
+    /// var symbolicPerm = new FilePermissionSymbolic("u+x");
+    /// var combinedFileMode = symbolicPerm.ComputeUnixFileMode(defaultFileMode);
+    /// </code>
+    /// </example>
+    public abstract UnixFileMode ComputeUnixFileMode(UnixFileMode defaultUnixFileMode); 
+    
+    /// <summary>
     /// Static factory method for using the default file permission
     /// </summary>
     public static FilePermissionDefault UseDefault => new FilePermissionDefault();
@@ -68,7 +94,24 @@ public abstract partial record FilePermission
     }
 
     internal static bool IsValidOctalNotation(string textRepresentation) => RexOctalDigits.IsMatch(textRepresentation);
-    internal static bool IsValidSymbolicNotation(string textRepresentation) => RexSymbolicNotation.IsMatch(textRepresentation);
+    internal static bool IsValidSymbolicNotation(string textRepresentation)
+    {
+        if (string.IsNullOrWhiteSpace(textRepresentation) || 40 < textRepresentation.Length)
+            return false;
+
+        var numberOfExpressions = 0;
+        // split the group of symbolic expressions on the comma delimiter
+        // and handle each expression separately 
+        foreach (var expr in textRepresentation.Split(',', StringSplitOptions.None))
+        {
+            // accept a maximum of 10 expressions
+            if (10 < ++numberOfExpressions) return false;
+            
+            if (!RexSymbolicNotation.IsMatch(expr)) return false;
+        }    
+        
+        return (0 < numberOfExpressions);
+    }
 
     private static readonly Regex RexOctalDigits = RexOctalDigitsPartial();
     private static readonly Regex RexSymbolicNotation = RexSymbolicNotationPartial();
@@ -76,6 +119,6 @@ public abstract partial record FilePermission
     [GeneratedRegex("^[0-7][0-7][0-7]$", RegexOptions.None)]
     private static partial Regex RexOctalDigitsPartial();
     
-    [GeneratedRegex("^(a|u|ug|ugo|uo|uog|g|gu|guo|go|gou|o|ou|oug|og|ogu)[-=+](|r|rw|rwx|rx|rxw|w|wr|wrx|wx|wxr|x|xr|xrw|xw|xwr)(,(a|u|ug|ugo|uo|uog|g|gu|guo|go|gou|o|ou|oug|og|ogu)[-=+](|r|rw|rwx|rx|rxw|w|wr|wrx|wx|wxr|x|xr|xrw|xw|xwr)){0,9}$", RegexOptions.None)]
+    [GeneratedRegex("^(((|a|u|ug|ugo|uo|uog|g|gu|guo|go|gou|o|ou|oug|og|ogu)=(|r|rw|rwx|rx|rxw|w|wr|wrx|wx|wxr|x|xr|xrw|xw|xwr))|((|a|u|ug|ugo|uo|uog|g|gu|guo|go|gou|o|ou|oug|og|ogu)[-+](r|rw|rwx|rx|rxw|w|wr|wrx|wx|wxr|x|xr|xrw|xw|xwr)))$$", RegexOptions.None)]
     private static partial Regex RexSymbolicNotationPartial();
 }
