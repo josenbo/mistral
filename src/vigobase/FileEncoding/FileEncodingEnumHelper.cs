@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using JetBrains.Annotations;
 
@@ -28,5 +29,25 @@ public static class FileEncodingEnumHelper
             FileEncodingEnum.Windows_1252 => System.Text.Encoding.GetEncoding(1252),
             _ => throw new ArgumentOutOfRangeException(nameof(value), value, $"Do not know how to handle the encoding {value}")
         };
+    }
+    public static bool TryParse(string text, [NotNullWhen(true)] out FileEncodingEnum? result)
+    {
+        result = text
+                .Replace("_", "")
+                .Replace("-", "")
+                .Replace(" ", "")
+                .Replace(".", "")
+                .Trim()
+                .ToLower() switch
+        {
+            "utf8" => FileEncodingEnum.UTF_8,
+            "ascii" => FileEncodingEnum.Ascii,
+            "iso88591" => FileEncodingEnum.ISO_8859_1,
+            "iso885915" => FileEncodingEnum.ISO_8859_15,
+            "windows1252" => FileEncodingEnum.Windows_1252,
+            "win1252" => FileEncodingEnum.Windows_1252,
+            _ => null
+        };
+        return result.HasValue;
     }
 }

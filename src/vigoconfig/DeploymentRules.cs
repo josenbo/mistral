@@ -1,24 +1,25 @@
-﻿using vigobase;
+﻿using System.Text.RegularExpressions;
+using vigobase;
 
 namespace vigoconfig;
 
-public class DeploymentRules
+public class DirectoryDeploymentController
 {
-    public DeploymentDefaults CurrentDefaults { get; }
-    public DirectoryInfo CurrentDirectory { get; }
-    public bool DirectoryHasDeploymentRules { get; }
+    public DeploymentDefaults Defaults { get; }
+    public DirectoryInfo Location { get; }
+    public bool HasDeploymentRules { get; }
 
     public bool DeployFile(FileInfo file)
     {
-        return DirectoryHasDeploymentRules && file.Exists && file.Name != _defaults.DeploymentConfigFileName;
+        return HasDeploymentRules && file.Exists && file.Name != _defaults.DeploymentConfigFileName;
     }
     
-    public DeploymentRules(DirectoryInfo directory, DeploymentDefaults defaults)
+    public DirectoryDeploymentController(DirectoryInfo directory, DeploymentDefaults defaults)
     {
         _defaults = defaults;
-        CurrentDefaults = defaults;
-        CurrentDirectory = directory;
-        DirectoryHasDeploymentRules = File.Exists(Path.Combine(directory.FullName, _defaults.DeploymentConfigFileName));
+        Defaults = defaults;
+        Location = directory;
+        HasDeploymentRules = File.Exists(Path.Combine(directory.FullName, _defaults.DeploymentConfigFileName));
     }
 
     private readonly DeploymentDefaults _defaults;

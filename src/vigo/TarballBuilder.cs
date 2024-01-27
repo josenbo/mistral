@@ -10,7 +10,7 @@ internal class TarballBuilder
     {
         var tarball = new Tarball(_configuration.RepositoryRoot.FullName, _configuration.AdditionalTarRootFolder);
         var defaults = GetDeploymentDefaults(_configuration.DeploymentConfigFileName);
-        var rules = new DeploymentRules(_configuration.RepositoryRoot, defaults);
+        var rules = new DirectoryDeploymentController(_configuration.RepositoryRoot, defaults);
 
         ProcessDirectory(rules, tarball);
         
@@ -22,22 +22,22 @@ internal class TarballBuilder
         _configuration = configuration;
     }
 
-    private static void ProcessDirectory(DeploymentRules rules, Tarball tarball)
+    private static void ProcessDirectory(DirectoryDeploymentController controller, Tarball tarball)
     {
-        if (rules.DirectoryHasDeploymentRules)
+        if (controller.HasDeploymentRules)
         {
-            foreach (var fi in rules.CurrentDirectory.EnumerateFiles())
+            foreach (var fi in controller.Location.EnumerateFiles())
             {
-                if (rules.DeployFile(fi))
+                if (controller.DeployFile(fi))
                     tarball.AddFile(fi);
             }
         }
 
-        foreach (var di in rules.CurrentDirectory.EnumerateDirectories())
+        foreach (var di in controller.Location.EnumerateDirectories())
         {
             if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
                 continue;
-            ProcessDirectory(new DeploymentRules(di, rules.CurrentDefaults), tarball);
+            ProcessDirectory(new DirectoryDeploymentController(di, controller.Defaults), tarball);
         }
     }
     
@@ -46,7 +46,7 @@ internal class TarballBuilder
         return new DeploymentDefaults(
             DeploymentConfigFileName: deploymentConfigFileName,
             FileModeDefault: (UnixFileMode)0b_110_110_100,
-            DirectoryModeDefault: (UnixFileMode)0b_110_110_100,
+            DirectoryModeDefault: (UnixFileMode)0b_111_111_101,
             SourceFileEncodingDefault: FileEncodingEnum.UTF_8,
             TargetFileEncodingDefault: FileEncodingEnum.UTF_8,
             LineEndingDefault: LineEndingEnum.LF,

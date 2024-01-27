@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
@@ -93,6 +94,38 @@ public abstract partial record FilePermission
         return new FilePermissionSymbolic(symbolicNotation);
     }
 
+    /// <summary>
+    /// Check if the given text is a valid octal or symbolic notation
+    /// and, if that is the case, return a permission object of that type.
+    /// If the text is empty, return the default permission. 
+    /// </summary>
+    /// <param name="text">The text to parse for a valid notation</param>
+    /// <param name="result">Null, if the notation was not recognized or a permission object with the appropriate subtype</param>
+    /// <returns>True, if the notation was recognized</returns>
+    public static bool TryParse(string text, [NotNullWhen(true)] out FilePermission? result)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            result = UseDefault;
+            return true;
+        }
+
+        if (IsValidOctalNotation(text))
+        {
+            result = new FilePermissionOctal(text);
+            return true;
+        }
+        
+        if (IsValidSymbolicNotation(text))
+        {
+            result = new FilePermissionSymbolic(text);
+            return true;
+        }
+
+        result = null;
+        return false;
+    }
+    
     internal static bool IsValidOctalNotation(string textRepresentation) => RexOctalDigits.IsMatch(textRepresentation);
     internal static bool IsValidSymbolicNotation(string textRepresentation)
     {

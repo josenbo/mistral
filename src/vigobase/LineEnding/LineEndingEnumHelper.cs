@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace vigobase;
@@ -19,5 +20,26 @@ public static class LineEndingEnumHelper
             LineEndingEnum.CR_LF => "\r\n",
             _ => throw new ArgumentOutOfRangeException(nameof(value), value, $"Unknown line ending {value} cannot be converted into a newline sequence")
         };
+    }
+    
+    public static bool TryParse(string text, [NotNullWhen(true)] out LineEndingEnum? result)
+    {
+        result = text
+                .Replace("_", "")
+                .Replace("-", "")
+                .Replace(" ", "")
+                .Replace(".", "")
+                .Trim()
+                .ToLower() switch
+            {
+                "crlf" => LineEndingEnum.CR_LF,
+                "windows" => LineEndingEnum.CR_LF,
+                "win" => LineEndingEnum.CR_LF,
+                "lf" => LineEndingEnum.LF,
+                "unix" => LineEndingEnum.LF,
+                "linux" => LineEndingEnum.LF,
+                _ => null
+            };
+        return result.HasValue;
     }
 }
