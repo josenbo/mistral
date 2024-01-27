@@ -1,0 +1,597 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.FilePermissionValueDefined
+  commentId: T:vigocfg.FilePermissionValueDefined
+  id: FilePermissionValueDefined
+  parent: vigocfg
+  children:
+  - vigocfg.FilePermissionValueDefined.#ctor(System.Boolean,System.String)
+  - vigocfg.FilePermissionValueDefined.IsSymbolicNotation
+  - vigocfg.FilePermissionValueDefined.TextRepresentation
+  langs:
+  - csharp
+  - vb
+  name: FilePermissionValueDefined
+  nameWithType: FilePermissionValueDefined
+  fullName: vigocfg.FilePermissionValueDefined
+  type: Class
+  source:
+    remote:
+      path: src/vigocfg/FilePermissionValue.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: FilePermissionValueDefined
+    path: ../src/vigocfg/FilePermissionValue.cs
+    startLine: 36
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: 'public record FilePermissionValueDefined : FilePermissionValue, IEquatable<FilePermissionValue>, IEquatable<FilePermissionValueDefined>'
+    content.vb: Public Class FilePermissionValueDefined Inherits FilePermissionValue Implements IEquatable(Of FilePermissionValue), IEquatable(Of FilePermissionValueDefined)
+  inheritance:
+  - System.Object
+  - vigocfg.FilePermissionValue
+  implements:
+  - System.IEquatable{vigocfg.FilePermissionValue}
+  - System.IEquatable{vigocfg.FilePermissionValueDefined}
+  inheritedMembers:
+  - vigocfg.FilePermissionValue.Undefined
+  - vigocfg.FilePermissionValue.FromOctalText(System.String)
+  - vigocfg.FilePermissionValue.FromSymbolicNotation(System.String)
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: vigocfg.FilePermissionValueDefined.#ctor(System.Boolean,System.String)
+  commentId: M:vigocfg.FilePermissionValueDefined.#ctor(System.Boolean,System.String)
+  id: '#ctor(System.Boolean,System.String)'
+  parent: vigocfg.FilePermissionValueDefined
+  langs:
+  - csharp
+  - vb
+  name: FilePermissionValueDefined(bool, string)
+  nameWithType: FilePermissionValueDefined.FilePermissionValueDefined(bool, string)
+  fullName: vigocfg.FilePermissionValueDefined.FilePermissionValueDefined(bool, string)
+  type: Constructor
+  source:
+    remote:
+      path: src/vigocfg/FilePermissionValue.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: .ctor
+    path: ../src/vigocfg/FilePermissionValue.cs
+    startLine: 36
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: public FilePermissionValueDefined(bool IsSymbolicNotation, string TextRepresentation)
+    parameters:
+    - id: IsSymbolicNotation
+      type: System.Boolean
+    - id: TextRepresentation
+      type: System.String
+    content.vb: Public Sub New(IsSymbolicNotation As Boolean, TextRepresentation As String)
+  overload: vigocfg.FilePermissionValueDefined.#ctor*
+  nameWithType.vb: FilePermissionValueDefined.New(Boolean, String)
+  fullName.vb: vigocfg.FilePermissionValueDefined.New(Boolean, String)
+  name.vb: New(Boolean, String)
+- uid: vigocfg.FilePermissionValueDefined.IsSymbolicNotation
+  commentId: P:vigocfg.FilePermissionValueDefined.IsSymbolicNotation
+  id: IsSymbolicNotation
+  parent: vigocfg.FilePermissionValueDefined
+  langs:
+  - csharp
+  - vb
+  name: IsSymbolicNotation
+  nameWithType: FilePermissionValueDefined.IsSymbolicNotation
+  fullName: vigocfg.FilePermissionValueDefined.IsSymbolicNotation
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/FilePermissionValue.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: IsSymbolicNotation
+    path: ../src/vigocfg/FilePermissionValue.cs
+    startLine: 36
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: public bool IsSymbolicNotation { get; init; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property IsSymbolicNotation As Boolean
+  overload: vigocfg.FilePermissionValueDefined.IsSymbolicNotation*
+- uid: vigocfg.FilePermissionValueDefined.TextRepresentation
+  commentId: P:vigocfg.FilePermissionValueDefined.TextRepresentation
+  id: TextRepresentation
+  parent: vigocfg.FilePermissionValueDefined
+  langs:
+  - csharp
+  - vb
+  name: TextRepresentation
+  nameWithType: FilePermissionValueDefined.TextRepresentation
+  fullName: vigocfg.FilePermissionValueDefined.TextRepresentation
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/FilePermissionValue.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TextRepresentation
+    path: ../src/vigocfg/FilePermissionValue.cs
+    startLine: 36
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: public string TextRepresentation { get; init; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property TextRepresentation As String
+  overload: vigocfg.FilePermissionValueDefined.TextRepresentation*
+references:
+- uid: vigocfg
+  commentId: N:vigocfg
+  href: vigocfg.html
+  name: vigocfg
+  nameWithType: vigocfg
+  fullName: vigocfg
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: vigocfg.FilePermissionValue
+  commentId: T:vigocfg.FilePermissionValue
+  parent: vigocfg
+  href: vigocfg.FilePermissionValue.html
+  name: FilePermissionValue
+  nameWithType: FilePermissionValue
+  fullName: vigocfg.FilePermissionValue
+- uid: System.IEquatable{vigocfg.FilePermissionValue}
+  commentId: T:System.IEquatable{vigocfg.FilePermissionValue}
+  parent: System
+  definition: System.IEquatable`1
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  name: IEquatable<FilePermissionValue>
+  nameWithType: IEquatable<FilePermissionValue>
+  fullName: System.IEquatable<vigocfg.FilePermissionValue>
+  nameWithType.vb: IEquatable(Of FilePermissionValue)
+  fullName.vb: System.IEquatable(Of vigocfg.FilePermissionValue)
+  name.vb: IEquatable(Of FilePermissionValue)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: <
+  - uid: vigocfg.FilePermissionValue
+    name: FilePermissionValue
+    href: vigocfg.FilePermissionValue.html
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: vigocfg.FilePermissionValue
+    name: FilePermissionValue
+    href: vigocfg.FilePermissionValue.html
+  - name: )
+- uid: System.IEquatable{vigocfg.FilePermissionValueDefined}
+  commentId: T:System.IEquatable{vigocfg.FilePermissionValueDefined}
+  parent: System
+  definition: System.IEquatable`1
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  name: IEquatable<FilePermissionValueDefined>
+  nameWithType: IEquatable<FilePermissionValueDefined>
+  fullName: System.IEquatable<vigocfg.FilePermissionValueDefined>
+  nameWithType.vb: IEquatable(Of FilePermissionValueDefined)
+  fullName.vb: System.IEquatable(Of vigocfg.FilePermissionValueDefined)
+  name.vb: IEquatable(Of FilePermissionValueDefined)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: <
+  - uid: vigocfg.FilePermissionValueDefined
+    name: FilePermissionValueDefined
+    href: vigocfg.FilePermissionValueDefined.html
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: vigocfg.FilePermissionValueDefined
+    name: FilePermissionValueDefined
+    href: vigocfg.FilePermissionValueDefined.html
+  - name: )
+- uid: vigocfg.FilePermissionValue.Undefined
+  commentId: P:vigocfg.FilePermissionValue.Undefined
+  parent: vigocfg.FilePermissionValue
+  href: vigocfg.FilePermissionValue.html#vigocfg_FilePermissionValue_Undefined
+  name: Undefined
+  nameWithType: FilePermissionValue.Undefined
+  fullName: vigocfg.FilePermissionValue.Undefined
+- uid: vigocfg.FilePermissionValue.FromOctalText(System.String)
+  commentId: M:vigocfg.FilePermissionValue.FromOctalText(System.String)
+  parent: vigocfg.FilePermissionValue
+  isExternal: true
+  href: vigocfg.FilePermissionValue.html#vigocfg_FilePermissionValue_FromOctalText_System_String_
+  name: FromOctalText(string)
+  nameWithType: FilePermissionValue.FromOctalText(string)
+  fullName: vigocfg.FilePermissionValue.FromOctalText(string)
+  nameWithType.vb: FilePermissionValue.FromOctalText(String)
+  fullName.vb: vigocfg.FilePermissionValue.FromOctalText(String)
+  name.vb: FromOctalText(String)
+  spec.csharp:
+  - uid: vigocfg.FilePermissionValue.FromOctalText(System.String)
+    name: FromOctalText
+    href: vigocfg.FilePermissionValue.html#vigocfg_FilePermissionValue_FromOctalText_System_String_
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: vigocfg.FilePermissionValue.FromOctalText(System.String)
+    name: FromOctalText
+    href: vigocfg.FilePermissionValue.html#vigocfg_FilePermissionValue_FromOctalText_System_String_
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: vigocfg.FilePermissionValue.FromSymbolicNotation(System.String)
+  commentId: M:vigocfg.FilePermissionValue.FromSymbolicNotation(System.String)
+  parent: vigocfg.FilePermissionValue
+  isExternal: true
+  href: vigocfg.FilePermissionValue.html#vigocfg_FilePermissionValue_FromSymbolicNotation_System_String_
+  name: FromSymbolicNotation(string)
+  nameWithType: FilePermissionValue.FromSymbolicNotation(string)
+  fullName: vigocfg.FilePermissionValue.FromSymbolicNotation(string)
+  nameWithType.vb: FilePermissionValue.FromSymbolicNotation(String)
+  fullName.vb: vigocfg.FilePermissionValue.FromSymbolicNotation(String)
+  name.vb: FromSymbolicNotation(String)
+  spec.csharp:
+  - uid: vigocfg.FilePermissionValue.FromSymbolicNotation(System.String)
+    name: FromSymbolicNotation
+    href: vigocfg.FilePermissionValue.html#vigocfg_FilePermissionValue_FromSymbolicNotation_System_String_
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: vigocfg.FilePermissionValue.FromSymbolicNotation(System.String)
+    name: FromSymbolicNotation
+    href: vigocfg.FilePermissionValue.html#vigocfg_FilePermissionValue_FromSymbolicNotation_System_String_
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.IEquatable`1
+  commentId: T:System.IEquatable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  name: IEquatable<T>
+  nameWithType: IEquatable<T>
+  fullName: System.IEquatable<T>
+  nameWithType.vb: IEquatable(Of T)
+  fullName.vb: System.IEquatable(Of T)
+  name.vb: IEquatable(Of T)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: vigocfg.FilePermissionValueDefined.#ctor*
+  commentId: Overload:vigocfg.FilePermissionValueDefined.#ctor
+  href: vigocfg.FilePermissionValueDefined.html#vigocfg_FilePermissionValueDefined__ctor_System_Boolean_System_String_
+  name: FilePermissionValueDefined
+  nameWithType: FilePermissionValueDefined.FilePermissionValueDefined
+  fullName: vigocfg.FilePermissionValueDefined.FilePermissionValueDefined
+  nameWithType.vb: FilePermissionValueDefined.New
+  fullName.vb: vigocfg.FilePermissionValueDefined.New
+  name.vb: New
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: vigocfg.FilePermissionValueDefined.IsSymbolicNotation*
+  commentId: Overload:vigocfg.FilePermissionValueDefined.IsSymbolicNotation
+  href: vigocfg.FilePermissionValueDefined.html#vigocfg_FilePermissionValueDefined_IsSymbolicNotation
+  name: IsSymbolicNotation
+  nameWithType: FilePermissionValueDefined.IsSymbolicNotation
+  fullName: vigocfg.FilePermissionValueDefined.IsSymbolicNotation
+- uid: vigocfg.FilePermissionValueDefined.TextRepresentation*
+  commentId: Overload:vigocfg.FilePermissionValueDefined.TextRepresentation
+  href: vigocfg.FilePermissionValueDefined.html#vigocfg_FilePermissionValueDefined_TextRepresentation
+  name: TextRepresentation
+  nameWithType: FilePermissionValueDefined.TextRepresentation
+  fullName: vigocfg.FilePermissionValueDefined.TextRepresentation

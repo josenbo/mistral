@@ -1,0 +1,46 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.Settings
+  commentId: N:vigocfg.Settings
+  id: vigocfg.Settings
+  children:
+  - vigocfg.Settings.Configuration
+  langs:
+  - csharp
+  - vb
+  name: vigocfg.Settings
+  nameWithType: vigocfg.Settings
+  fullName: vigocfg.Settings
+  type: Namespace
+  assemblies:
+  - vigocfg
+references:
+- uid: vigocfg.Settings.Configuration
+  commentId: T:vigocfg.Settings.Configuration
+  parent: vigocfg.Settings
+  href: vigocfg.Settings.Configuration.html
+  name: Configuration
+  nameWithType: Configuration
+  fullName: vigocfg.Settings.Configuration
+- uid: vigocfg.Settings
+  commentId: N:vigocfg.Settings
+  href: vigocfg.html
+  name: vigocfg.Settings
+  nameWithType: vigocfg.Settings
+  fullName: vigocfg.Settings
+  spec.csharp:
+  - uid: vigocfg
+    name: vigocfg
+    href: vigocfg.html
+  - name: .
+  - uid: vigocfg.Settings
+    name: Settings
+    href: vigocfg.Settings.html
+  spec.vb:
+  - uid: vigocfg
+    name: vigocfg
+    href: vigocfg.html
+  - name: .
+  - uid: vigocfg.Settings
+    name: Settings
+    href: vigocfg.Settings.html
