@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using vigobase;
+﻿using vigobase;
 
 namespace vigoconfig;
 
@@ -7,13 +6,14 @@ public class DirectoryDeploymentController
 {
     public DeploymentDefaults Defaults { get; }
     public DirectoryInfo Location { get; }
-    public bool HasDeploymentRules { get; }
 
-    public bool DeployFile(FileInfo file)
+    public IDeploymentTransformationReadWrite GetFileTransformation(FileInfo file)
     {
-        return HasDeploymentRules && file.Exists && file.Name != _defaults.DeploymentConfigFileName;
+        var transformation = DeploymentTransformationFactory.Create(file, _defaults);
+        transformation.CanDeploy = HasDeploymentRules && file.Exists && file.Name != _defaults.DeploymentConfigFileName;
+        return transformation;
     }
-    
+
     public DirectoryDeploymentController(DirectoryInfo directory, DeploymentDefaults defaults)
     {
         _defaults = defaults;
@@ -22,5 +22,7 @@ public class DirectoryDeploymentController
         HasDeploymentRules = File.Exists(Path.Combine(directory.FullName, _defaults.DeploymentConfigFileName));
     }
 
+    private bool HasDeploymentRules { get; }
+    
     private readonly DeploymentDefaults _defaults;
 }

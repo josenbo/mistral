@@ -5,6 +5,7 @@ namespace vigobase;
 
 internal class DeploymentTransformation : IDeploymentTransformationReadWrite, IDeploymentTransformationReadOnly
 {
+    public bool CanDeploy { get; set; }
     public FileInfo SourceFile { get; }
     public string? DifferentTargetFileName
     {
@@ -17,7 +18,7 @@ internal class DeploymentTransformation : IDeploymentTransformationReadWrite, ID
             {
                 _differentTargetFileName = string.IsNullOrEmpty(value) ? null : value;
 
-                if (_differentTargetFileName == null || _differentTargetFileName != SourceFile.Name)
+                if (_differentTargetFileName == null || _differentTargetFileName == SourceFile.Name)
                 {
                     _targetFile = SourceFile;
                     return;

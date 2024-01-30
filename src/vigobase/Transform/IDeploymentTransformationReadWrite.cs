@@ -11,5 +11,6 @@ public interface IDeploymentTransformationReadWrite
     FilePermission FilePermission { get; set; }
     LineEndingEnum LineEnding { get; set; }
     bool FixTrailingNewline { get; set; }
+    bool CanDeploy { get; set; }
     IDeploymentTransformationReadOnly GetReadOnlyInterface();
 }

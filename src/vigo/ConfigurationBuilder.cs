@@ -12,14 +12,25 @@ internal static class ConfigurationBuilder
     {
         try
         {
-            return new Configuration(
-                RepositoryRoot: GetRepositoryRoot(),
-                Tarball: GetTarballFile(),
-                DeploymentConfigFileName: GetDeploymentConfigFileName(),
-                AdditionalTarRootFolder: GetAdditionalTarRootFolder(),
-                Logfile: GetLogfile(),
-                LogLevel: GetLogLevel()
-            );
+            var command = GetCommand();
+
+            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+            return command switch
+            {
+                CommandEnum.DeployToTarball => new ConfigurationDeployToTarball(
+                    RepositoryRoot: GetRepositoryRoot(),
+                    Tarball: GetTarballFile(), 
+                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
+                    AdditionalTarRootFolder: GetAdditionalTarRootFolder(), 
+                    Logfile: GetLogfile(),
+                    LogLevel: GetLogLevel()),
+                CommandEnum.CheckCommit => new ConfigurationCheckCommit(
+                    RepositoryRoot: GetRepositoryRoot(),
+                    DeploymentConfigFileName: GetDeploymentConfigFileName(), 
+                    Logfile: GetLogfile(),
+                    LogLevel: GetLogLevel()),
+                _ => throw new VigoFatalException($"The command {command} is not handled")
+            };
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -28,6 +39,37 @@ internal static class ConfigurationBuilder
         }
     }
 
+    private static CommandEnum GetCommand()
+    {
+        try
+        {
+            const string environmentVariableName = "VIGO_COMMAND";
+        
+            var command = GetEnvironmentVariable(environmentVariableName);
+        
+            if (command is null)
+                throw new VigoFatalException(
+                    $"Expected the command in the environment variable {environmentVariableName}");
+
+            if (20 < command.Length)
+                command = command[..20];
+
+            command = command.Trim().ToLowerInvariant();
+
+            return command switch
+            {
+                "tarball" => CommandEnum.DeployToTarball,
+                "check" => CommandEnum.CheckCommit,
+                _ => throw new VigoFatalException($"Expected the command to be either Tarball or Check")
+            };
+        }
+        catch (Exception e) when (e is not VigoException)
+        {
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetRepositoryRoot)}(). Message was: {e.Message}");
+            throw new VigoFatalException("Startup configuration failed", e);
+        }
+    }
+    
     private static DirectoryInfo GetRepositoryRoot()
     {
         try
@@ -197,5 +239,5 @@ internal static class ConfigurationBuilder
         return Environment.GetEnvironmentVariable(environmentVariableName);
     }
     
-    private static Configuration? _activeConfiguration = null;
+    private static Configuration? _activeConfiguration;
 }

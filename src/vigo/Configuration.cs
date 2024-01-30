@@ -2,11 +2,12 @@
 
 namespace vigo;
 
-internal record Configuration(
-    DirectoryInfo RepositoryRoot, 
-    FileInfo Tarball, 
+internal abstract record Configuration(
+    DirectoryInfo RepositoryRoot,
     string DeploymentConfigFileName,
-    string? AdditionalTarRootFolder,
     FileInfo? Logfile,
     LogEventLevel LogLevel
-    );
+)
+{
+    public abstract CommandEnum Command { get; }
+}

@@ -4,11 +4,18 @@ using vigo;
 
 try
 {
-    Configuration config = ConfigurationBuilder.ActiveConfiguration;
+    var config = ConfigurationBuilder.ActiveConfiguration;
 
     ConfigureLogging(config.Logfile, config.LogLevel);
 
-    Environment.ExitCode = BuildAndCleanup(config) ? 0 : 1;
+    var result = config switch
+    {
+        ConfigurationDeployToTarball configurationDeployToTarball => BuildTarball(configurationDeployToTarball),
+        ConfigurationCheckCommit configurationCheckCommit => RunCommitChecks(configurationCheckCommit),
+        _ => false
+    };
+    
+    Environment.ExitCode = result ? 0 : 1;
 }
 catch (Exception e)
 {
@@ -19,7 +26,12 @@ catch (Exception e)
 
 return;
 
-bool BuildAndCleanup(Configuration config)
+bool RunCommitChecks(ConfigurationCheckCommit config)
+{
+    return true;
+}
+
+bool BuildTarball(ConfigurationDeployToTarball config)
 {
     try
     {
