@@ -3,16 +3,20 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal record RuleToCopyUnconditional(
+internal record RuleToCopyMatchingPattern(
     int Index,
+    string NameToMatch, 
+    string NameReplacement,
     FileTypeEnum FileType,
     FileEncodingEnum SourceFileEncoding,
     FileEncodingEnum TargetFileEncoding,
     FilePermission FilePermission,
     LineEndingEnum LineEnding,
     bool FixTrailingNewline
-) : RuleToCopy(
+) : RuleToCopyConditional(
     Index,
+    NameToMatch, 
+    NameReplacement,
     FileType,
     SourceFileEncoding,
     TargetFileEncoding,

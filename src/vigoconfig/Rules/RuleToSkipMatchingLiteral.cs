@@ -4,11 +4,11 @@ using vigobase;
 namespace vigoconfig;
 
 internal record RuleToSkipMatchingLiteral(
-    string NameToMatch,
-    string NameReplacement
+    int Index,
+    string NameToMatch
 ) : RuleToSkipConditional(
-    NameToMatch,
-    NameReplacement
+    Index,
+    NameToMatch
 )
 {
     internal override bool GetTransformation(string filename, out RuleCheckResultEnum result,

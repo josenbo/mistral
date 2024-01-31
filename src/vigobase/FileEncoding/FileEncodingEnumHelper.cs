@@ -30,9 +30,9 @@ public static class FileEncodingEnumHelper
             _ => throw new ArgumentOutOfRangeException(nameof(value), value, $"Do not know how to handle the encoding {value}")
         };
     }
-    public static bool TryParse(string text, [NotNullWhen(true)] out FileEncodingEnum? result)
+    public static bool TryParse(string? text, [NotNullWhen(true)] out FileEncodingEnum? result)
     {
-        result = text
+        result = (text ?? string.Empty)
                 .Replace("_", "")
                 .Replace("-", "")
                 .Replace(" ", "")

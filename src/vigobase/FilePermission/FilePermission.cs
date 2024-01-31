@@ -102,7 +102,7 @@ public abstract partial record FilePermission
     /// <param name="text">The text to parse for a valid notation</param>
     /// <param name="result">Null, if the notation was not recognized or a permission object with the appropriate subtype</param>
     /// <returns>True, if the notation was recognized</returns>
-    public static bool TryParse(string text, [NotNullWhen(true)] out FilePermission? result)
+    public static bool TryParse(string? text, [NotNullWhen(true)] out FilePermission? result)
     {
         if (string.IsNullOrWhiteSpace(text))
         {

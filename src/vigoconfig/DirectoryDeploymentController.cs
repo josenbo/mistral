@@ -19,10 +19,14 @@ public class DirectoryDeploymentController
         _defaults = defaults;
         Defaults = defaults;
         Location = directory;
+        _folderConfig = FolderConfigFactory.Create(directory, defaults);
         HasDeploymentRules = File.Exists(Path.Combine(directory.FullName, _defaults.DeploymentConfigFileName));
     }
 
     private bool HasDeploymentRules { get; }
     
     private readonly DeploymentDefaults _defaults;
+    private readonly FolderConfig _folderConfig;
+
+
 }

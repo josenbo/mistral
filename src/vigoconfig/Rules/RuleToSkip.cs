@@ -1,3 +1,3 @@
 ﻿namespace vigoconfig;
 
-internal abstract record RuleToSkip() : Rule();
+internal abstract record RuleToSkip(int Index) : Rule(Index);

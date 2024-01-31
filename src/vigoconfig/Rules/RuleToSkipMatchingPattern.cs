@@ -3,7 +3,13 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal record RuleToSkipUnconditional(int Index) : RuleToSkip(Index)
+internal record RuleToSkipMatchingPattern(
+    int Index,
+    string NameToMatch
+) : RuleToSkipConditional(
+    Index,
+    NameToMatch
+)
 {
     internal override bool GetTransformation(string filename, out RuleCheckResultEnum result,
         [NotNullWhen(true)] out IDeploymentTransformationReadWrite? transformation)

@@ -1,6 +1,6 @@
 ﻿namespace vigoconfig;
 
 internal abstract record RuleToSkipConditional(
-    string NameToMatch, 
-    string NameReplacement
-) : RuleToSkip();
+    int Index,
+    string NameToMatch 
+) : RuleToSkip(Index);

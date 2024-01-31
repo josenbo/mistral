@@ -22,9 +22,9 @@ public static class LineEndingEnumHelper
         };
     }
     
-    public static bool TryParse(string text, [NotNullWhen(true)] out LineEndingEnum? result)
+    public static bool TryParse(string? text, [NotNullWhen(true)] out LineEndingEnum? result)
     {
-        result = text
+        result = (text ?? string.Empty)
                 .Replace("_", "")
                 .Replace("-", "")
                 .Replace(" ", "")

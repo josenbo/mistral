@@ -4,6 +4,7 @@ using vigobase;
 namespace vigoconfig;
 
 internal record RuleToCopyMatchingLiteral(
+    int Index,
     string NameToMatch, 
     string NameReplacement,
     FileTypeEnum FileType,
@@ -13,6 +14,7 @@ internal record RuleToCopyMatchingLiteral(
     LineEndingEnum LineEnding,
     bool FixTrailingNewline
 ) : RuleToCopyConditional(
+    Index,
     NameToMatch, 
     NameReplacement,
     FileType,

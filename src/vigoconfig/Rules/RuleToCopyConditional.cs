@@ -3,6 +3,7 @@
 namespace vigoconfig;
 
 internal abstract record RuleToCopyConditional(
+    int Index,
     string NameToMatch, 
     string NameReplacement,
     FileTypeEnum FileType,
@@ -12,6 +13,7 @@ internal abstract record RuleToCopyConditional(
     LineEndingEnum LineEnding,
     bool FixTrailingNewline
 ) : RuleToCopy(
+    Index,
     FileType,
     SourceFileEncoding,
     TargetFileEncoding,
