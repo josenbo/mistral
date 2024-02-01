@@ -7,11 +7,13 @@ internal record ConfigurationDeployToTarball(
     FileInfo Tarball, 
     string DeploymentConfigFileName,
     string? AdditionalTarRootFolder,
+    DirectoryInfo TemporaryDirectory,
     FileInfo? Logfile,
     LogEventLevel LogLevel
 ) : Configuration(
     RepositoryRoot, 
     DeploymentConfigFileName,
+    TemporaryDirectory,
     Logfile,
     LogLevel
 )

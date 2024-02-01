@@ -1,4 +1,5 @@
-﻿using Ardalis.GuardClauses;
+﻿using System.Globalization;
+using Ardalis.GuardClauses;
 using Serilog.Events;
 using vigobase;
 
@@ -6,6 +7,31 @@ namespace vigo;
 
 internal static class ConfigurationBuilder
 {
+    // "Tarball" or "Check" with case-insensitive comparison 
+    private const string EnvVarVigoCommand = "VIGO_COMMAND";
+    // ReSharper disable InconsistentNaming
+    private const string VigoCommand_Tarball = "Tarball";
+    private const string VigoCommandLowerCase_Tarball = "tarball";
+    private const string VigoCommand_Check = "Check";    
+    private const string VigoCommandLowerCase_Check = "check";    
+    // ReSharper restore InconsistentNaming
+
+    // Directory must exist 
+    private const string EnvVarVigoRepositoryRoot = "VIGO_REPOSITORY_ROOT";
+    // Directory must exist, file will be created or overwritten
+    private const string EnvVarVigoTarballFile = "VIGO_TARBALL_FILE";
+    // Filename to look for in each repository folder (and its default value)
+    private const string EnvVarVigoDeployConfigFilename = "VIGO_DEPLOY_CONFIG_FILENAME";
+    private const string DefaultDeploymentConfigFileName = "deployment.toml";
+    // The name of a virtual folder to become the root directory in the tarball
+    private const string EnvVarVigoExtraRootFolder = "VIGO_EXTRA_ROOT_FOLDER";
+    // An existing directory where to place temporary files
+    private const string EnvVarVigoTempDir = "VIGO_TEMP_DIR";
+    // Directory must exist, file will be created or written to
+    private const string EnvVarVigoLogfile = "VIGO_LOGFILE";
+    // A log level for logging to a file only (Fatal, Error, Warning, *Information*, Debug) case-insensitive
+    private const string EnvVarVigoLogLevel = "VIGO_LOGLEVEL";
+    
     public static Configuration ActiveConfiguration => _activeConfiguration ??= BuildActiveConfiguration();
 
     private static Configuration BuildActiveConfiguration()
@@ -22,14 +48,16 @@ internal static class ConfigurationBuilder
                     Tarball: GetTarballFile(), 
                     DeploymentConfigFileName: GetDeploymentConfigFileName(),
                     AdditionalTarRootFolder: GetAdditionalTarRootFolder(), 
+                    TemporaryDirectory: GetTemporaryDirectory(),
                     Logfile: GetLogfile(),
                     LogLevel: GetLogLevel()),
                 CommandEnum.CheckCommit => new ConfigurationCheckCommit(
                     RepositoryRoot: GetRepositoryRoot(),
-                    DeploymentConfigFileName: GetDeploymentConfigFileName(), 
+                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
+                    TemporaryDirectory: GetTemporaryDirectory(),
                     Logfile: GetLogfile(),
                     LogLevel: GetLogLevel()),
-                _ => throw new VigoFatalException($"The command {command} is not handled")
+                _ => throw new ArgumentException($"The command {command} is not handled", nameof(command))
             };
         }
         catch (Exception e) when (e is not VigoException)
@@ -43,25 +71,31 @@ internal static class ConfigurationBuilder
     {
         try
         {
-            const string environmentVariableName = "VIGO_COMMAND";
-        
-            var command = GetEnvironmentVariable(environmentVariableName);
+            var command = GetEnvironmentVariable(EnvVarVigoCommand);
         
             if (command is null)
-                throw new VigoFatalException(
-                    $"Expected the command in the environment variable {environmentVariableName}");
+            {
+                const string message = $"Expected the command in the environment variable {EnvVarVigoCommand}";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
 
             if (20 < command.Length)
                 command = command[..20];
 
             command = command.Trim().ToLowerInvariant();
 
-            return command switch
+            switch (command)
             {
-                "tarball" => CommandEnum.DeployToTarball,
-                "check" => CommandEnum.CheckCommit,
-                _ => throw new VigoFatalException($"Expected the command to be either Tarball or Check")
-            };
+                case VigoCommandLowerCase_Tarball:
+                    return CommandEnum.DeployToTarball;
+                case VigoCommandLowerCase_Check:
+                    return CommandEnum.CheckCommit;
+                default:
+                    const string message = $"Expected the command in {EnvVarVigoCommand} to be either \"{VigoCommand_Tarball}\" or \"{VigoCommand_Check}\"";
+                    Console.Error.WriteLine(message);
+                    throw new VigoFatalException(message);
+            }
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -74,24 +108,29 @@ internal static class ConfigurationBuilder
     {
         try
         {
-            const string environmentVariableName = "VIGO_REPOSITORY_ROOT";
-        
-            var path = GetEnvironmentVariable(environmentVariableName);
-        
+            var path = GetEnvironmentVariable(EnvVarVigoRepositoryRoot);
+
             if (path is null)
-                throw new VigoFatalException(
-                    $"Expected the repository root path in the environment variable {environmentVariableName}");
+            {
+                const string message = $"Expected the repository root path in the environment variable {EnvVarVigoRepositoryRoot}";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
 
             if (4096 < path.Length)
                 path = path[..4096];
 
-            var directoryInfo = new DirectoryInfo(path);
-        
-            if (!directoryInfo.Exists || !Path.IsPathRooted(directoryInfo.FullName)) 
-                throw new VigoFatalException(
-                    $"Expected the repository root path to be an existing and rooted path");
+            if (!Directory.Exists(path))
+            {
+                const string message = $"Invalid repository root path in the environment variable {EnvVarVigoRepositoryRoot}";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
 
-            return directoryInfo;
+            if (!Path.IsPathRooted(path))
+                path = Path.GetFullPath(path);
+            
+            return new DirectoryInfo(path);
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -104,22 +143,29 @@ internal static class ConfigurationBuilder
     {
         try
         {
-            const string environmentVariableName = "VIGO_TARBALL_FILE";
-        
-            var path = GetEnvironmentVariable(environmentVariableName);
+            var path = GetEnvironmentVariable(EnvVarVigoTarballFile);
         
             if (path is null)
-                throw new VigoFatalException(
-                    $"Expected the tarball file path in the environment variable {environmentVariableName}");
+            {
+                const string message = $"Expected the tarball file path in the environment variable {EnvVarVigoTarballFile}";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
 
             if (4096 < path.Length)
                 path = path[..4096];
 
+            if (!Path.IsPathRooted(path))
+                path = Path.GetFullPath(path);
+            
             var fileInfo = new FileInfo(path);
         
             if (fileInfo.Directory is null || !fileInfo.Directory.Exists) 
-                throw new VigoFatalException(
-                    $"Expected the tarball file path to be located in an existing directory");
+            {
+                var message = $"Expected the tarball file path to be located in an existing directory (Tarball file path: {path})";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
 
             if (fileInfo.Exists)
                 fileInfo.Delete();
@@ -137,14 +183,21 @@ internal static class ConfigurationBuilder
     {
         try
         {
-            const string environmentVariableName = "VIGO_DEPLOY_CONFIG_FILENAME";
-            const string defaultDeploymentConfigFileName = "deployment.toml";
-        
-            var fileName = GetEnvironmentVariable(environmentVariableName, defaultDeploymentConfigFileName);
-        
+            var fileName = GetEnvironmentVariable(EnvVarVigoDeployConfigFilename, DefaultDeploymentConfigFileName);
+
             if (256 < fileName.Length)
                 fileName = fileName[..256];
-        
+
+            if (fileName.Contains(Path.DirectorySeparatorChar) || fileName.Contains(Path.AltDirectorySeparatorChar))
+            {
+                const string message = "The deployment configuration file name is not allowed to contain path separators";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
+            
+            // trigger exception on a file name containing illegal characters 
+            File.Exists(fileName);
+
             return fileName;
         }
         catch (Exception e) when (e is not VigoException)
@@ -158,13 +211,24 @@ internal static class ConfigurationBuilder
     {
         try
         {
-            const string environmentVariableName = "VIGO_EXTRA_ROOT_FOLDER";
-        
-            var fileName = GetEnvironmentVariable(environmentVariableName);
-        
-            if (fileName is not null && 256 < fileName.Length)
+            var fileName = GetEnvironmentVariable(EnvVarVigoExtraRootFolder);
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                return string.Empty;
+            
+            if (256 < fileName.Length)
                 fileName = fileName[..256];
         
+            if (fileName.Contains(Path.DirectorySeparatorChar) || fileName.Contains(Path.AltDirectorySeparatorChar))
+            {
+                const string message = "The name of the extra root folder in the tarball is not allowed to contain path separators";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
+            
+            // trigger exception on a file name containing illegal characters 
+            File.Exists(fileName);
+
             return fileName;
         }
         catch (Exception e) when (e is not VigoException)
@@ -174,13 +238,61 @@ internal static class ConfigurationBuilder
         }
     }
 
+    private static DirectoryInfo GetTemporaryDirectory()
+    {
+        try
+        {
+            var path = GetEnvironmentVariable(EnvVarVigoTempDir) ?? Path.GetTempPath();
+
+            if (4096 < path.Length)
+                path = path[..4096];
+
+            if (!Directory.Exists(path))
+            {
+                const string message = "Could not locate the directory for temporary files";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
+                
+            if (!Path.IsPathRooted(path))
+                path = Path.GetFullPath(path);
+            
+            var formatProvider = CultureInfo.GetCultureInfo("en-US");
+            // ReSharper disable StringLiteralTypo
+            var timestamp = DateTime.Now.ToString("DyyyyMMdd_THHmmss", formatProvider);
+            // ReSharper restore StringLiteralTypo
+            var random = Random.Shared.Next(1,99999).ToString("00000", formatProvider);
+            var name = $"VIGO_{timestamp}_R{random}";
+
+            path = Path.Combine(path, name);
+            
+            var directoryInfo = new DirectoryInfo(path);
+
+            if (directoryInfo.Exists)
+            {
+                const string message = "Could not set up the directory for temporary files";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
+            
+            directoryInfo.Create();
+            
+            return directoryInfo;
+        }
+        catch (Exception e) when (e is not VigoException)
+        {
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetTemporaryDirectory)}(). Message was: {e.Message}");
+            throw new VigoFatalException("Startup configuration failed", e);
+        }
+            
+    }
+    
     private static FileInfo? GetLogfile()
     {
         try
         {
-            const string environmentVariableName = "VIGO_LOGFILE";
         
-            var path = GetEnvironmentVariable(environmentVariableName);
+            var path = GetEnvironmentVariable(EnvVarVigoLogfile);
 
             if (path is null)
                 return null;
@@ -206,17 +318,20 @@ internal static class ConfigurationBuilder
     {
         try
         {
-            const string environmentVariableName = "VIGO_LOGLEVEL";
-        
-            var value = GetEnvironmentVariable(environmentVariableName, "Information");
+            var value = GetEnvironmentVariable(EnvVarVigoLogLevel, "Information");
 
+            if (string.IsNullOrWhiteSpace(value))
+                return LogEventLevel.Information;
+            
             if (40 < value.Length)
                 value = value[..40];
         
-            if (Enum.TryParse<LogEventLevel>(value, true, out var logLevel)) return logLevel;
+            if (Enum.TryParse<LogEventLevel>(value, true, out var logLevel)) 
+                return logLevel;
         
-            Console.Error.WriteLine($"Warning: Invalid log level {value} specified");
             logLevel = LogEventLevel.Information;
+
+            Console.Error.WriteLine($"Warning: Invalid log level {value} specified. Will use {logLevel} instead");
 
             return logLevel;
         }
