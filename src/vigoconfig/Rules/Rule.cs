@@ -5,5 +5,8 @@ namespace vigoconfig;
 
 internal abstract record Rule(int Index)
 {
-    internal abstract bool GetTransformation(string filename, out RuleCheckResultEnum result, [NotNullWhen(true)]  out IDeploymentTransformationReadWrite? transformation);
+    internal abstract bool GetTransformation(FileInfo file, DeploymentDefaults defaults,
+        [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation);
+    internal virtual bool IsCopyRule => this is RuleToCopy;
+    internal virtual bool IsSkipRule => this is RuleToSkip;
 }

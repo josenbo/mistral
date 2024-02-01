@@ -12,7 +12,7 @@ internal class TarballBuilder
         
         var tarball = new Tarball(_configuration.RepositoryRoot.FullName, _configuration.AdditionalTarRootFolder);
 
-        foreach (var transformation in reader.Transformations)
+        foreach (var transformation in reader.FileTransformations)
         {
             tarball.AddFile(transformation.TargetFile);
         }

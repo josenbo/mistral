@@ -1,20 +1,47 @@
-﻿using vigobase;
+﻿using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using Serilog;
+using vigobase;
 
 namespace vigoconfig;
 
-public class FolderConfigDataRule
+public partial class FolderConfigDataRule
 {
+    [DataMember(Name = "Action")]   
     public string? RuleType { get; set; }
+
+    [DataMember(Name = "WhenNameIsEqual")]   
     public string? SourceFileName { get; set; }
+
+    [DataMember(Name = "ChangeName")]   
     public string? TargetFileName { get; set; }
+
+    [DataMember(Name = "WhenNameMatchesPattern")]   
     public string? SourceFileNamePattern { get; set; }
+
+    [DataMember(Name = "TransformNameByRule")]   
     public string? TargetFileNamePattern { get; set; }
+
+    [DataMember(Name = "FileType")]   
     public string? FileType { get; set; }
+
+    [DataMember(Name = "StoredWithEncoding")]   
     public string? SourceFileEncoding { get; set; }
+
+    [DataMember(Name = "DeployWithEncoding")]   
     public string? TargetFileEncoding { get; set; }
+
+    [DataMember(Name = "Newline")]   
     public string? LineEnding { get; set; }
+
+    [DataMember(Name = "FileMode")]   
     public string? FilePermission { get; set; }
+
+    [DataMember(Name = "FixTrailingNewline")]   
     public bool? FixTrailingNewline { get; set; }
+    
+    [DataMember(Name = "TargetList")]   
+    public string? Buckets { get; set; }
     
     private bool IsCopyRule()
     {
@@ -43,6 +70,26 @@ public class FolderConfigDataRule
         return string.IsNullOrWhiteSpace(replacement) ? string.Empty : replacement.Trim();
     }
 
+    private static IEnumerable<string> CheckValidBuckets(string? buckets)
+    {
+        if (string.IsNullOrWhiteSpace(buckets))
+            yield break;
+
+        foreach (var bucket in  buckets.Split(
+                         BucketSeparators,
+                         StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+                         ).Distinct(StringComparer.InvariantCultureIgnoreCase))
+        {
+            if (!RexBucket.IsMatch(bucket))
+            {
+                Log.Fatal("Invalid bucket name {TheBucketName}", bucket);
+                throw new VigoFatalException("Invalid bucket name");
+            }
+
+            yield return bucket;
+        }
+    }
+
     internal FolderConfigDataValidRule GetValidRuleData(DeploymentDefaults defaults)
     {
         var isCopyRule = IsCopyRule();
@@ -50,7 +97,7 @@ public class FolderConfigDataRule
         var targetFileName = CheckValidFileName(TargetFileName);
         var sourceFileNamePattern = CheckValidFileNamePattern(SourceFileNamePattern);
         var targetFileNamePattern = CheckValidFileNamePatternReplacement(TargetFileNamePattern);
-        var ruleType = RuleTypeEnum.Undefined;
+        RuleTypeEnum ruleType;
         
         if (isCopyRule)
         {
@@ -123,7 +170,18 @@ public class FolderConfigDataRule
 
         if (FixTrailingNewline.HasValue)
             validRuleData.FixTrailingNewline = FixTrailingNewline.Value;
+
+        foreach (var bucket in CheckValidBuckets(Buckets))
+        {
+            validRuleData.Buckets.Add(bucket);
+        }
         
         return validRuleData;
     }
+    
+    private static readonly char[] BucketSeparators = new char[] {' ', ',', ';'};
+    private static readonly Regex RexBucket = CompiledRexBucket();
+
+    [GeneratedRegex("^[a-zA-Z]([-_.]?[a-zA-Z0-9]{1,40}){1,40}$")]
+    private static partial Regex CompiledRexBucket();
 }

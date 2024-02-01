@@ -167,6 +167,13 @@ internal static class ConfigurationBuilder
                 throw new VigoFatalException(message);
             }
 
+            if (!fileInfo.Name.EndsWith(".tar.gz") || fileInfo.Name.Length < 8) 
+            {
+                var message = $"Expected the tarball file name to have a .tar.gz suffix and a non-empty base name (Tarball file name: {fileInfo.Name})";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
+            
             if (fileInfo.Exists)
                 fileInfo.Delete();
         

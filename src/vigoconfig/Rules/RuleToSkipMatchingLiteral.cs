@@ -11,9 +11,20 @@ internal record RuleToSkipMatchingLiteral(
     NameToMatch
 )
 {
-    internal override bool GetTransformation(string filename, out RuleCheckResultEnum result,
-        [NotNullWhen(true)] out IDeploymentTransformationReadWrite? transformation)
+    internal override bool GetTransformation(FileInfo file,
+        DeploymentDefaults defaults,
+        [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
-        throw new NotImplementedException();
+        if (!NameToMatch.Equals(file.Name, StringComparison.Ordinal))
+        {
+            transformation = null;
+            return false;
+        }
+
+        transformation = new DeploymentTransformationFile(file, defaults)
+        {
+            CanDeploy = false
+        };
+        return true;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using vigobase;
 
 namespace vigoconfig;
@@ -11,9 +12,20 @@ internal record RuleToSkipMatchingPattern(
     NameToMatch
 )
 {
-    internal override bool GetTransformation(string filename, out RuleCheckResultEnum result,
-        [NotNullWhen(true)] out IDeploymentTransformationReadWrite? transformation)
+    internal override bool GetTransformation(FileInfo file,
+        DeploymentDefaults defaults,
+        [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
-        throw new NotImplementedException();
+        if (!Regex.IsMatch(file.Name, NameToMatch))
+        {
+            transformation = null;
+            return false;
+        }
+
+        transformation = new DeploymentTransformationFile(file, defaults)
+        {
+            CanDeploy = false
+        };
+        return true;
     }
 }

@@ -1,21 +1,59 @@
-﻿using Serilog;
+﻿using System.Diagnostics;
+using Serilog;
 using Serilog.Events;
 using vigo;
 
 try
 {
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
+
     var config = ConfigurationBuilder.ActiveConfiguration;
 
-    ConfigureLogging(config.Logfile, config.LogLevel);
+    Environment.ExitCode = 1;
 
-    var result = config switch
-    {
-        ConfigurationDeployToTarball configurationDeployToTarball => BuildTarball(configurationDeployToTarball),
-        ConfigurationCheckCommit configurationCheckCommit => RunCommitChecks(configurationCheckCommit),
-        _ => false
-    };
+    if (config.Logfile is not null && File.Exists(config.Logfile.FullName))
+        config.Logfile.Delete();
+
+    ConfigureLogging(config.Logfile, config.LogLevel);
     
-    Environment.ExitCode = result ? 0 : 1;
+    Log.Information("Running the command {TheCommand} with the repository root folder {TheRepositoryRoot}",
+        config.Command,
+        config.RepositoryRoot.FullName);
+
+    try
+    {
+        var result = config switch
+        {
+            ConfigurationDeployToTarball configurationDeployToTarball => BuildTarball(configurationDeployToTarball),
+            ConfigurationCheckCommit configurationCheckCommit => RunCommitChecks(configurationCheckCommit),
+            _ => false
+        };
+
+        Log.Information("Process terminated {TheResult}",
+            (result ? "successfully" : "with errors"));
+
+        stopwatch.Stop();
+        Log.Information("Process duration was {TheTimeSpan}",
+            stopwatch.Elapsed);
+
+        Environment.ExitCode = result ? 0 : 1;
+    }
+    finally
+    {
+        try
+        {
+            if (config is ConfigurationDeployToTarball configTarball && File.Exists(configTarball.TemporaryTarballPath))
+                File.Move(configTarball.TemporaryTarballPath, configTarball.Tarball.FullName);
+            
+            config.TemporaryDirectory.Delete(true);
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine($"Could not delete the temporary folder ({e.GetType().Name}: {e.Message})");
+        }
+    }
+    stopwatch.Stop();
 }
 catch (Exception e)
 {
@@ -24,7 +62,12 @@ catch (Exception e)
     Environment.ExitCode = 1;
 }
 
+Log.CloseAndFlush();
 return;
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 bool RunCommitChecks(ConfigurationCheckCommit config)
 {
@@ -69,7 +112,8 @@ void ConfigureLogging(FileInfo? logfile, LogEventLevel logLevelFile, LogEventLev
 
     if (logfile is not null)
     {
-        loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 4);
+        // loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 4);
+        loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile);
     }
 
     Log.Logger = loggerConfiguration.CreateLogger();

@@ -10,5 +10,6 @@ internal abstract record Configuration(
     LogEventLevel LogLevel
 )
 {
+    public string TemporaryTarballPath => Path.Combine(TemporaryDirectory.FullName, "vigo.tar.gz");
     public abstract CommandEnum Command { get; }
 }

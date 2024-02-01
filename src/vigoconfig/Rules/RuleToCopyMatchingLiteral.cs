@@ -25,9 +25,31 @@ internal record RuleToCopyMatchingLiteral(
     FixTrailingNewline
 )
 {
-    internal override bool GetTransformation(string filename, out RuleCheckResultEnum result,
-        [NotNullWhen(true)] out IDeploymentTransformationReadWrite? transformation)
+    internal override bool GetTransformation(FileInfo file,
+        DeploymentDefaults defaults,
+        [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
-        throw new NotImplementedException();
+        if (!NameToMatch.Equals(file.Name, StringComparison.Ordinal))
+        {
+            transformation = null;
+            return false;
+        }
+
+        var newName = string.IsNullOrWhiteSpace(NameReplacement)
+            ? string.Empty
+            : NameReplacement;
+
+        transformation = new DeploymentTransformationFile(file, defaults)
+        {
+            CanDeploy = true,
+            DifferentTargetFileName = newName,
+            FileType = FileType,
+            SourceFileEncoding = SourceFileEncoding,
+            TargetFileEncoding = TargetFileEncoding,
+            FilePermission = FilePermission,
+            LineEnding = LineEnding,
+            FixTrailingNewline = FixTrailingNewline
+        };
+        return true;
     }
 }

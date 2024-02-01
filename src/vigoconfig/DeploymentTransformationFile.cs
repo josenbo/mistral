@@ -1,12 +1,14 @@
 ﻿using Ardalis.GuardClauses;
 using Serilog;
+using vigobase;
 
-namespace vigobase;
+namespace vigoconfig;
 
-internal class DeploymentTransformation : IDeploymentTransformationReadWrite, IDeploymentTransformationReadOnly
+internal class DeploymentTransformationFile : IDeploymentTransformationReadWriteFile, IDeploymentTransformationReadOnlyFile
 {
     public bool CanDeploy { get; set; }
     public FileInfo SourceFile { get; }
+    public string RelativePathSourceFile => _defaults.GetRepositoryRelativePath(SourceFile.FullName);
     public string? DifferentTargetFileName
     {
         get => _differentTargetFileName;
@@ -20,7 +22,7 @@ internal class DeploymentTransformation : IDeploymentTransformationReadWrite, ID
 
                 if (_differentTargetFileName == null || _differentTargetFileName == SourceFile.Name)
                 {
-                    _targetFile = SourceFile;
+                    TargetFile = SourceFile;
                     return;
                 }
 
@@ -28,22 +30,22 @@ internal class DeploymentTransformation : IDeploymentTransformationReadWrite, ID
                 {
                     Log.Error("Setting the new name {NewName} for the repository file {TheSourceFile} failed, because the repository file has no parent directory",
                         _differentTargetFileName,
-                        SourceFile);                    
+                        _defaults.GetRepositoryRelativePath(SourceFile.FullName));                    
                     throw new VigoFatalException("The DirectoryName of a repository file should never be null");
                 }
         
-                _targetFile = new FileInfo(Path.Combine(SourceFile.DirectoryName, _differentTargetFileName));
+                TargetFile = new FileInfo(Path.Combine(SourceFile.DirectoryName, _differentTargetFileName));
             }
             catch (Exception e) when (e is not VigoException)
             {
                 Log.Error(e,"Setting the new name {NewName} for the repository file {TheSourceFile} failed with an Exception",
                     _differentTargetFileName,
-                    SourceFile);                    
+                    _defaults.GetRepositoryRelativePath(SourceFile.FullName));                    
                 throw new VigoFatalException("Failed to set a new name for a repository file", e);
             }
         }
     }
-    public FileInfo TargetFile => _targetFile;
+    public FileInfo TargetFile { get; private set; }
 
     public FileTypeEnum FileType
     {
@@ -73,14 +75,15 @@ internal class DeploymentTransformation : IDeploymentTransformationReadWrite, ID
 
     public bool FixTrailingNewline { get; set; }
 
-    IDeploymentTransformationReadOnly IDeploymentTransformationReadWrite.GetReadOnlyInterface()
+    IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.GetReadOnlyInterface()
     {
         return this;
     }
 
-    internal DeploymentTransformation(FileInfo sourceFile, DeploymentDefaults defaults)
+    internal DeploymentTransformationFile(FileInfo sourceFile, DeploymentDefaults defaults)
     {
-        _targetFile = SourceFile = sourceFile;
+        _defaults = defaults;
+        TargetFile = SourceFile = sourceFile;
         FileType = defaults.FileTypeDefault;
         SourceFileEncoding = defaults.SourceFileEncodingDefault;
         TargetFileEncoding = defaults.TargetFileEncodingDefault;
@@ -89,10 +92,10 @@ internal class DeploymentTransformation : IDeploymentTransformationReadWrite, ID
         FixTrailingNewline = defaults.TrailingNewlineDefault;
     }
 
-    private FileInfo _targetFile;
     private string? _differentTargetFileName;
     private FileTypeEnum _fileType;
     private FileEncodingEnum _sourceFileEncoding;
     private FileEncodingEnum _targetFileEncoding;
     private LineEndingEnum _lineEnding;
+    private readonly DeploymentDefaults _defaults;
 }

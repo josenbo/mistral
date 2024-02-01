@@ -15,6 +15,7 @@ internal class FolderConfigDataValidRule
     public LineEndingEnum LineEnding { get; set; }
     public FilePermission FilePermission { get; set; }
     public bool FixTrailingNewline { get; set; }
+    public IList<string> Buckets { get; }
 
     internal FolderConfigDataValidRule(DeploymentDefaults defaults)
     {
@@ -24,5 +25,6 @@ internal class FolderConfigDataValidRule
         LineEnding = defaults.LineEndingDefault;
         FilePermission = FilePermission.UseDefault;
         FixTrailingNewline = defaults.TrailingNewlineDefault;
+        Buckets = new List<string>();
     }
 }

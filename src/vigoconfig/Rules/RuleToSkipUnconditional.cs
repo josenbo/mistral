@@ -5,9 +5,14 @@ namespace vigoconfig;
 
 internal record RuleToSkipUnconditional(int Index) : RuleToSkip(Index)
 {
-    internal override bool GetTransformation(string filename, out RuleCheckResultEnum result,
-        [NotNullWhen(true)] out IDeploymentTransformationReadWrite? transformation)
+    internal override bool GetTransformation(FileInfo file,
+        DeploymentDefaults defaults,
+        [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
-        throw new NotImplementedException();
+        transformation = new DeploymentTransformationFile(file, defaults)
+        {
+            CanDeploy = false
+        };
+        return true;
     }
 }
