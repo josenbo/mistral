@@ -15,6 +15,7 @@ internal class FolderConfigDataValidRule
     public LineEndingEnum LineEnding { get; set; }
     public FilePermission FilePermission { get; set; }
     public bool FixTrailingNewline { get; set; }
+    public string ValidCharacters  { get; set; }
     public IList<string> Targets { get; }
 
     internal FolderConfigDataValidRule(DeploymentDefaults defaults)
@@ -23,8 +24,9 @@ internal class FolderConfigDataValidRule
         SourceFileEncoding = defaults.SourceFileEncodingDefault;
         TargetFileEncoding = defaults.TargetFileEncodingDefault;
         LineEnding = defaults.LineEndingDefault;
-        FilePermission = FilePermission.UseDefault;
+        FilePermission = defaults.FilePermissionDefault;
         FixTrailingNewline = defaults.TrailingNewlineDefault;
-        Targets = new List<string>();
+        ValidCharacters = defaults.ValidCharactersDefault;
+        Targets = defaults.DefaultTargets.ToList();
     }
 }

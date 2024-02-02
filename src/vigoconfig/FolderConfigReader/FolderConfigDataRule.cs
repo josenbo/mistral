@@ -1,6 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using Serilog;
 using vigobase;
 
 namespace vigoconfig;
@@ -73,26 +71,6 @@ public partial class FolderConfigDataRule
         return string.IsNullOrWhiteSpace(replacement) ? string.Empty : replacement.Trim();
     }
 
-    private static IEnumerable<string> CheckValidTargets(string? targets)
-    {
-        if (string.IsNullOrWhiteSpace(targets))
-            yield break;
-
-        foreach (var target in  targets.Split(
-                         BucketSeparators,
-                         StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
-                         ).Distinct(StringComparer.InvariantCultureIgnoreCase))
-        {
-            if (!RexBucket.IsMatch(target))
-            {
-                Log.Fatal("Invalid target name {TheBucketName}", target);
-                throw new VigoFatalException("Invalid target name");
-            }
-
-            yield return target;
-        }
-    }
-
     internal FolderConfigDataValidRule GetValidRuleData(DeploymentDefaults defaults)
     {
         var isCopyRule = IsCopyRule();
@@ -156,35 +134,39 @@ public partial class FolderConfigDataRule
             TargetFileNamePattern = targetFileNamePattern,
         };
 
-        if (FileTypeEnumHelper.TryParse(FileType, out var fileType))
+        if (FileType is not null && FileTypeEnumHelper.TryParse(FileType, out var fileType))
             validRuleData.FileType = fileType ?? throw new Exception("FileTypeEnumHelper.TryParse null constraint violated");
         
-        if (FileEncodingEnumHelper.TryParse(SourceFileEncoding, out var sourceFileEncoding))
+        if (SourceFileEncoding is not null && FileEncodingEnumHelper.TryParse(SourceFileEncoding, out var sourceFileEncoding))
             validRuleData.SourceFileEncoding = sourceFileEncoding ?? throw new Exception("FileEncodingEnumHelper.TryParse null constraint violated");
         
-        if (FileEncodingEnumHelper.TryParse(TargetFileEncoding, out var targetFileEncoding))
+        if (TargetFileEncoding is not null && FileEncodingEnumHelper.TryParse(TargetFileEncoding, out var targetFileEncoding))
             validRuleData.TargetFileEncoding = targetFileEncoding ?? throw new Exception("FileEncodingEnumHelper.TryParse null constraint violated");
         
-        if (LineEndingEnumHelper.TryParse(LineEnding, out var lineEnding))
+        if (LineEnding is not null && LineEndingEnumHelper.TryParse(LineEnding, out var lineEnding))
             validRuleData.LineEnding = lineEnding ?? throw new Exception("LineEndingEnumHelper.TryParse null constraint violated");
-
-        if (vigobase.FilePermission.TryParse(FilePermission, out var filePermission))
+        
+        if (FilePermission is not null && vigobase.FilePermission.TryParse(FilePermission, out var filePermission))
             validRuleData.FilePermission = filePermission;
 
         if (FixTrailingNewline.HasValue)
             validRuleData.FixTrailingNewline = FixTrailingNewline.Value;
 
-        foreach (var bucket in CheckValidTargets(Targets))
+        if (ValidCharacters is not null)
+            validRuleData.ValidCharacters = ValidCharactersHelper.ParseConfiguration(ValidCharacters); 
+        
+        // ReSharper disable once InvertIf
+        if (Targets != null)
         {
-            validRuleData.Targets.Add(bucket);
+            // delete the inherited defaults
+            validRuleData.Targets.Clear();
+            
+            foreach (var target in DeploymentTargetHelper.ParseTargets(Targets))
+            {
+                validRuleData.Targets.Add(target);
+            }
         }
         
         return validRuleData;
     }
-    
-    private static readonly char[] BucketSeparators = new char[] {' ', ',', ';'};
-    private static readonly Regex RexBucket = CompiledRexBucket();
-
-    [GeneratedRegex("^[a-zA-Z]([-_.]?[a-zA-Z0-9]{1,40}){1,40}$")]
-    private static partial Regex CompiledRexBucket();
 }

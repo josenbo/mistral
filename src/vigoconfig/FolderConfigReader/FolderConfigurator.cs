@@ -13,40 +13,41 @@ internal static class FolderConfigurator
     {
         try
         {
-            if (!TryReadFileContent(config.Location, config.Defaults.DeploymentConfigFileName, out var content))
+            if (!TryReadFileContent(config.Location, config.GlobalDefaults.DeploymentConfigFileName, out var content))
             {
                 config.AddRule(BuildDefaultRuleSkipAll(config.NextRuleIndex));
                 return;
             }
             
             Log.Information("Found a deployment configuration file in the directory {TheDirectory}",
-                config.Defaults.GetRepositoryRelativePath(config.Location.FullName));
+                config.GlobalDefaults.GetRepositoryRelativePath(config.Location.FullName));
         
             if (!TryParseConfiguration(content, out var tomlConfigurationData))
             {
                 Log.Fatal("Could not read the configuration file {TheFileName}}",
-                    config.Defaults.DeploymentConfigFileName);
+                    config.GlobalDefaults.DeploymentConfigFileName);
 
                 throw new VigoFatalException("Could not read the folder configuration");
             }
 
             config.HasKeepFolderFlag = tomlConfigurationData.KeepEmptyFolder is true;
+            config.SetLocalDefaults(tomlConfigurationData.GetLocalDefaults(config.GlobalDefaults));
                 
             ValidateAndAppendRules(config, tomlConfigurationData.Rules);
 
-            config.AddRule(BuildDefaultRuleCopyAll(config.Defaults, config.NextRuleIndex));
+            config.AddRule(BuildDefaultRuleCopyAll(config.GlobalDefaults, config.NextRuleIndex));
         }
         catch (Exception e) when (e is not VigoException)
         {
             Log.Fatal(e,"Could not read the configuration in the directory {TheDir}",
-                config.Defaults.GetRepositoryRelativePath(config.Location.FullName));
+                config.GlobalDefaults.GetRepositoryRelativePath(config.Location.FullName));
             throw new VigoFatalException("Failed to read the deployment configuration in the repository folder");
         }
     }
 
     private static void ValidateAndAppendRules(IFolderConfiguration config, IEnumerable<FolderConfigDataRule> tomlRuleData)
     {
-        foreach (var data in tomlRuleData.Select(d => d.GetValidRuleData(config.Defaults)))
+        foreach (var data in tomlRuleData.Select(d => d.GetValidRuleData(config.LocalDefaults)))
         {
             switch (data.RuleType)
             {

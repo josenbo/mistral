@@ -3,24 +3,23 @@
 public record DeploymentDefaults(
     string RepositoryPath,
     string DeploymentConfigFileName,
-    string ValidCharachters,
     UnixFileMode FileModeDefault,
     UnixFileMode DirectoryModeDefault,
+    FileTypeEnum FileTypeDefault,
     FileEncodingEnum SourceFileEncodingDefault,
     FileEncodingEnum TargetFileEncodingDefault,
     LineEndingEnum LineEndingDefault,
+    FilePermission FilePermissionDefault,
     bool TrailingNewlineDefault,
-    FileTypeEnum FileTypeDefault
-)
+    string ValidCharactersDefault,
+    IReadOnlyList<string> DefaultTargets)
 {
     public string GetRepositoryRelativePath(string path)
     {
-        if (string.IsNullOrWhiteSpace(RepositoryPath) || string.IsNullOrWhiteSpace(path))
-            return path;
-
-        if (!path.StartsWith(RepositoryPath))
-            return path;
-
-        return RepositoryPath.Length < path.Length ? path[RepositoryPath.Length..] : string.Empty;
+        return Path.GetRelativePath(RepositoryPath, path);
+    }
+    public string GetRepositoryRelativePath(FileInfo file)
+    {
+        return Path.GetRelativePath(RepositoryPath, file.FullName);
     }
 }

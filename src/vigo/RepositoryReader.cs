@@ -58,23 +58,27 @@ internal class RepositoryReader
         {
             if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
                 continue;
-            ProcessDirectory(new DirectoryController(di, controller.Defaults));
+            ProcessDirectory(new DirectoryController(di, controller.GlobalDefaults));
         }
     }
     
     private static DeploymentDefaults GetDeploymentDefaults(string deploymentConfigFileName, string repositoryPath)
     {
+        var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
+        
         return new DeploymentDefaults(
             RepositoryPath: repositoryPath,
             DeploymentConfigFileName: deploymentConfigFileName,
-            ValidCharachters: @"\u0000-\u007FäöüÄÖÜß€",
             FileModeDefault: (UnixFileMode)0b_110_110_100,
             DirectoryModeDefault: (UnixFileMode)0b_111_111_101,
+            FileTypeDefault: FileTypeEnum.BinaryFile, 
             SourceFileEncodingDefault: FileEncodingEnum.UTF_8,
             TargetFileEncodingDefault: FileEncodingEnum.UTF_8,
             LineEndingDefault: LineEndingEnum.LF,
+            FilePermissionDefault: FilePermission.UseDefault, 
             TrailingNewlineDefault: true,
-            FileTypeDefault: FileTypeEnum.BinaryFile    
+            ValidCharactersDefault: asciiGerman,
+            DefaultTargets: [ "Prod", "NonProd" ]
         );
     }
 

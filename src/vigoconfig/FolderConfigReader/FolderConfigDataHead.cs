@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using vigobase;
 
 namespace vigoconfig;
 
@@ -33,5 +34,43 @@ public class FolderConfigDataHead
     
     [DataMember(Name = "Rules")]   
     public List<FolderConfigDataRule> Rules { get; } = [];
-  
+
+    internal DeploymentDefaults GetLocalDefaults(DeploymentDefaults globalDefaults)
+    {
+        var retval = globalDefaults;
+
+        if (FileType is not null && FileTypeEnumHelper.TryParse(FileType, out var fileType))
+            retval = retval with { FileTypeDefault = fileType.Value };
+
+        if (SourceFileEncoding is not null && FileEncodingEnumHelper.TryParse(SourceFileEncoding, out var sourceFileEncoding))
+            retval = retval with { SourceFileEncodingDefault = sourceFileEncoding.Value };
+        
+        if (TargetFileEncoding is not null && FileEncodingEnumHelper.TryParse(TargetFileEncoding, out var targetFileEncoding))
+            retval = retval with { TargetFileEncodingDefault = targetFileEncoding.Value };
+
+        if (LineEnding is not null && LineEndingEnumHelper.TryParse(LineEnding, out var lineEnding))
+            retval = retval with { LineEndingDefault = lineEnding.Value };
+
+        if (FilePermission is not null && vigobase.FilePermission.TryParse(FilePermission, out var filePermission))
+            retval = retval with { FilePermissionDefault = filePermission };
+
+        if (FixTrailingNewline.HasValue)
+            retval = retval with { TrailingNewlineDefault = FixTrailingNewline.Value };
+
+        if (ValidCharacters is not null)
+            retval = retval with
+            {
+                ValidCharactersDefault = vigobase.ValidCharactersHelper.ParseConfiguration(ValidCharacters)
+            };
+
+        // ReSharper disable once InvertIf
+        if (Targets is not null)
+        {
+            var targets = DeploymentTargetHelper.ParseTargets(Targets).ToList();
+
+            retval = retval with { DefaultTargets = targets };
+        }
+        
+        return retval;
+    }
 }
