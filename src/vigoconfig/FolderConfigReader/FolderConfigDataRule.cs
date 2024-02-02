@@ -22,6 +22,9 @@ public partial class FolderConfigDataRule
     [DataMember(Name = "TransformNameByRule")]   
     public string? TargetFileNamePattern { get; set; }
 
+    [DataMember(Name = "ValidChars")]   
+    public string? ValidCharacters { get; set; }
+
     [DataMember(Name = "FileType")]   
     public string? FileType { get; set; }
 
@@ -41,7 +44,7 @@ public partial class FolderConfigDataRule
     public bool? FixTrailingNewline { get; set; }
     
     [DataMember(Name = "TargetList")]   
-    public string? Buckets { get; set; }
+    public string? Targets { get; set; }
     
     private bool IsCopyRule()
     {
@@ -70,23 +73,23 @@ public partial class FolderConfigDataRule
         return string.IsNullOrWhiteSpace(replacement) ? string.Empty : replacement.Trim();
     }
 
-    private static IEnumerable<string> CheckValidBuckets(string? buckets)
+    private static IEnumerable<string> CheckValidTargets(string? targets)
     {
-        if (string.IsNullOrWhiteSpace(buckets))
+        if (string.IsNullOrWhiteSpace(targets))
             yield break;
 
-        foreach (var bucket in  buckets.Split(
+        foreach (var target in  targets.Split(
                          BucketSeparators,
                          StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
                          ).Distinct(StringComparer.InvariantCultureIgnoreCase))
         {
-            if (!RexBucket.IsMatch(bucket))
+            if (!RexBucket.IsMatch(target))
             {
-                Log.Fatal("Invalid bucket name {TheBucketName}", bucket);
-                throw new VigoFatalException("Invalid bucket name");
+                Log.Fatal("Invalid target name {TheBucketName}", target);
+                throw new VigoFatalException("Invalid target name");
             }
 
-            yield return bucket;
+            yield return target;
         }
     }
 
@@ -171,9 +174,9 @@ public partial class FolderConfigDataRule
         if (FixTrailingNewline.HasValue)
             validRuleData.FixTrailingNewline = FixTrailingNewline.Value;
 
-        foreach (var bucket in CheckValidBuckets(Buckets))
+        foreach (var bucket in CheckValidTargets(Targets))
         {
-            validRuleData.Buckets.Add(bucket);
+            validRuleData.Targets.Add(bucket);
         }
         
         return validRuleData;

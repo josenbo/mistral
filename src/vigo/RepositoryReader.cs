@@ -67,13 +67,14 @@ internal class RepositoryReader
         return new DeploymentDefaults(
             RepositoryPath: repositoryPath,
             DeploymentConfigFileName: deploymentConfigFileName,
+            ValidCharachters: @"\u0000-\u007FäöüÄÖÜß€",
             FileModeDefault: (UnixFileMode)0b_110_110_100,
             DirectoryModeDefault: (UnixFileMode)0b_111_111_101,
             SourceFileEncodingDefault: FileEncodingEnum.UTF_8,
             TargetFileEncodingDefault: FileEncodingEnum.UTF_8,
             LineEndingDefault: LineEndingEnum.LF,
             TrailingNewlineDefault: true,
-            FileTypeDefault: FileTypeEnum.TextFile    
+            FileTypeDefault: FileTypeEnum.BinaryFile    
         );
     }
 

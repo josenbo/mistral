@@ -19,7 +19,7 @@ internal static class FolderConfigurator
                 return;
             }
             
-            Log.Information("Found a configuration file in the directory {TheDirectory}",
+            Log.Information("Found a deployment configuration file in the directory {TheDirectory}",
                 config.Defaults.GetRepositoryRelativePath(config.Location.FullName));
         
             if (!TryParseConfiguration(content, out var tomlConfigurationData))

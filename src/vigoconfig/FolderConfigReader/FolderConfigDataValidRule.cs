@@ -4,18 +4,18 @@ namespace vigoconfig;
 
 internal class FolderConfigDataValidRule
 {
-    public RuleTypeEnum RuleType { get; set; } = RuleTypeEnum.Undefined;
-    public string SourceFileName { get; set; } = string.Empty;
-    public string TargetFileName { get; set; } = string.Empty;
-    public string SourceFileNamePattern { get; set; } = string.Empty;
-    public string TargetFileNamePattern { get; set; } = string.Empty;
+    public RuleTypeEnum RuleType { get; init; } = RuleTypeEnum.Undefined;
+    public string SourceFileName { get; init; } = string.Empty;
+    public string TargetFileName { get; init; } = string.Empty;
+    public string SourceFileNamePattern { get; init; } = string.Empty;
+    public string TargetFileNamePattern { get; init; } = string.Empty;
     public FileTypeEnum FileType { get; set; }
     public FileEncodingEnum SourceFileEncoding { get; set; }
     public FileEncodingEnum TargetFileEncoding { get; set; }
     public LineEndingEnum LineEnding { get; set; }
     public FilePermission FilePermission { get; set; }
     public bool FixTrailingNewline { get; set; }
-    public IList<string> Buckets { get; }
+    public IList<string> Targets { get; }
 
     internal FolderConfigDataValidRule(DeploymentDefaults defaults)
     {
@@ -25,6 +25,6 @@ internal class FolderConfigDataValidRule
         LineEnding = defaults.LineEndingDefault;
         FilePermission = FilePermission.UseDefault;
         FixTrailingNewline = defaults.TrailingNewlineDefault;
-        Buckets = new List<string>();
+        Targets = new List<string>();
     }
 }

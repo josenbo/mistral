@@ -3,6 +3,7 @@
 public record DeploymentDefaults(
     string RepositoryPath,
     string DeploymentConfigFileName,
+    string ValidCharachters,
     UnixFileMode FileModeDefault,
     UnixFileMode DirectoryModeDefault,
     FileEncodingEnum SourceFileEncodingDefault,
