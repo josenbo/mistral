@@ -5,8 +5,68 @@ using vigobase;
 
 namespace vigo;
 
-internal static class ConfigurationBuilder
+internal class AppSettingsBuilder
 {
+    #region instance members
+
+    private AppSettings AppSettingsRecord { get; }
+    private FileHandlingParameters DefaultFileHandlingParamsRecord { get; }
+
+    private AppSettingsBuilder()
+    {
+        try
+        {
+            var command = GetCommand();
+
+            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+            AppSettingsRecord = command switch
+            {
+                CommandEnum.DeployToTarball => new AppSettingsDeployToTarball(
+                    RepositoryRoot: GetRepositoryRoot(),
+                    Tarball: GetTarballFile(), 
+                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
+                    AdditionalTarRootFolder: GetAdditionalTarRootFolder(), 
+                    TemporaryDirectory: GetTemporaryDirectory(),
+                    Logfile: GetLogfile(),
+                    LogLevel: GetLogLevel()),
+                CommandEnum.CheckCommit => new AppSettingsCheckCommit(
+                    RepositoryRoot: GetRepositoryRoot(),
+                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
+                    TemporaryDirectory: GetTemporaryDirectory(),
+                    Logfile: GetLogfile(),
+                    LogLevel: GetLogLevel()),
+                _ => throw new ArgumentException($"The command {command} is not handled", nameof(command))
+            };
+            
+            var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
+    
+            DefaultFileHandlingParamsRecord = new FileHandlingParameters(
+                AppSettings: AppSettingsRecord,
+                FileModeDefault: (UnixFileMode)0b_110_110_100,
+                DirectoryModeDefault: (UnixFileMode)0b_111_111_101,
+                FileTypeDefault: FileTypeEnum.BinaryFile, 
+                SourceFileEncodingDefault: FileEncodingEnum.UTF_8,
+                TargetFileEncodingDefault: FileEncodingEnum.UTF_8,
+                LineEndingDefault: LineEndingEnum.LF,
+                FilePermissionDefault: FilePermission.UseDefault, 
+                TrailingNewlineDefault: true,
+                ValidCharactersDefault: asciiGerman,
+                DefaultTargets: [ "Prod", "NonProd" ]
+            );
+
+            AppSettingsRecord.DefaultFileHandlingParams = DefaultFileHandlingParamsRecord;
+        }
+        catch (Exception e) when (e is not VigoException)
+        {
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)} constructor. Message was: {e.Message}");
+            throw new VigoFatalException("Startup configuration failed", e);
+        }
+    }
+    
+    #endregion
+
+    #region static members
+
     // "Tarball" or "Check" with case-insensitive comparison 
     private const string EnvVarVigoCommand = "VIGO_COMMAND";
     // ReSharper disable InconsistentNaming
@@ -31,42 +91,11 @@ internal static class ConfigurationBuilder
     private const string EnvVarVigoLogfile = "VIGO_LOGFILE";
     // A log level for logging to a file only (Fatal, Error, Warning, *Information*, Debug) case-insensitive
     private const string EnvVarVigoLogLevel = "VIGO_LOGLEVEL";
+
+    public static AppSettings AppSettings => _appSettings ??= Singleton.AppSettingsRecord;
+    public static FileHandlingParameters DefaultFileHandlingParams => _defaultFileHandlingParams ??= Singleton.DefaultFileHandlingParamsRecord;
+    private static AppSettingsBuilder Singleton => _singleton ??= new AppSettingsBuilder();
     
-    public static Configuration ActiveConfiguration => _activeConfiguration ??= BuildActiveConfiguration();
-
-    private static Configuration BuildActiveConfiguration()
-    {
-        try
-        {
-            var command = GetCommand();
-
-            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            return command switch
-            {
-                CommandEnum.DeployToTarball => new ConfigurationDeployToTarball(
-                    RepositoryRoot: GetRepositoryRoot(),
-                    Tarball: GetTarballFile(), 
-                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
-                    AdditionalTarRootFolder: GetAdditionalTarRootFolder(), 
-                    TemporaryDirectory: GetTemporaryDirectory(),
-                    Logfile: GetLogfile(),
-                    LogLevel: GetLogLevel()),
-                CommandEnum.CheckCommit => new ConfigurationCheckCommit(
-                    RepositoryRoot: GetRepositoryRoot(),
-                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
-                    TemporaryDirectory: GetTemporaryDirectory(),
-                    Logfile: GetLogfile(),
-                    LogLevel: GetLogLevel()),
-                _ => throw new ArgumentException($"The command {command} is not handled", nameof(command))
-            };
-        }
-        catch (Exception e) when (e is not VigoException)
-        {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(BuildActiveConfiguration)}(). Message was: {e.Message}");
-            throw new VigoFatalException("Startup configuration failed", e);
-        }
-    }
-
     private static CommandEnum GetCommand()
     {
         try
@@ -99,7 +128,7 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetRepositoryRoot)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetRepositoryRoot)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -134,7 +163,7 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetRepositoryRoot)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetRepositoryRoot)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -181,7 +210,7 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetTarballFile)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetTarballFile)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -209,12 +238,12 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetDeploymentConfigFileName)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetDeploymentConfigFileName)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
 
-    private static string? GetAdditionalTarRootFolder()
+    private static string GetAdditionalTarRootFolder()
     {
         try
         {
@@ -240,7 +269,7 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetAdditionalTarRootFolder)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetAdditionalTarRootFolder)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -288,7 +317,7 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetTemporaryDirectory)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetTemporaryDirectory)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
             
@@ -316,7 +345,7 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetLogfile)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetLogfile)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -344,7 +373,7 @@ internal static class ConfigurationBuilder
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(ConfigurationBuilder)}.{nameof(GetLogLevel)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetLogLevel)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -361,5 +390,9 @@ internal static class ConfigurationBuilder
         return Environment.GetEnvironmentVariable(environmentVariableName);
     }
     
-    private static Configuration? _activeConfiguration;
+    private static AppSettingsBuilder? _singleton;
+    private static AppSettings? _appSettings;
+    private static FileHandlingParameters? _defaultFileHandlingParams;
+
+    #endregion
 }

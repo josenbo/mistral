@@ -1,16 +1,15 @@
 ﻿using Serilog.Events;
+using vigobase;
 
 namespace vigo;
 
-internal record ConfigurationDeployToTarball(
+internal record AppSettingsCheckCommit(
     DirectoryInfo RepositoryRoot, 
-    FileInfo Tarball, 
     string DeploymentConfigFileName,
-    string? AdditionalTarRootFolder,
     DirectoryInfo TemporaryDirectory,
     FileInfo? Logfile,
     LogEventLevel LogLevel
-) : Configuration(
+) : AppSettings(
     RepositoryRoot, 
     DeploymentConfigFileName,
     TemporaryDirectory,
@@ -18,5 +17,5 @@ internal record ConfigurationDeployToTarball(
     LogLevel
 )
 {
-    public override CommandEnum Command => CommandEnum.DeployToTarball;
+    public override CommandEnum Command => CommandEnum.CheckCommit;
 }

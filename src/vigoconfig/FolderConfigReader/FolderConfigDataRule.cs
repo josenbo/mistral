@@ -71,7 +71,7 @@ public partial class FolderConfigDataRule
         return string.IsNullOrWhiteSpace(replacement) ? string.Empty : replacement.Trim();
     }
 
-    internal FolderConfigDataValidRule GetValidRuleData(DeploymentDefaults defaults)
+    internal FolderConfigDataValidRule GetValidRuleData(FileHandlingParameters defaults)
     {
         var isCopyRule = IsCopyRule();
         var sourceFileName = CheckValidFileName(SourceFileName);

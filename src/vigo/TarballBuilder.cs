@@ -6,25 +6,25 @@ internal class TarballBuilder
 {
     public void Build()
     {
-        var reader = new RepositoryReader(_configuration);
+        var reader = new RepositoryReader(_appSettings);
         
         reader.ReadRepository();
         
-        var tarball = new Tarball(_configuration.RepositoryRoot.FullName, _configuration.AdditionalTarRootFolder);
+        var tarball = new Tarball(_appSettings.RepositoryRoot.FullName, _appSettings.AdditionalTarRootFolder);
 
         foreach (var transformation in reader.FileTransformations)
         {
             tarball.AddFile(transformation.TargetFile);
         }
         
-        tarball.Save(_configuration.Tarball);
+        tarball.Save(_appSettings.Tarball);
     }
     
-    internal TarballBuilder(ConfigurationDeployToTarball configuration)
+    internal TarballBuilder(AppSettingsDeployToTarball appSettings)
     {
-        _configuration = configuration;
+        _appSettings = appSettings;
     }
 
 
-    private readonly ConfigurationDeployToTarball _configuration;
+    private readonly AppSettingsDeployToTarball _appSettings;
 }

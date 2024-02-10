@@ -18,7 +18,7 @@ internal class FolderConfigDataValidRule
     public string ValidCharacters  { get; set; }
     public IList<string> Targets { get; }
 
-    internal FolderConfigDataValidRule(DeploymentDefaults defaults)
+    internal FolderConfigDataValidRule(FileHandlingParameters defaults)
     {
         FileType = defaults.FileTypeDefault;
         SourceFileEncoding = defaults.SourceFileEncodingDefault;

@@ -8,7 +8,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
 {
     public bool CanDeploy { get; set; }
     public FileInfo SourceFile { get; }
-    public string RelativePathSourceFile => _defaults.GetRepositoryRelativePath(SourceFile.FullName);
+    public string RelativePathSourceFile => _handling.AppSettings.GetRepoRelativePath(SourceFile.FullName);
     public string? DifferentTargetFileName
     {
         get => _differentTargetFileName;
@@ -30,7 +30,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
                 {
                     Log.Error("Setting the new name {NewName} for the repository file {TheSourceFile} failed, because the repository file has no parent directory",
                         _differentTargetFileName,
-                        _defaults.GetRepositoryRelativePath(SourceFile.FullName));                    
+                        _handling.AppSettings.GetRepoRelativePath(SourceFile.FullName));                    
                     throw new VigoFatalException("The DirectoryName of a repository file should never be null");
                 }
         
@@ -40,7 +40,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
             {
                 Log.Error(e,"Setting the new name {NewName} for the repository file {TheSourceFile} failed with an Exception",
                     _differentTargetFileName,
-                    _defaults.GetRepositoryRelativePath(SourceFile.FullName));                    
+                    _handling.AppSettings.GetRepoRelativePath(SourceFile.FullName));                    
                 throw new VigoFatalException("Failed to set a new name for a repository file", e);
             }
         }
@@ -49,53 +49,51 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
 
     public FileTypeEnum FileType
     {
-        get => _fileType;
-        set => _fileType = Guard.Against.InvalidInput(value, nameof(value), FileTypeEnumHelper.IsDefinedAndValid);
+        get => _handling.FileTypeDefault;
+        set => _handling = _handling with { FileTypeDefault = Guard.Against.InvalidInput(value, nameof(value), FileTypeEnumHelper.IsDefinedAndValid) };
     }
 
     public FileEncodingEnum SourceFileEncoding
     {
-        get => _sourceFileEncoding;
-        set => _sourceFileEncoding = Guard.Against.InvalidInput(value, nameof(value), FileEncodingEnumHelper.IsDefinedAndValid);
+        get => _handling.SourceFileEncodingDefault;
+        set => _handling = _handling with { SourceFileEncodingDefault = Guard.Against.InvalidInput(value, nameof(value), FileEncodingEnumHelper.IsDefinedAndValid) };
     }
 
     public FileEncodingEnum TargetFileEncoding
     {
-        get => _targetFileEncoding;
-        set => _targetFileEncoding = Guard.Against.InvalidInput(value, nameof(value), FileEncodingEnumHelper.IsDefinedAndValid);
+        get => _handling.TargetFileEncodingDefault;
+        set => _handling = _handling with { TargetFileEncodingDefault = Guard.Against.InvalidInput(value, nameof(value), FileEncodingEnumHelper.IsDefinedAndValid) };
     }
 
-    public FilePermission FilePermission { get; set; }
+    public FilePermission FilePermission
+    {
+        get => _handling.FilePermissionDefault;
+        set => _handling = _handling with { FilePermissionDefault = value };
+    }
 
     public LineEndingEnum LineEnding
     {
-        get => _lineEnding;
-        set => _lineEnding = Guard.Against.InvalidInput(value, nameof(value), LineEndingEnumHelper.IsDefinedAndValid);
+        get => _handling.LineEndingDefault;
+        set => _handling = _handling with { LineEndingDefault = Guard.Against.InvalidInput(value, nameof(value), LineEndingEnumHelper.IsDefinedAndValid) };
     }
 
-    public bool FixTrailingNewline { get; set; }
+    public bool FixTrailingNewline
+    {
+        get => _handling.TrailingNewlineDefault; 
+        set => _handling = _handling with { TrailingNewlineDefault = value };
+    }
 
     IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.GetReadOnlyInterface()
     {
         return this;
     }
 
-    internal DeploymentTransformationFile(FileInfo sourceFile, DeploymentDefaults defaults)
+    internal DeploymentTransformationFile(FileInfo sourceFile, FileHandlingParameters defaults)
     {
-        _defaults = defaults;
+        _handling = defaults;
         TargetFile = SourceFile = sourceFile;
-        FileType = defaults.FileTypeDefault;
-        SourceFileEncoding = defaults.SourceFileEncodingDefault;
-        TargetFileEncoding = defaults.TargetFileEncodingDefault;
-        FilePermission = FilePermission.UseDefault;
-        LineEnding = defaults.LineEndingDefault;
-        FixTrailingNewline = defaults.TrailingNewlineDefault;
     }
 
+    private FileHandlingParameters _handling;
     private string? _differentTargetFileName;
-    private FileTypeEnum _fileType;
-    private FileEncodingEnum _sourceFileEncoding;
-    private FileEncodingEnum _targetFileEncoding;
-    private LineEndingEnum _lineEnding;
-    private readonly DeploymentDefaults _defaults;
 }

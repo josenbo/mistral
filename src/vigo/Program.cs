@@ -8,25 +8,25 @@ try
     var stopwatch = new Stopwatch();
     stopwatch.Start();
 
-    var config = ConfigurationBuilder.ActiveConfiguration;
+    var settings = AppSettingsBuilder.AppSettings;
 
     Environment.ExitCode = 1;
 
-    if (config.Logfile is not null && File.Exists(config.Logfile.FullName))
-        config.Logfile.Delete();
+    if (settings.Logfile is not null && File.Exists(settings.Logfile.FullName))
+        settings.Logfile.Delete();
 
-    ConfigureLogging(config.Logfile, config.LogLevel);
+    ConfigureLogging(settings.Logfile, settings.LogLevel);
     
     Log.Information("Running the command {TheCommand} with the repository root folder {TheRepositoryRoot}",
-        config.Command,
-        config.RepositoryRoot.FullName);
+        settings.Command,
+        settings.RepositoryRoot.FullName);
 
     try
     {
-        var result = config switch
+        var result = settings switch
         {
-            ConfigurationDeployToTarball configurationDeployToTarball => BuildTarball(configurationDeployToTarball),
-            ConfigurationCheckCommit configurationCheckCommit => RunCommitChecks(configurationCheckCommit),
+            AppSettingsDeployToTarball configurationDeployToTarball => BuildTarball(configurationDeployToTarball),
+            AppSettingsCheckCommit configurationCheckCommit => RunCommitChecks(configurationCheckCommit),
             _ => false
         };
 
@@ -43,10 +43,10 @@ try
     {
         try
         {
-            if (config is ConfigurationDeployToTarball configTarball && File.Exists(configTarball.TemporaryTarballPath))
+            if (settings is AppSettingsDeployToTarball configTarball && File.Exists(configTarball.TemporaryTarballPath))
                 File.Move(configTarball.TemporaryTarballPath, configTarball.Tarball.FullName);
             
-            config.TemporaryDirectory.Delete(true);
+            settings.TemporaryDirectory.Delete(true);
         }
         catch (Exception e)
         {
@@ -69,12 +69,12 @@ return;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-bool RunCommitChecks(ConfigurationCheckCommit config)
+bool RunCommitChecks(AppSettingsCheckCommit config)
 {
     return true;
 }
 
-bool BuildTarball(ConfigurationDeployToTarball config)
+bool BuildTarball(AppSettingsDeployToTarball config)
 {
     try
     {

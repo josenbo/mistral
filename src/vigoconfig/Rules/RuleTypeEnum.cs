@@ -6,7 +6,10 @@ internal enum RuleTypeEnum
     CopyAll = 101,
     CopyName = 102,
     CopyPattern = 103,
-    SkipAll = 201,
-    SkipName = 202,
-    SkipPattern = 203
+    CheckAll = 304,
+    CheckName = 305,
+    CheckPattern = 306,
+    SkipAll = 507,
+    SkipName = 508,
+    SkipPattern = 509
 }

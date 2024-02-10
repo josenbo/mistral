@@ -21,18 +21,14 @@ internal class RepositoryReader
     {
         Log.Information("Scanning the repository folder tree");
         
-        var defaults = GetDeploymentDefaults(
-            _configuration.DeploymentConfigFileName, 
-            _configuration.RepositoryRoot.FullName);
-        
-        var rules = new DirectoryController(_configuration.RepositoryRoot, defaults);
+        var rules = new DirectoryController(_appSettings.RepositoryRoot, _appSettings.DefaultFileHandlingParams);
 
         ProcessDirectory(rules);
     }
     
-    internal RepositoryReader(Configuration configuration)
+    internal RepositoryReader(AppSettings appSettings)
     {
-        _configuration = configuration;
+        _appSettings = appSettings;
     }
     
     private void ProcessDirectory(DirectoryController controller)
@@ -58,30 +54,10 @@ internal class RepositoryReader
         {
             if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
                 continue;
-            ProcessDirectory(new DirectoryController(di, controller.GlobalDefaults));
+            ProcessDirectory(new DirectoryController(di, controller.ParentFileHandlingParams));
         }
     }
-    
-    private static DeploymentDefaults GetDeploymentDefaults(string deploymentConfigFileName, string repositoryPath)
-    {
-        var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
-        
-        return new DeploymentDefaults(
-            RepositoryPath: repositoryPath,
-            DeploymentConfigFileName: deploymentConfigFileName,
-            FileModeDefault: (UnixFileMode)0b_110_110_100,
-            DirectoryModeDefault: (UnixFileMode)0b_111_111_101,
-            FileTypeDefault: FileTypeEnum.BinaryFile, 
-            SourceFileEncodingDefault: FileEncodingEnum.UTF_8,
-            TargetFileEncodingDefault: FileEncodingEnum.UTF_8,
-            LineEndingDefault: LineEndingEnum.LF,
-            FilePermissionDefault: FilePermission.UseDefault, 
-            TrailingNewlineDefault: true,
-            ValidCharactersDefault: asciiGerman,
-            DefaultTargets: [ "Prod", "NonProd" ]
-        );
-    }
 
-    private readonly Configuration _configuration;
+    private readonly AppSettings _appSettings;
     private readonly List<IDeploymentTransformationReadOnly> _transformations = [];
 }

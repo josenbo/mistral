@@ -35,7 +35,7 @@ public class FolderConfigDataHead
     [DataMember(Name = "Rules")]   
     public List<FolderConfigDataRule> Rules { get; } = [];
 
-    internal DeploymentDefaults GetLocalDefaults(DeploymentDefaults globalDefaults)
+    internal FileHandlingParameters GetLocalDefaults(FileHandlingParameters globalDefaults)
     {
         var retval = globalDefaults;
 

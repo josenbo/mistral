@@ -13,46 +13,46 @@ internal static class FolderConfigurator
     {
         try
         {
-            if (!TryReadFileContent(config.Location, config.GlobalDefaults.DeploymentConfigFileName, out var content))
+            if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.AppSettings.DeploymentConfigFileName, out var content))
             {
                 config.AddRule(BuildDefaultRuleSkipAll(config.NextRuleIndex));
                 return;
             }
             
             Log.Information("Found a deployment configuration file in the directory {TheDirectory}",
-                config.GlobalDefaults.GetRepositoryRelativePath(config.Location.FullName));
+                config.ParentFileHandlingParams.AppSettings.GetRepoRelativePath(config.Location.FullName));
         
             if (!TryParseConfiguration(content, out var tomlConfigurationData))
             {
                 Log.Fatal("Could not read the configuration file {TheFileName}}",
-                    config.GlobalDefaults.DeploymentConfigFileName);
+                    config.ParentFileHandlingParams.AppSettings.DeploymentConfigFileName);
 
                 throw new VigoFatalException("Could not read the folder configuration");
             }
 
             config.HasKeepFolderFlag = tomlConfigurationData.KeepEmptyFolder is true;
-            config.SetLocalDefaults(tomlConfigurationData.GetLocalDefaults(config.GlobalDefaults));
+            config.SetLocalDefaults(tomlConfigurationData.GetLocalDefaults(config.ParentFileHandlingParams));
                 
             ValidateAndAppendRules(config, tomlConfigurationData.Rules);
 
-            config.AddRule(BuildDefaultRuleCopyAll(config.GlobalDefaults, config.NextRuleIndex));
+            config.AddRule(BuildDefaultRuleCopyAll(config.ParentFileHandlingParams, config.NextRuleIndex));
         }
         catch (Exception e) when (e is not VigoException)
         {
             Log.Fatal(e,"Could not read the configuration in the directory {TheDir}",
-                config.GlobalDefaults.GetRepositoryRelativePath(config.Location.FullName));
+                config.ParentFileHandlingParams.AppSettings.GetRepoRelativePath(config.Location.FullName));
             throw new VigoFatalException("Failed to read the deployment configuration in the repository folder");
         }
     }
 
     private static void ValidateAndAppendRules(IFolderConfiguration config, IEnumerable<FolderConfigDataRule> tomlRuleData)
     {
-        foreach (var data in tomlRuleData.Select(d => d.GetValidRuleData(config.LocalDefaults)))
+        foreach (var data in tomlRuleData.Select(d => d.GetValidRuleData(config.LocalFileHandlingParams)))
         {
             switch (data.RuleType)
             {
                 case RuleTypeEnum.CopyAll:
-                    config.AddRule(new RuleToCopyUnconditional(
+                    config.AddRule(new FileRuleUnconditional(
                         config.NextRuleIndex, 
                         data.FileType,
                         data.SourceFileEncoding,
@@ -62,7 +62,7 @@ internal static class FolderConfigurator
                         data.FixTrailingNewline));
                     break;
                 case RuleTypeEnum.CopyName:
-                    config.AddRule(new RuleToCopyMatchingLiteral(
+                    config.AddRule(new FileRuleMatchingLiteral(
                         config.NextRuleIndex,
                         data.SourceFileName,
                         data.TargetFileName,
@@ -74,7 +74,7 @@ internal static class FolderConfigurator
                         data.FixTrailingNewline));
                     break;
                 case RuleTypeEnum.CopyPattern:
-                    config.AddRule(new RuleToCopyMatchingPattern(
+                    config.AddRule(new FileRuleMatchingPattern(
                         config.NextRuleIndex,
                         data.SourceFileNamePattern,
                         data.TargetFileNamePattern,
@@ -185,9 +185,9 @@ internal static class FolderConfigurator
         // return sb.ToString();
     }
 
-    private static RuleToCopyUnconditional BuildDefaultRuleCopyAll(DeploymentDefaults defaults, int index)
+    private static FileRuleUnconditional BuildDefaultRuleCopyAll(FileHandlingParameters defaults, int index)
     {
-        return new RuleToCopyUnconditional(
+        return new FileRuleUnconditional(
             Index: index,
             FileType: defaults.FileTypeDefault,
             SourceFileEncoding: defaults.SourceFileEncodingDefault,

@@ -7,8 +7,8 @@ namespace vigoconfig;
 [PublicAPI]
 public class DirectoryController : IFolderConfiguration
 {
-    public DeploymentDefaults GlobalDefaults { get; }
-    public DeploymentDefaults LocalDefaults { get; private set; }
+    public FileHandlingParameters ParentFileHandlingParams { get; }
+    public FileHandlingParameters LocalFileHandlingParams { get; private set; }
     public DirectoryInfo Location { get; }
 
     public IDeploymentTransformationReadWriteDirectory GetDirectoryTransformation()
@@ -20,20 +20,20 @@ public class DirectoryController : IFolderConfiguration
     {
         foreach (var rule in _rules)
         {
-            if (rule.GetTransformation(file, LocalDefaults, out var transformation))
+            if (rule.GetTransformation(file, LocalFileHandlingParams, out var transformation))
                 return transformation;
         }
         
         Log.Fatal("There is no rule matching the file name {TheFileName} in the directory {TheDirectory}",
             file.Name,
-            LocalDefaults.GetRepositoryRelativePath(file.FullName));
+            LocalFileHandlingParams.AppSettings.GetRepoRelativePath(file.FullName));
         throw new VigoFatalException("Could not find a file rule");
     }
     
-    public DirectoryController(DirectoryInfo directory, DeploymentDefaults defaults)
+    public DirectoryController(DirectoryInfo location, FileHandlingParameters parentFileHandlingParams)
     {
-        LocalDefaults = GlobalDefaults = defaults;
-        Location = directory;
+        LocalFileHandlingParams = ParentFileHandlingParams = parentFileHandlingParams;
+        Location = location;
         FolderConfigurator.Configure(this);
     }
 
@@ -44,9 +44,9 @@ public class DirectoryController : IFolderConfiguration
 
     int IFolderConfiguration.NextRuleIndex => _rules.Count;
 
-    void IFolderConfiguration.SetLocalDefaults(DeploymentDefaults localDefaults)
+    void IFolderConfiguration.SetLocalDefaults(FileHandlingParameters localDefaults)
     {
-        LocalDefaults = localDefaults;
+        LocalFileHandlingParams = localDefaults;
     }
 
     bool IFolderConfiguration.HasKeepFolderFlag
@@ -55,7 +55,7 @@ public class DirectoryController : IFolderConfiguration
         set => _keepEmptyDirector = value;
     }
 
-    void IFolderConfiguration.AddRule(Rule rule)
+    void IFolderConfiguration.AddRule(FileRule rule)
     {
         if (rule.Index != _rules.Count)
         {

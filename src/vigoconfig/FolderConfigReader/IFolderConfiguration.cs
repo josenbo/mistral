@@ -4,11 +4,11 @@ namespace vigoconfig;
 
 internal interface IFolderConfiguration
 {
-    DeploymentDefaults GlobalDefaults { get; }
-    DeploymentDefaults LocalDefaults { get; }
+    FileHandlingParameters ParentFileHandlingParams { get; }
+    FileHandlingParameters LocalFileHandlingParams { get; }
     DirectoryInfo Location { get; }
-    void SetLocalDefaults(DeploymentDefaults localDefaults);
+    void SetLocalDefaults(FileHandlingParameters localDefaults);
     bool HasKeepFolderFlag { get; set; }
     int NextRuleIndex { get; }
-    void AddRule(Rule rule);
+    void AddRule(FileRule rule);
 }
