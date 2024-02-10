@@ -20,13 +20,13 @@ public class DirectoryController : IFolderConfiguration
     {
         foreach (var rule in _rules)
         {
-            if (rule.GetTransformation(file, LocalFileHandlingParams, out var transformation))
+            if (rule.GetTransformation(file, out var transformation))
                 return transformation;
         }
         
         Log.Fatal("There is no rule matching the file name {TheFileName} in the directory {TheDirectory}",
             file.Name,
-            LocalFileHandlingParams.AppSettings.GetRepoRelativePath(file.FullName));
+            LocalFileHandlingParams.Settings.GetRepoRelativePath(file.FullName));
         throw new VigoFatalException("Could not find a file rule");
     }
     

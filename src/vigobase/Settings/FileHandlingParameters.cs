@@ -1,14 +1,14 @@
 ﻿namespace vigobase;
 
 public record FileHandlingParameters(
-    IAppSettings AppSettings,
-    UnixFileMode FileModeDefault,
-    UnixFileMode DirectoryModeDefault,
-    FileTypeEnum FileTypeDefault,
-    FileEncodingEnum SourceFileEncodingDefault,
-    FileEncodingEnum TargetFileEncodingDefault,
-    LineEndingEnum LineEndingDefault,
-    FilePermission FilePermissionDefault,
-    bool TrailingNewlineDefault,
-    string ValidCharactersDefault,
-    IReadOnlyList<string> DefaultTargets);
+    IAppSettings Settings,
+    UnixFileMode StandardModeForFiles,
+    UnixFileMode StandardModeForDirectories,
+    FileTypeEnum FileType,
+    FileEncodingEnum SourceFileEncoding,
+    FileEncodingEnum TargetFileEncoding,
+    LineEndingEnum LineEnding,
+    FilePermission Permissions,
+    bool FixTrailingNewline,
+    string ValidChars,
+    IReadOnlyList<string> Targets);

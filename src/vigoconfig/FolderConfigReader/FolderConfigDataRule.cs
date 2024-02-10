@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Serilog;
 using vigobase;
 
 namespace vigoconfig;
@@ -44,16 +45,137 @@ public partial class FolderConfigDataRule
     [DataMember(Name = "TargetList")]   
     public string? Targets { get; set; }
     
-    private bool IsCopyRule()
+    internal FileRule GetFileRule(IFolderConfiguration folderConfig, FileHandlingParameters handlingDefaults)
+    {
+        var relativePath = handlingDefaults.Settings.GetRepoRelativePath(folderConfig.Location);
+        
+        var handling = handlingDefaults;
+
+        if (FileType is not null && FileTypeEnumHelper.TryParse(FileType, out var fileType))
+            handling = handling with { FileType = fileType.Value };
+        
+        if (SourceFileEncoding is not null && FileEncodingEnumHelper.TryParse(SourceFileEncoding, out var sourceFileEncoding))
+            handling = handling with { SourceFileEncoding = sourceFileEncoding.Value };
+        
+        if (TargetFileEncoding is not null && FileEncodingEnumHelper.TryParse(TargetFileEncoding, out var targetFileEncoding))
+            handling = handling with { TargetFileEncoding = targetFileEncoding.Value };
+
+        if (LineEnding is not null && LineEndingEnumHelper.TryParse(LineEnding, out var lineEnding))
+            handling = handling with { LineEnding = lineEnding.Value };
+        
+        if (FilePermission is not null && vigobase.FilePermission.TryParse(FilePermission, out var filePermission))
+            handling = handling with { Permissions = filePermission } ;
+
+        if (FixTrailingNewline.HasValue)
+            handling = handling with { FixTrailingNewline = FixTrailingNewline.Value };
+
+        if (ValidCharacters is not null)
+            handling = handling with { ValidChars = ValidCharactersHelper.ParseConfiguration(ValidCharacters) }; 
+        
+        if (Targets != null)
+            handling = handling with { Targets = DeploymentTargetHelper.ParseTargets(Targets).ToList() };
+        
+        var action = GetAction();
+        var (condition, lookFor, replaceWith) = GetCondition(relativePath);
+
+        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+        return condition switch
+        {
+            FileRuleConditionEnum.Unconditional => new FileRuleUnconditional(
+                Index: folderConfig.NextRuleIndex,
+                Action: action,
+                Handling: handling
+                ),
+            FileRuleConditionEnum.MatchName => new FileRuleMatchingLiteral(
+                Index: folderConfig.NextRuleIndex,
+                Action: action,
+                NameToMatch: lookFor,
+                NameReplacement: replaceWith,
+                Handling: handling
+                ),
+            FileRuleConditionEnum.MatchPattern => new FileRuleMatchingPattern(
+                Index: folderConfig.NextRuleIndex,
+                Action: action,
+                NameToMatch: lookFor,
+                NameReplacement: replaceWith,
+                Handling: handling
+                ),
+            _ => throw new ArgumentOutOfRangeException($"The condition {condition} is not allowed or not understood in {relativePath}", nameof(condition))
+        };
+    }
+
+    private FileRuleActionEnum GetAction()
     {
         var ruleType = RuleType?.Trim().ToLower() ?? string.Empty;
         
         return ruleType switch
         {
-            "copy" => true,
-            "skip" => false,
-            _ => throw new ArgumentException($"Invalid RuleType value {RuleType}")
+            "copy" => FileRuleActionEnum.CopyRule,
+            "check" => FileRuleActionEnum.CheckRule,
+            "skip" => FileRuleActionEnum.SkipRule,
+            _ => throw new ArgumentException($"Invalid or missing action (Value: {RuleType})", nameof(ruleType))
         };
+    }
+
+    private (FileRuleConditionEnum condition, string lookFor, string replaceWith) GetCondition(string relativePath)
+    {
+        var sourceFileName = CheckValidFileName(SourceFileName);
+        var targetFileName = CheckValidFileName(TargetFileName);
+        var sourceFileNamePattern = CheckValidFileNamePattern(SourceFileNamePattern);
+        var targetFileNamePattern = CheckValidFileNamePatternReplacement(TargetFileNamePattern);
+
+        if (!string.IsNullOrWhiteSpace(sourceFileName))
+        {
+            if (sourceFileName == targetFileName)
+                targetFileName = string.Empty;
+            
+            // ReSharper disable once InvertIf
+            if (!string.IsNullOrEmpty(sourceFileName) || !string.IsNullOrEmpty(targetFileNamePattern))
+            {
+                Log.Warning("The condition \"{TheRuleType} when name is {SourceFileName}\" in the directory {TheDirectory} has a redundant file name pattern and/or replacement, which will be ignored",
+                    RuleType,
+                    SourceFileName,
+                    relativePath
+                    );
+                sourceFileNamePattern = string.Empty;
+                targetFileNamePattern = string.Empty;
+            }
+
+            return (FileRuleConditionEnum.MatchName, sourceFileName, targetFileName);
+        }
+        else if (!string.IsNullOrWhiteSpace(sourceFileNamePattern))
+        {
+            targetFileName = string.Empty;
+            
+            // ReSharper disable once InvertIf
+            if (!string.IsNullOrEmpty(targetFileName))
+            {
+                Log.Warning("The condition \"{TheRuleType} when name matches {SourceFileNamePattern}\" in the directory {TheDirectory} has a redundant literal file name replacement, which will be ignored",
+                    RuleType,
+                    SourceFileNamePattern,
+                    relativePath
+                );
+                targetFileName = string.Empty;
+            }
+
+            return (FileRuleConditionEnum.MatchPattern, sourceFileNamePattern, targetFileNamePattern);
+        }
+        else
+        {
+            // ReSharper disable once InvertIf
+            if (!string.IsNullOrEmpty(targetFileName) || !string.IsNullOrEmpty(targetFileNamePattern))
+            {
+                Log.Warning("The condition \"{TheRuleType} unconditionally\" in the directory {TheDirectory} has redundant file name replacements, which will be ignored",
+                    RuleType,
+                    SourceFileName,
+                    relativePath
+                );
+                targetFileName = string.Empty;
+                targetFileNamePattern = string.Empty;
+            }
+
+            return (FileRuleConditionEnum.Unconditional, string.Empty, string.Empty);
+        }
     }
     
     private static string CheckValidFileName(string? name)
@@ -69,104 +191,5 @@ public partial class FolderConfigDataRule
     private static string CheckValidFileNamePatternReplacement(string? replacement)
     {
         return string.IsNullOrWhiteSpace(replacement) ? string.Empty : replacement.Trim();
-    }
-
-    internal FolderConfigDataValidRule GetValidRuleData(FileHandlingParameters defaults)
-    {
-        var isCopyRule = IsCopyRule();
-        var sourceFileName = CheckValidFileName(SourceFileName);
-        var targetFileName = CheckValidFileName(TargetFileName);
-        var sourceFileNamePattern = CheckValidFileNamePattern(SourceFileNamePattern);
-        var targetFileNamePattern = CheckValidFileNamePatternReplacement(TargetFileNamePattern);
-        RuleTypeEnum ruleType;
-        
-        if (isCopyRule)
-        {
-            if (!string.IsNullOrWhiteSpace(sourceFileName))
-            {
-                ruleType = RuleTypeEnum.CopyName;
-                if (sourceFileName == targetFileName)
-                    targetFileName = string.Empty;
-                sourceFileNamePattern = string.Empty;
-                targetFileNamePattern = string.Empty;
-            }
-            else if (!string.IsNullOrWhiteSpace(sourceFileNamePattern))
-            {
-                ruleType = RuleTypeEnum.CopyPattern;
-                targetFileName = string.Empty;
-            }
-            else
-            {
-                ruleType = RuleTypeEnum.CopyAll;
-                targetFileName = string.Empty;
-                targetFileNamePattern = string.Empty;
-            }
-        }
-        else
-        {
-            if (!string.IsNullOrWhiteSpace(sourceFileName))
-            {
-                ruleType = RuleTypeEnum.SkipName;
-                if (sourceFileName == targetFileName)
-                    targetFileName = string.Empty;
-                sourceFileNamePattern = string.Empty;
-                targetFileNamePattern = string.Empty;
-            }
-            else if (!string.IsNullOrWhiteSpace(sourceFileNamePattern))
-            {
-                ruleType = RuleTypeEnum.SkipPattern;
-                targetFileName = string.Empty;
-            }
-            else
-            {
-                ruleType = RuleTypeEnum.SkipAll;
-                targetFileName = string.Empty;
-                targetFileNamePattern = string.Empty;
-            }
-        }
-        
-        var validRuleData = new FolderConfigDataValidRule(defaults)
-        {
-            RuleType = ruleType,
-            SourceFileName = sourceFileName,
-            TargetFileName = targetFileName,
-            SourceFileNamePattern = sourceFileNamePattern,
-            TargetFileNamePattern = targetFileNamePattern,
-        };
-
-        if (FileType is not null && FileTypeEnumHelper.TryParse(FileType, out var fileType))
-            validRuleData.FileType = fileType ?? throw new Exception("FileTypeEnumHelper.TryParse null constraint violated");
-        
-        if (SourceFileEncoding is not null && FileEncodingEnumHelper.TryParse(SourceFileEncoding, out var sourceFileEncoding))
-            validRuleData.SourceFileEncoding = sourceFileEncoding ?? throw new Exception("FileEncodingEnumHelper.TryParse null constraint violated");
-        
-        if (TargetFileEncoding is not null && FileEncodingEnumHelper.TryParse(TargetFileEncoding, out var targetFileEncoding))
-            validRuleData.TargetFileEncoding = targetFileEncoding ?? throw new Exception("FileEncodingEnumHelper.TryParse null constraint violated");
-        
-        if (LineEnding is not null && LineEndingEnumHelper.TryParse(LineEnding, out var lineEnding))
-            validRuleData.LineEnding = lineEnding ?? throw new Exception("LineEndingEnumHelper.TryParse null constraint violated");
-        
-        if (FilePermission is not null && vigobase.FilePermission.TryParse(FilePermission, out var filePermission))
-            validRuleData.FilePermission = filePermission;
-
-        if (FixTrailingNewline.HasValue)
-            validRuleData.FixTrailingNewline = FixTrailingNewline.Value;
-
-        if (ValidCharacters is not null)
-            validRuleData.ValidCharacters = ValidCharactersHelper.ParseConfiguration(ValidCharacters); 
-        
-        // ReSharper disable once InvertIf
-        if (Targets != null)
-        {
-            // delete the inherited defaults
-            validRuleData.Targets.Clear();
-            
-            foreach (var target in DeploymentTargetHelper.ParseTargets(Targets))
-            {
-                validRuleData.Targets.Add(target);
-            }
-        }
-        
-        return validRuleData;
     }
 }

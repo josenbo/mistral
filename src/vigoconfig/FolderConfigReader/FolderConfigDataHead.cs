@@ -40,27 +40,27 @@ public class FolderConfigDataHead
         var retval = globalDefaults;
 
         if (FileType is not null && FileTypeEnumHelper.TryParse(FileType, out var fileType))
-            retval = retval with { FileTypeDefault = fileType.Value };
+            retval = retval with { FileType = fileType.Value };
 
         if (SourceFileEncoding is not null && FileEncodingEnumHelper.TryParse(SourceFileEncoding, out var sourceFileEncoding))
-            retval = retval with { SourceFileEncodingDefault = sourceFileEncoding.Value };
+            retval = retval with { SourceFileEncoding = sourceFileEncoding.Value };
         
         if (TargetFileEncoding is not null && FileEncodingEnumHelper.TryParse(TargetFileEncoding, out var targetFileEncoding))
-            retval = retval with { TargetFileEncodingDefault = targetFileEncoding.Value };
+            retval = retval with { TargetFileEncoding = targetFileEncoding.Value };
 
         if (LineEnding is not null && LineEndingEnumHelper.TryParse(LineEnding, out var lineEnding))
-            retval = retval with { LineEndingDefault = lineEnding.Value };
+            retval = retval with { LineEnding = lineEnding.Value };
 
         if (FilePermission is not null && vigobase.FilePermission.TryParse(FilePermission, out var filePermission))
-            retval = retval with { FilePermissionDefault = filePermission };
+            retval = retval with { Permissions = filePermission };
 
         if (FixTrailingNewline.HasValue)
-            retval = retval with { TrailingNewlineDefault = FixTrailingNewline.Value };
+            retval = retval with { FixTrailingNewline = FixTrailingNewline.Value };
 
         if (ValidCharacters is not null)
             retval = retval with
             {
-                ValidCharactersDefault = vigobase.ValidCharactersHelper.ParseConfiguration(ValidCharacters)
+                ValidChars = vigobase.ValidCharactersHelper.ParseConfiguration(ValidCharacters)
             };
 
         // ReSharper disable once InvertIf
@@ -68,7 +68,7 @@ public class FolderConfigDataHead
         {
             var targets = DeploymentTargetHelper.ParseTargets(Targets).ToList();
 
-            retval = retval with { DefaultTargets = targets };
+            retval = retval with { Targets = targets };
         }
         
         return retval;

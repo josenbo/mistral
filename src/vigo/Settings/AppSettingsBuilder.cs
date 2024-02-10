@@ -43,24 +43,24 @@ internal class AppSettingsBuilder
             var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
     
             DefaultFileHandlingParamsRecord = new FileHandlingParameters(
-                AppSettings: AppSettingsRecord,
-                FileModeDefault: (UnixFileMode)0b_110_110_100,
-                DirectoryModeDefault: (UnixFileMode)0b_111_111_101,
-                FileTypeDefault: FileTypeEnum.BinaryFile, 
-                SourceFileEncodingDefault: FileEncodingEnum.UTF_8,
-                TargetFileEncodingDefault: FileEncodingEnum.UTF_8,
-                LineEndingDefault: LineEndingEnum.LF,
-                FilePermissionDefault: FilePermission.UseDefault, 
-                TrailingNewlineDefault: true,
-                ValidCharactersDefault: asciiGerman,
-                DefaultTargets: [ "Prod", "NonProd" ]
+                Settings: AppSettingsRecord,
+                StandardModeForFiles: (UnixFileMode)0b_110_110_100,
+                StandardModeForDirectories: (UnixFileMode)0b_111_111_101,
+                FileType: FileTypeEnum.BinaryFile, 
+                SourceFileEncoding: FileEncodingEnum.UTF_8,
+                TargetFileEncoding: FileEncodingEnum.UTF_8,
+                LineEnding: LineEndingEnum.LF,
+                Permissions: FilePermission.UseDefault, 
+                FixTrailingNewline: true,
+                ValidChars: asciiGerman,
+                Targets: [ "Prod", "NonProd" ]
             );
 
             AppSettingsRecord.DefaultFileHandlingParams = DefaultFileHandlingParamsRecord;
             
             ImplicitFinalRuleHandlingRecord = DefaultFileHandlingParamsRecord with {
-                FileTypeDefault = FileTypeEnum.BinaryFile,
-                FilePermissionDefault = FilePermission.UseDefault
+                FileType = FileTypeEnum.BinaryFile,
+                Permissions = FilePermission.UseDefault
             };
 
             AppSettingsRecord.ImplicitFinalRuleIsSkippingTheFile = true;

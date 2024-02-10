@@ -2,7 +2,6 @@
 using System.Text;
 using Serilog;
 using Tomlyn;
-using Tomlyn.Syntax;
 using vigobase;
 
 namespace vigoconfig;
@@ -11,21 +10,25 @@ internal static class FolderConfigurator
 {
     public static void Configure(IFolderConfiguration config)
     {
+        var appSettings = config.ParentFileHandlingParams.Settings;
+
         try
         {
-            if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.AppSettings.DeploymentConfigFileName, out var content))
+            config.AddRule(BuildSkipDeploymentConfigFileRule(config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DefaultFileHandlingParams));
+            
+            if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.Settings.DeploymentConfigFileName, out var content))
             {
-                config.AddRule(BuildDefaultRuleSkipAll(config.NextRuleIndex));
+                config.AddRule(BuildImplicitFinalUnconditionalFileRule(config.NextRuleIndex, appSettings.ImplicitFinalRuleIsSkippingTheFile, appSettings.ImplicitFinalRuleHandling));
                 return;
             }
             
             Log.Information("Found a deployment configuration file in the directory {TheDirectory}",
-                config.ParentFileHandlingParams.AppSettings.GetRepoRelativePath(config.Location.FullName));
+                appSettings.GetRepoRelativePath(config.Location.FullName));
         
             if (!TryParseConfiguration(content, out var tomlConfigurationData))
             {
-                Log.Fatal("Could not read the configuration file {TheFileName}}",
-                    config.ParentFileHandlingParams.AppSettings.DeploymentConfigFileName);
+                Log.Fatal("Could not read the configuration file {TheFileName}",
+                    appSettings.DeploymentConfigFileName);
 
                 throw new VigoFatalException("Could not read the folder configuration");
             }
@@ -35,70 +38,14 @@ internal static class FolderConfigurator
                 
             ValidateAndAppendRules(config, tomlConfigurationData.Rules);
 
-            config.AddRule(BuildDefaultRuleCopyAll(config.ParentFileHandlingParams, config.NextRuleIndex));
+            config.AddRule(BuildImplicitFinalUnconditionalFileRule(config.NextRuleIndex, appSettings.ImplicitFinalRuleIsSkippingTheFile, appSettings.ImplicitFinalRuleHandling));
         }
         catch (Exception e) when (e is not VigoException)
         {
             Log.Fatal(e,"Could not read the configuration in the directory {TheDir}",
-                config.ParentFileHandlingParams.AppSettings.GetRepoRelativePath(config.Location.FullName));
+                appSettings.GetRepoRelativePath(config.Location.FullName));
             throw new VigoFatalException("Failed to read the deployment configuration in the repository folder");
         }
-    }
-
-    private static void ValidateAndAppendRules(IFolderConfiguration config, IEnumerable<FolderConfigDataRule> tomlRuleData)
-    {
-        foreach (var data in tomlRuleData.Select(d => d.GetValidRuleData(config.LocalFileHandlingParams)))
-        {
-            switch (data.RuleType)
-            {
-                case RuleTypeEnum.CopyAll:
-                    config.AddRule(new FileRuleUnconditional(
-                        config.NextRuleIndex, 
-                        data.FileType,
-                        data.SourceFileEncoding,
-                        data.TargetFileEncoding,
-                        data.FilePermission,
-                        data.LineEnding,
-                        data.FixTrailingNewline));
-                    break;
-                case RuleTypeEnum.CopyName:
-                    config.AddRule(new FileRuleMatchingLiteral(
-                        config.NextRuleIndex,
-                        data.SourceFileName,
-                        data.TargetFileName,
-                        data.FileType,
-                        data.SourceFileEncoding,
-                        data.TargetFileEncoding,
-                        data.FilePermission,
-                        data.LineEnding,
-                        data.FixTrailingNewline));
-                    break;
-                case RuleTypeEnum.CopyPattern:
-                    config.AddRule(new FileRuleMatchingPattern(
-                        config.NextRuleIndex,
-                        data.SourceFileNamePattern,
-                        data.TargetFileNamePattern,
-                        data.FileType,
-                        data.SourceFileEncoding,
-                        data.TargetFileEncoding,
-                        data.FilePermission,
-                        data.LineEnding,
-                        data.FixTrailingNewline));
-                    break;
-                case RuleTypeEnum.SkipAll:
-                    config.AddRule(new RuleToSkipUnconditional(config.NextRuleIndex));
-                    break;
-                case RuleTypeEnum.SkipName:
-                    config.AddRule(new RuleToSkipMatchingLiteral(config.NextRuleIndex, data.SourceFileName));
-                    break;
-                case RuleTypeEnum.SkipPattern:
-                    config.AddRule(new RuleToSkipMatchingPattern(config.NextRuleIndex, data.SourceFileNamePattern));
-                    break;
-                case RuleTypeEnum.Undefined:
-                default:
-                    throw new ArgumentOutOfRangeException($"Invalid rule type {data.RuleType}");
-            }
-        }    
     }
 
     private static bool TryReadFileContent(DirectoryInfo? directory, string deploymentConfigFileName, [NotNullWhen(true)] out string? content)
@@ -125,9 +72,7 @@ internal static class FolderConfigurator
     {
         Log.Debug("Trying to parse the configuration text into a custom model of type {ModelType}", 
             typeof(FolderConfigDataHead).FullName);
-        
-        DiagnosticsBag? diagnostics;
-        
+
         var options = new TomlModelOptions
         {
             // IgnoreMissingProperties = true,
@@ -136,7 +81,7 @@ internal static class FolderConfigurator
 
         if (Toml.TryToModel<FolderConfigDataHead>(configurationText,
                 out var parsedConfiguration,
-                out diagnostics,
+                out var diagnostics,
                 null,
                 options))
         {
@@ -158,6 +103,14 @@ internal static class FolderConfigurator
         return false;
     }
 
+    private static void ValidateAndAppendRules(IFolderConfiguration config, IEnumerable<FolderConfigDataRule> tomlRuleData)
+    {
+        foreach (var data in tomlRuleData.Select(d => d.GetFileRule(config, config.LocalFileHandlingParams)))
+        {
+            config.AddRule(data);
+        }    
+    }
+    
     // Convert the property name for matching with the TOML key
     private static string ConvertPropertyName(string name)
     {
@@ -185,20 +138,23 @@ internal static class FolderConfigurator
         // return sb.ToString();
     }
 
-    private static FileRuleUnconditional BuildDefaultRuleCopyAll(FileHandlingParameters defaults, int index)
+    private static FileRuleMatchingLiteral BuildSkipDeploymentConfigFileRule(int index, string deploymentConfigFileName, FileHandlingParameters handling)
+    {
+        return new FileRuleMatchingLiteral(
+            Index: index,
+            Action: FileRuleActionEnum.SkipRule,
+            NameToMatch: deploymentConfigFileName,
+            Handling: handling,
+            NameReplacement: string.Empty
+            );
+    }
+    
+    private static FileRuleUnconditional BuildImplicitFinalUnconditionalFileRule(int index, bool skipTheFile, FileHandlingParameters handling)
     {
         return new FileRuleUnconditional(
             Index: index,
-            FileType: defaults.FileTypeDefault,
-            SourceFileEncoding: defaults.SourceFileEncodingDefault,
-            TargetFileEncoding: defaults.TargetFileEncodingDefault,
-            FilePermission: FilePermission.UseDefault,
-            LineEnding: defaults.LineEndingDefault,
-            FixTrailingNewline: defaults.TrailingNewlineDefault);
-    }
-
-    private static RuleToSkipUnconditional BuildDefaultRuleSkipAll(int index)
-    {
-        return new RuleToSkipUnconditional(index);
+            Action: skipTheFile ? FileRuleActionEnum.SkipRule : FileRuleActionEnum.CopyRule,
+            Handling: handling
+            );
     }
 }
