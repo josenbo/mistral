@@ -18,6 +18,7 @@ internal record FileRuleMatchingPattern(
     Handling
 )
 {
+    internal override FileRuleConditionEnum Condition => FileRuleConditionEnum.MatchPattern;
     internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
         if (!Regex.IsMatch(file.Name, NameToMatch))

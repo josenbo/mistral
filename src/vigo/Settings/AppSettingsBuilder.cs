@@ -12,6 +12,8 @@ internal class AppSettingsBuilder
     private AppSettings AppSettingsRecord { get; }
     private FileHandlingParameters DefaultFileHandlingParamsRecord { get; }
 
+    private FileHandlingParameters ImplicitFinalRuleHandlingRecord { get; }
+    
     private AppSettingsBuilder()
     {
         try
@@ -55,6 +57,14 @@ internal class AppSettingsBuilder
             );
 
             AppSettingsRecord.DefaultFileHandlingParams = DefaultFileHandlingParamsRecord;
+            
+            ImplicitFinalRuleHandlingRecord = DefaultFileHandlingParamsRecord with {
+                FileTypeDefault = FileTypeEnum.BinaryFile,
+                FilePermissionDefault = FilePermission.UseDefault
+            };
+
+            AppSettingsRecord.ImplicitFinalRuleIsSkippingTheFile = true;
+            AppSettingsRecord.ImplicitFinalRuleHandling = ImplicitFinalRuleHandlingRecord;
         }
         catch (Exception e) when (e is not VigoException)
         {

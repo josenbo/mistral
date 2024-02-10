@@ -13,6 +13,7 @@ internal record FileRuleUnconditional(
     Handling
 )
 {
+    internal override FileRuleConditionEnum Condition => FileRuleConditionEnum.Unconditional;
     internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
         transformation = new DeploymentTransformationFile(file, Handling)

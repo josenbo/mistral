@@ -11,10 +11,19 @@ internal abstract record AppSettings(
     LogEventLevel LogLevel
 ) : IAppSettings
 {
+    // bool ImplicitFinalRuleIsSkippingTheFile { get;  }
+    // FileHandlingParameters ImplicitFinalRuleHandling { get; }
+
     public FileHandlingParameters DefaultFileHandlingParams
     {
         get => _defaultFileHandlingParams ?? throw new NullReferenceException($"{nameof(_defaultFileHandlingParams)} is null");
         set => _defaultFileHandlingParams = value;
+    }
+    public bool ImplicitFinalRuleIsSkippingTheFile { get; set; } = true;
+    public FileHandlingParameters ImplicitFinalRuleHandling
+    {
+        get => _implicitFinalRuleHandling ?? throw new NullReferenceException($"{nameof(_implicitFinalRuleHandling)} is null");
+        set => _implicitFinalRuleHandling = value;
     }
     public string TemporaryTarballPath => Path.Combine(TemporaryDirectory.FullName, "vigo.tar.gz");
     public abstract CommandEnum Command { get; }
@@ -31,4 +40,5 @@ internal abstract record AppSettings(
     }
 
     private FileHandlingParameters? _defaultFileHandlingParams;
+    private FileHandlingParameters? _implicitFinalRuleHandling;
 }

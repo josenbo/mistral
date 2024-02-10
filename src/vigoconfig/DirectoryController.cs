@@ -37,7 +37,7 @@ public class DirectoryController : IFolderConfiguration
         FolderConfigurator.Configure(this);
     }
 
-    private readonly List<Rule> _rules = [];
+    private readonly List<FileRule> _rules = [];
     private bool _keepEmptyDirector;
 
     #region interface IFolderConfiguration

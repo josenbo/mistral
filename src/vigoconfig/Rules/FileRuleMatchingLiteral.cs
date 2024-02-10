@@ -17,6 +17,7 @@ internal record FileRuleMatchingLiteral(
     Handling
 )
 {
+    internal override FileRuleConditionEnum Condition => FileRuleConditionEnum.MatchName;
     internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
         if (!NameToMatch.Equals(file.Name, StringComparison.Ordinal))

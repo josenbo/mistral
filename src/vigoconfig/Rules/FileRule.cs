@@ -9,8 +9,6 @@ internal abstract record FileRule(
     FileHandlingParameters Handling
 ) 
 {
+    internal abstract FileRuleConditionEnum Condition { get; }
     internal abstract bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation);
-    internal virtual bool DoCheck => Action is FileRuleActionEnum.CheckRule or FileRuleActionEnum.CopyRule;
-    internal virtual bool DoCopy => Action is FileRuleActionEnum.CopyRule;
-    internal virtual bool DoSkip => Action is FileRuleActionEnum.SkipRule;
 }
