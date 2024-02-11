@@ -37,6 +37,8 @@ internal class RepositoryReader
         
         BeforeApplyDirectoryTransformationEvent?.Invoke(directoryTransformation);
         
+        directoryTransformation.CheckAndTransform();
+        
         if (directoryTransformation.KeepEmptyDirectory)
             _transformations.Add(directoryTransformation.GetReadOnlyInterface());
         
@@ -46,6 +48,8 @@ internal class RepositoryReader
 
             BeforeApplyFileTransformationEvent?.Invoke(transformation);
 
+            transformation.CheckAndTransform();
+            
             if (transformation.CanDeploy)
                 _transformations.Add(transformation.GetReadOnlyInterface());
         }

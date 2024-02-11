@@ -8,6 +8,10 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
 {
     public bool CanDeploy { get; set; }
     public FileInfo SourceFile { get; }
+    public FileInfo CheckedAndTransformedTemporaryFile => _checkedAndTransformedTemporaryFile ??
+                                                          throw new VigoFatalException(
+                                                              $"The checked and transformed file is not (yet) available ({_handling.Settings.GetRepoRelativePath(SourceFile)})");
+    public bool CheckedSuccessfully { get; private set; } = false;
     public string RelativePathSourceFile => _handling.Settings.GetRepoRelativePath(SourceFile.FullName);
     public string? DifferentTargetFileName
     {
@@ -88,12 +92,23 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         return this;
     }
 
+    void IDeploymentTransformationReadWrite.CheckAndTransform()
+    {
+        // Todo: apply transformations, creating temp file if necessary
+        //       Set CheckedSuccessfully true if checked OK or no check necessary
+        //       Set _differentTargetFileName to transformed temp file or to source file
+        //       Log validation errors as Errors to the console logger (want them in the github actions log)
+        CheckedSuccessfully = true;
+        _checkedAndTransformedTemporaryFile = SourceFile;
+    }
+    
     internal DeploymentTransformationFile(FileInfo sourceFile, FileHandlingParameters defaults)
     {
         _handling = defaults;
         TargetFile = SourceFile = sourceFile;
     }
-
+    
     private FileHandlingParameters _handling;
     private string? _differentTargetFileName;
+    private FileInfo? _checkedAndTransformedTemporaryFile;
 }

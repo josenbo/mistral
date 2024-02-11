@@ -3,6 +3,7 @@
 public interface IDeploymentTransformationReadOnlyFile : IDeploymentTransformationReadOnly
 {
     FileInfo SourceFile { get; }
+    FileInfo CheckedAndTransformedTemporaryFile { get; }
     string RelativePathSourceFile { get; }
     string? DifferentTargetFileName { get; }
     FileInfo TargetFile { get; }
