@@ -10,8 +10,6 @@ try
 
     var settings = AppSettingsBuilder.AppSettings;
 
-    Environment.ExitCode = 1;
-
     if (settings.Logfile is not null && File.Exists(settings.Logfile.FullName))
         settings.Logfile.Delete();
 
@@ -21,39 +19,20 @@ try
         settings.Command,
         settings.RepositoryRoot.FullName);
 
-    try
+    var jobRunner = new JobRunner(settings);
+    
+    if (jobRunner.Prepare())
     {
-        var result = settings switch
-        {
-            AppSettingsDeployToTarball configurationDeployToTarball => BuildTarball(configurationDeployToTarball),
-            AppSettingsCheckCommit configurationCheckCommit => RunCommitChecks(configurationCheckCommit),
-            _ => false
-        };
-
-        Log.Information("Process terminated {TheResult}",
-            (result ? "successfully" : "with errors"));
-
-        stopwatch.Stop();
-        Log.Information("Process duration was {TheTimeSpan}",
-            stopwatch.Elapsed);
-
-        Environment.ExitCode = result ? 0 : 1;
+        jobRunner.Run();
+        jobRunner.CleanUp();
     }
-    finally
-    {
-        try
-        {
-            if (settings is AppSettingsDeployToTarball configTarball && File.Exists(configTarball.TemporaryTarballPath))
-                File.Move(configTarball.TemporaryTarballPath, configTarball.Tarball.FullName);
-            
-            settings.TemporaryDirectory.Delete(true);
-        }
-        catch (Exception e)
-        {
-            Console.Error.WriteLine($"Could not delete the temporary folder ({e.GetType().Name}: {e.Message})");
-        }
-    }
+    
     stopwatch.Stop();
+    Log.Information("Process terminated {TheResult} after {TheTimeSpan}",
+        (jobRunner.Success ? "successfully" : "with errors"),
+        stopwatch.Elapsed);
+
+    Environment.ExitCode = jobRunner.Success ? 0 : 1;
 }
 catch (Exception e)
 {
@@ -68,41 +47,6 @@ return;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
-bool RunCommitChecks(AppSettingsCheckCommit config)
-{
-    return true;
-}
-
-bool BuildTarball(AppSettingsDeployToTarball config)
-{
-    try
-    {
-        var builder = new TarballBuilder(config);
-    
-        builder.Build();
-
-        return true;
-    }
-    catch (Exception e)
-    {
-        Log.Fatal(e, "Failed to deploy repository files to a tarball. The tarball file might be incomplete and will be deleted, if it exists");
-        Console.Error.WriteLine("Fatal: the program terminates prematurely due to an unhandled error");
-
-        try
-        {
-            config.Tarball.Refresh();
-            if (config.Tarball.Exists)
-                config.Tarball.Delete();
-        }
-        catch (Exception)
-        {
-            // ignore errors during cleanup
-        }
-
-        return false;
-    }
-}
 
 void ConfigureLogging(FileInfo? logfile, LogEventLevel logLevelFile, LogEventLevel logLevelConsole = LogEventLevel.Warning)
 {
