@@ -9,7 +9,7 @@ internal class AppSettingsBuilder
 {
     #region instance members
 
-    private AppSettings Settings { get; }
+    private AppSettings LocalAppSettings { get; }
     private FileHandlingParameters DefaultHandling { get; }
 
     private FileHandlingParameters FinalCatchAllHandling { get; }
@@ -22,7 +22,7 @@ internal class AppSettingsBuilder
             var command = GetCommand();
 
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            Settings = command switch
+            LocalAppSettings = command switch
             {
                 CommandEnum.DeployToTarball => new AppSettingsDeployToTarball(
                     RepositoryRoot: GetRepositoryRoot(),
@@ -44,7 +44,7 @@ internal class AppSettingsBuilder
             var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
     
             DefaultHandling = new FileHandlingParameters(
-                Settings: Settings,
+                Settings: LocalAppSettings,
                 StandardModeForFiles: (UnixFileMode)0b_110_110_100,
                 StandardModeForDirectories: (UnixFileMode)0b_111_111_101,
                 FileType: FileTypeEnum.BinaryFile, 
@@ -57,14 +57,14 @@ internal class AppSettingsBuilder
                 Targets: [ "Prod", "NonProd" ]
             );
 
-            Settings.DefaultFileHandlingParams = DefaultHandling;
+            LocalAppSettings.DefaultFileHandlingParams = DefaultHandling;
             
             FinalCatchAllHandling = DefaultHandling with {
                 FileType = FileTypeEnum.BinaryFile,
                 Permissions = FilePermission.UseDefault
             };
 
-            AppSettings.FinalCatchAllRule = new StandardFileHandling(FinalCatchAllHandling, false);
+            LocalAppSettings.FinalCatchAllRule = new StandardFileHandling(FinalCatchAllHandling, false);
 
             DeployConfigHandling = DefaultHandling with
             {
@@ -72,7 +72,7 @@ internal class AppSettingsBuilder
                 Permissions = FilePermission.UseDefault
             };
             
-            AppSettings.DeployConfigRule = new StandardFileHandling(DeployConfigHandling, false);
+            LocalAppSettings.DeployConfigRule = new StandardFileHandling(DeployConfigHandling, false);
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -103,9 +103,24 @@ internal class AppSettingsBuilder
     // A log level for logging to a file only (Fatal, Error, Warning, *Information*, Debug) case-insensitive
     private const string EnvVarVigoLogLevel = "VIGO_LOGLEVEL";
 
-    public static AppSettings AppSettings => _appSettings ??= Singleton.Settings;
-    public static FileHandlingParameters DefaultFileHandlingParams => _defaultFileHandlingParams ??= Singleton.DefaultHandling;
-    private static AppSettingsBuilder Singleton => _singleton ??= new AppSettingsBuilder();
+    public static AppSettings AppSettings => _appSettings ?? CreateAppSettings();
+
+    private static AppSettings CreateAppSettings()
+    {
+        lock (_appSettingsLock)
+        {
+            if (_appSettings is null)
+            {
+                var builder = new AppSettingsBuilder();
+                _appSettings = builder.LocalAppSettings;
+            }
+
+            return _appSettings;
+        }
+    }
+
+    // public static FileHandlingParameters DefaultFileHandlingParams => _defaultFileHandlingParams ??= Singleton.DefaultHandling;
+    // private static AppSettingsBuilder Singleton => _singleton ??= new AppSettingsBuilder();
     
     private static CommandEnum GetCommand()
     {
@@ -390,10 +405,11 @@ internal class AppSettingsBuilder
     {
         return Environment.GetEnvironmentVariable(environmentVariableName);
     }
+ 
     
-    private static AppSettingsBuilder? _singleton;
     private static AppSettings? _appSettings;
-    private static FileHandlingParameters? _defaultFileHandlingParams;
+    private static string _appSettingsLock = new string("AppSettings");
+    // private static FileHandlingParameters? _defaultFileHandlingParams;
 
     #endregion
 }

@@ -4,5 +4,5 @@ public interface IDeploymentTransformationReadWriteDirectory : IDeploymentTransf
 {
     DirectoryInfo SourceDirectory { get; }
     bool KeepEmptyDirectory { get; }
-    IDeploymentTransformationReadOnlyDirectory GetReadOnlyInterface();
+    IDeploymentTransformationReadOnlyDirectory CheckAndTransform();
 }

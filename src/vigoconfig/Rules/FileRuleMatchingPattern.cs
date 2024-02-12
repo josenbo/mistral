@@ -5,13 +5,13 @@ using vigobase;
 namespace vigoconfig;
 
 internal record FileRuleMatchingPattern(
-    int Index,
+    FileRuleId Id,
     FileRuleActionEnum Action,
     string NameToMatch, 
     string NameReplacement,
     FileHandlingParameters Handling
 ) : FileRuleConditional(
-    Index,
+    Id,
     Action,
     NameToMatch, 
     NameReplacement,
@@ -31,9 +31,9 @@ internal record FileRuleMatchingPattern(
             ? string.Empty
             : Regex.Replace(file.Name, NameToMatch, NameReplacement);
 
-        transformation = new DeploymentTransformationFile(file, Handling)
+        transformation = new DeploymentTransformationFile(file, Handling, this)
         {
-            CanDeploy = Action is FileRuleActionEnum.CopyRule || (Action is FileRuleActionEnum.CheckRule && Handling.Settings.Command.IsCheckCommit()),
+            CanDeploy = Action is FileRuleActionEnum.CopyRule,
             DifferentTargetFileName = newName
         };
         return true;

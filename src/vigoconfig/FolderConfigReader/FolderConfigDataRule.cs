@@ -76,25 +76,46 @@ public partial class FolderConfigDataRule
             handling = handling with { Targets = DeploymentTargetHelper.ParseTargets(Targets).ToList() };
         
         var action = GetAction();
+        
+        var actionName = action switch
+        {
+            FileRuleActionEnum.SkipRule => "Skip",
+            FileRuleActionEnum.CopyRule => "Copy",
+            FileRuleActionEnum.CheckRule => "Check",
+            FileRuleActionEnum.Undefined => throw new ArgumentException($"Invalid action enum \"{action}\""),
+            _ => throw new ArgumentException($"Unknown action enum \"{action}\"")
+        };
+
         var (condition, lookFor, replaceWith) = GetCondition(relativePath);
 
+        var conditionName = condition switch
+        {
+            FileRuleConditionEnum.Unconditional => "unconditionally",
+            FileRuleConditionEnum.MatchName => $"when name equals '{lookFor}'",
+            FileRuleConditionEnum.MatchPattern => $"when name matches '{lookFor}'",
+            FileRuleConditionEnum.Undefined => throw new ArgumentException($"Invalid condition enum \"{condition}\""),
+            _ => throw new ArgumentException($"Unknown condition enum \"{condition}\"")
+        };
+
+        var ruleIndex = folderConfig.NextRuleIndex;
+        
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return condition switch
         {
             FileRuleConditionEnum.Unconditional => new FileRuleUnconditional(
-                Index: folderConfig.NextRuleIndex,
+                Id: new FileRuleId(relativePath, ruleIndex, $"#{ruleIndex} {actionName} unconditionally"),
                 Action: action,
                 Handling: handling
                 ),
             FileRuleConditionEnum.MatchName => new FileRuleMatchingLiteral(
-                Index: folderConfig.NextRuleIndex,
+                Id: new FileRuleId(relativePath, ruleIndex, $"#{ruleIndex} {actionName} when name equals '{lookFor}"),
                 Action: action,
                 NameToMatch: lookFor,
                 NameReplacement: replaceWith,
                 Handling: handling
                 ),
             FileRuleConditionEnum.MatchPattern => new FileRuleMatchingPattern(
-                Index: folderConfig.NextRuleIndex,
+                Id: new FileRuleId(relativePath, ruleIndex, $"#{ruleIndex} {actionName} when name matches '{lookFor}"),
                 Action: action,
                 NameToMatch: lookFor,
                 NameReplacement: replaceWith,

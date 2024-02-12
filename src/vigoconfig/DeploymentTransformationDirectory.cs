@@ -11,12 +11,8 @@ internal class DeploymentTransformationDirectory(DirectoryInfo sourceDirectory, 
     public bool KeepEmptyDirectory { get; set; } = keepEmptyDirectory;
     public bool CheckedSuccessfully => true;
     
-    IDeploymentTransformationReadOnlyDirectory IDeploymentTransformationReadWriteDirectory.GetReadOnlyInterface()
+    IDeploymentTransformationReadOnlyDirectory IDeploymentTransformationReadWriteDirectory.CheckAndTransform()
     {
         return this;
-    }
-
-    public void CheckAndTransform()
-    {
     }
 }

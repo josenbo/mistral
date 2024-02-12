@@ -3,13 +3,13 @@
 namespace vigoconfig;
 
 internal abstract record FileRuleConditional(
-    int Index,
+    FileRuleId Id,
     FileRuleActionEnum Action,
     string NameToMatch, 
     string NameReplacement,
     FileHandlingParameters Handling
 ) : FileRule(
-    Index,
+    Id,
     Action,
     Handling
 );

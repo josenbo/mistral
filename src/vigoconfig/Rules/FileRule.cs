@@ -4,7 +4,7 @@ using vigobase;
 namespace vigoconfig;
 
 internal abstract record FileRule(
-    int Index,
+    FileRuleId Id,
     FileRuleActionEnum Action,
     FileHandlingParameters Handling
 ) 
@@ -12,3 +12,4 @@ internal abstract record FileRule(
     internal abstract FileRuleConditionEnum Condition { get; }
     internal abstract bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation);
 }
+

@@ -11,7 +11,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
     public FileInfo CheckedAndTransformedTemporaryFile => _checkedAndTransformedTemporaryFile ??
                                                           throw new VigoFatalException(
                                                               $"The checked and transformed file is not (yet) available ({_handling.Settings.GetRepoRelativePath(SourceFile)})");
-    public bool CheckedSuccessfully { get; private set; } = false;
+    public bool CheckedSuccessfully { get; private set; }
     public string RelativePathSourceFile => _handling.Settings.GetRepoRelativePath(SourceFile.FullName);
     public string? DifferentTargetFileName
     {
@@ -87,12 +87,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         set => _handling = _handling with { FixTrailingNewline = value };
     }
 
-    IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.GetReadOnlyInterface()
-    {
-        return this;
-    }
-
-    void IDeploymentTransformationReadWrite.CheckAndTransform()
+    IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.CheckAndTransform()
     {
         // Todo: apply transformations, creating temp file if necessary
         //       Set CheckedSuccessfully true if checked OK or no check necessary
@@ -100,15 +95,19 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         //       Log validation errors as Errors to the console logger (want them in the github actions log)
         CheckedSuccessfully = true;
         _checkedAndTransformedTemporaryFile = SourceFile;
+
+        return this;
     }
     
-    internal DeploymentTransformationFile(FileInfo sourceFile, FileHandlingParameters defaults)
+    internal DeploymentTransformationFile(FileInfo sourceFile, FileHandlingParameters defaults, FileRule appliedRule)
     {
         _handling = defaults;
         TargetFile = SourceFile = sourceFile;
+        _appliedRule = appliedRule;
     }
     
     private FileHandlingParameters _handling;
     private string? _differentTargetFileName;
     private FileInfo? _checkedAndTransformedTemporaryFile;
+    private readonly FileRule _appliedRule;
 }

@@ -13,5 +13,5 @@ public interface IDeploymentTransformationReadWriteFile : IDeploymentTransformat
     LineEndingEnum LineEnding { get; set; }
     bool FixTrailingNewline { get; set; }
     bool CanDeploy { get; set; }
-    IDeploymentTransformationReadOnlyFile GetReadOnlyInterface();
+    IDeploymentTransformationReadOnlyFile CheckAndTransform();
 }

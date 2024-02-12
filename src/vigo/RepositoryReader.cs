@@ -36,11 +36,11 @@ internal class RepositoryReader
         var directoryTransformation = controller.GetDirectoryTransformation();
         
         BeforeApplyDirectoryTransformationEvent?.Invoke(directoryTransformation);
+
+        var checkedDirectory = directoryTransformation.CheckAndTransform();
         
-        directoryTransformation.CheckAndTransform();
-        
-        if (directoryTransformation.KeepEmptyDirectory)
-            _transformations.Add(directoryTransformation.GetReadOnlyInterface());
+        if (checkedDirectory.KeepEmptyDirectory)
+            _transformations.Add(checkedDirectory);
         
         foreach (var fi in controller.Location.EnumerateFiles())
         {
@@ -48,10 +48,10 @@ internal class RepositoryReader
 
             BeforeApplyFileTransformationEvent?.Invoke(transformation);
 
-            transformation.CheckAndTransform();
+            var checkedFile = transformation.CheckAndTransform();
             
-            if (transformation.CanDeploy)
-                _transformations.Add(transformation.GetReadOnlyInterface());
+            if (checkedFile.CanDeploy)
+                _transformations.Add(checkedFile);
         }
 
         foreach (var di in controller.Location.EnumerateDirectories())

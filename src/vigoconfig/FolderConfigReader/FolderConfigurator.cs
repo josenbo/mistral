@@ -11,14 +11,15 @@ internal static class FolderConfigurator
     public static void Configure(IFolderConfiguration config)
     {
         var appSettings = config.ParentFileHandlingParams.Settings;
-
+        var relativePath = appSettings.GetRepoRelativePath(config.Location);
+        
         try
         {
-            config.AddRule(BuildDeployConfigFileRule(config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DeployConfigRule));
+            config.AddRule(BuildDeployConfigFileRule(relativePath, config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DeployConfigRule));
             
             if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.Settings.DeploymentConfigFileName, out var content))
             {
-                config.AddRule(BuildFinalCatchAllFileRule(config.NextRuleIndex, appSettings.FinalCatchAllRule));
+                config.AddRule(BuildFinalCatchAllFileRule(relativePath, config.NextRuleIndex, appSettings.FinalCatchAllRule));
                 return;
             }
             
@@ -38,7 +39,7 @@ internal static class FolderConfigurator
                 
             ValidateAndAppendRules(config, tomlConfigurationData.Rules);
 
-            config.AddRule(BuildFinalCatchAllFileRule(config.NextRuleIndex, appSettings.FinalCatchAllRule));
+            config.AddRule(BuildFinalCatchAllFileRule(relativePath, config.NextRuleIndex, appSettings.FinalCatchAllRule));
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -138,10 +139,10 @@ internal static class FolderConfigurator
         // return sb.ToString();
     }
 
-    private static FileRuleMatchingLiteral BuildDeployConfigFileRule(int index, string deploymentConfigFileName, StandardFileHandling ruleConfig)
+    private static FileRuleMatchingLiteral BuildDeployConfigFileRule(string repoDirectory, int index, string deploymentConfigFileName, StandardFileHandling ruleConfig)
     {
         return new FileRuleMatchingLiteral(
-            Index: index,
+            Id: new FileRuleId(repoDirectory, index, $"[Predefined initial rule] {(ruleConfig.DoCopy ? "Copy" : "Skip")} when name equals '{deploymentConfigFileName}'"),
             Action: ruleConfig.DoCopy ? FileRuleActionEnum.CopyRule : FileRuleActionEnum.SkipRule,
             NameToMatch: deploymentConfigFileName,
             Handling: ruleConfig.Handling,
@@ -149,10 +150,10 @@ internal static class FolderConfigurator
             );
     }
     
-    private static FileRuleUnconditional BuildFinalCatchAllFileRule(int index, StandardFileHandling ruleConfig)
+    private static FileRuleUnconditional BuildFinalCatchAllFileRule(string repoDirectory, int index, StandardFileHandling ruleConfig)
     {
         return new FileRuleUnconditional(
-            Index: index,
+            Id: new FileRuleId(repoDirectory, index, $"[Predefined final catch-all rule] {(ruleConfig.DoCopy ? "Copy" : "Skip")} unconditionally"),
             Action: ruleConfig.DoCopy ? FileRuleActionEnum.CopyRule : FileRuleActionEnum.SkipRule,
             Handling: ruleConfig.Handling
             );

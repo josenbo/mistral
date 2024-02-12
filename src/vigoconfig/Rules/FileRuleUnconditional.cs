@@ -4,11 +4,11 @@ using vigobase;
 namespace vigoconfig;
 
 internal record FileRuleUnconditional(
-    int Index,
+    FileRuleId Id,
     FileRuleActionEnum Action,
     FileHandlingParameters Handling
 ) : FileRule(
-    Index,
+    Id,
     Action,
     Handling
 )
@@ -16,9 +16,9 @@ internal record FileRuleUnconditional(
     internal override FileRuleConditionEnum Condition => FileRuleConditionEnum.Unconditional;
     internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
     {
-        transformation = new DeploymentTransformationFile(file, Handling)
+        transformation = new DeploymentTransformationFile(file, Handling, this)
         {
-            CanDeploy = Action is FileRuleActionEnum.CopyRule || (Action is FileRuleActionEnum.CheckRule && Handling.Settings.Command.IsCheckCommit()),
+            CanDeploy = Action is FileRuleActionEnum.CopyRule,
             DifferentTargetFileName = string.Empty
         };
         return true;

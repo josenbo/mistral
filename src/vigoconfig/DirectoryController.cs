@@ -57,7 +57,7 @@ public class DirectoryController : IFolderConfiguration
 
     void IFolderConfiguration.AddRule(FileRule rule)
     {
-        if (rule.Index != _rules.Count)
+        if (rule.Id.Index != _rules.Count)
         {
             const string message = "Precondition failed for rule numbering"; 
             Log.Fatal(message);
