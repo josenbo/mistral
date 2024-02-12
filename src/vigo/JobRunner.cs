@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Serilog;
 using vigoarchive;
 using vigobase;
@@ -76,11 +77,51 @@ internal class JobRunner(AppSettings settings)
     {
         try
         {
-            var tarball = new Tarball(config.RepositoryRoot.FullName, config.AdditionalTarRootFolder);
+            var settings = config.DefaultFileHandlingParams.Settings;
+            var directoryTimestamp = DateTimeOffset.Now;
+            
+            var targets = reader
+                .FileTransformations
+                .SelectMany(ft => ft.DeploymentTargets)
+                .Distinct()
+                .ToList();
 
-            foreach (var transformation in reader.FileTransformations)
+            var requests = new List<TarItem>();
+            
+            foreach (var target in targets)
             {
-                tarball.AddFile(transformation.TargetFile);
+                // ReSharper disable LoopCanBeConvertedToQuery
+
+                foreach (var transformation in reader.FileTransformations)
+                {
+                    requests.Add(new TarItemFile(
+                        TarRelativePath: Path.Combine(target, settings.GetRepoRelativePath(transformation.TargetFile)),
+                        TransformedContent: transformation.CheckedAndTransformedTemporaryFile,
+                        FileMode: transformation.FilePermission.ComputeUnixFileMode(config.DefaultFileHandlingParams.StandardModeForFiles),
+                        ModificationTime: DateTimeOffset.FromFileTime(transformation.SourceFile.LastWriteTime.ToFileTime())
+                        ));
+                }
+
+                foreach (var transformation in reader.DirectoryTransformations)
+                {
+                    requests.Add(new TarItemDirectory(
+                        TarRelativePath: Path.Combine(target, settings.GetRepoRelativePath(transformation.SourceDirectory)),
+                        FileMode: config.DefaultFileHandlingParams.StandardModeForDirectories,
+                        ModificationTime: directoryTimestamp
+                        ));
+                }
+                
+                // ReSharper restore LoopCanBeConvertedToQuery
+            }
+
+            var tarball = new Tarball()
+            {
+                DirectoryFileMode = config.DefaultFileHandlingParams.StandardModeForDirectories
+            };
+
+            foreach (var request in requests)
+            {
+                tarball.AddItem(request);
             }
         
             tarball.Save(config.Tarball);

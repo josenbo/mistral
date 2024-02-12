@@ -2,11 +2,10 @@
 
 namespace vigoarchive;
 
-public record TarItemFile(
+public record TarItemDirectory(
     string TarRelativePath,
     UnixFileMode FileMode,
-    DateTimeOffset ModificationTime,
-    FileInfo TransformedContent
+    DateTimeOffset ModificationTime
 ) : TarItem(
     TarRelativePath,
     FileMode,
@@ -19,7 +18,7 @@ public record TarItemFile(
         {
             var sb = new StringBuilder("", TarRelativePath.Length);
             
-            for (var i = 0; i < ItemArray.Length - 1; i++)
+            for (var i = 0; i < ItemArray.Length; i++)
             {
                 if (0 < i)
                     sb.Append(TarPathSeparator);

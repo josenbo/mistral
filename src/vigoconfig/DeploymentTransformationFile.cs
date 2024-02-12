@@ -88,6 +88,8 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         set => _handling = _handling with { FixTrailingNewline = value };
     }
 
+    public IEnumerable<string> DeploymentTargets => _handling.Targets;
+    
     IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.CheckAndTransform()
     {
         var filename = SourceFile.Name;
@@ -119,6 +121,17 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
             !LineEnding.IsDefinedAndValid())
         {
             Log.Fatal("Check failed for {FileName} in {FilePath} due to invalid settings {TheHandling}",
+                SourceFile.Name,
+                _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty),
+                _handling);
+            
+            CheckedSuccessfully = false;
+            return this;
+        }
+
+        if (!_handling.Targets.Any())
+        {
+            Log.Fatal("Check failed for {FileName} in {FilePath} because no targets were specified",
                 SourceFile.Name,
                 _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty),
                 _handling);

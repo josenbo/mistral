@@ -12,6 +12,7 @@ public interface IDeploymentTransformationReadOnlyFile : IDeploymentTransformati
     FileEncodingEnum TargetFileEncoding { get; }
     FilePermission FilePermission { get; }
     LineEndingEnum LineEnding { get; }
+    IEnumerable<string> DeploymentTargets { get; }
     bool CanDeploy { get; }
     bool FixTrailingNewline { get; }
 }
