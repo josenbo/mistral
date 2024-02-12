@@ -22,10 +22,9 @@ try
     var jobRunner = new JobRunner(settings);
     
     if (jobRunner.Prepare())
-    {
         jobRunner.Run();
-        jobRunner.CleanUp();
-    }
+
+    jobRunner.CleanUp();
     
     stopwatch.Stop();
     Log.Information("Process terminated {TheResult} after {TheTimeSpan}",

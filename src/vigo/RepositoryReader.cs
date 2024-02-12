@@ -1,16 +1,12 @@
-﻿using Serilog;
-using vigobase;
+﻿using vigobase;
 using vigoconfig;
 
 namespace vigo;
 
-internal class RepositoryReader
+internal class RepositoryReader : IRepositoryReader
 {
-    public delegate void BeforeApplyFileTransformation(IDeploymentTransformationReadWriteFile transformation);
-    public delegate void BeforeApplyDirectoryTransformation(IDeploymentTransformationReadWriteDirectory transformation);
-
-    public event BeforeApplyFileTransformation? BeforeApplyFileTransformationEvent;
-    public event BeforeApplyDirectoryTransformation? BeforeApplyDirectoryTransformationEvent;
+    public event IRepositoryReader.BeforeApplyFileTransformation? BeforeApplyFileTransformationEvent;
+    public event IRepositoryReader.BeforeApplyDirectoryTransformation? BeforeApplyDirectoryTransformationEvent;
 
     public IEnumerable<IDeploymentTransformationReadOnlyFile> FileTransformations =>
         _transformations.OfType<IDeploymentTransformationReadOnlyFile>();
@@ -19,7 +15,7 @@ internal class RepositoryReader
     
     public void ReadRepository()
     {
-        Log.Information("Scanning the repository folder tree");
+        Console.WriteLine($"Collecting files for deployment in the repository folder tree at {_appSettings.RepositoryRoot}");
         
         var rules = new DirectoryController(_appSettings.RepositoryRoot, _appSettings.DefaultFileHandlingParams);
 

@@ -151,7 +151,7 @@ public partial class FolderConfigDataRule
                 targetFileName = string.Empty;
             
             // ReSharper disable once InvertIf
-            if (!string.IsNullOrEmpty(sourceFileName) || !string.IsNullOrEmpty(targetFileNamePattern))
+            if (!string.IsNullOrEmpty(sourceFileNamePattern) || !string.IsNullOrEmpty(targetFileNamePattern))
             {
                 Log.Warning("The condition \"{TheRuleType} when name is {SourceFileName}\" in the directory {TheDirectory} has a redundant file name pattern and/or replacement, which will be ignored",
                     RuleType,
