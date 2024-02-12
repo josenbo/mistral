@@ -4,7 +4,7 @@ using vigobase;
 
 namespace vigoconfig;
 
-public partial class FolderConfigDataRule
+public class FolderConfigDataRule
 {
     [DataMember(Name = "Action")]   
     public string? RuleType { get; set; }
@@ -70,7 +70,7 @@ public partial class FolderConfigDataRule
             handling = handling with { FixTrailingNewline = FixTrailingNewline.Value };
 
         if (ValidCharacters is not null)
-            handling = handling with { ValidChars = ValidCharactersHelper.ParseConfiguration(ValidCharacters) }; 
+            handling = handling with { ValidCharsRegex = ValidCharactersHelper.ParseConfiguration(ValidCharacters) }; 
         
         if (Targets != null)
             handling = handling with { Targets = DeploymentTargetHelper.ParseTargets(Targets).ToList() };
@@ -87,15 +87,6 @@ public partial class FolderConfigDataRule
         };
 
         var (condition, lookFor, replaceWith) = GetCondition(relativePath);
-
-        var conditionName = condition switch
-        {
-            FileRuleConditionEnum.Unconditional => "unconditionally",
-            FileRuleConditionEnum.MatchName => $"when name equals '{lookFor}'",
-            FileRuleConditionEnum.MatchPattern => $"when name matches '{lookFor}'",
-            FileRuleConditionEnum.Undefined => throw new ArgumentException($"Invalid condition enum \"{condition}\""),
-            _ => throw new ArgumentException($"Unknown condition enum \"{condition}\"")
-        };
 
         var ruleIndex = folderConfig.NextRuleIndex;
         
@@ -188,7 +179,6 @@ public partial class FolderConfigDataRule
             {
                 Log.Warning("The condition \"{TheRuleType} unconditionally\" in the directory {TheDirectory} has redundant file name replacements, which will be ignored",
                     RuleType,
-                    SourceFileName,
                     relativePath
                 );
                 targetFileName = string.Empty;

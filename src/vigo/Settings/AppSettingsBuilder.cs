@@ -53,7 +53,7 @@ internal class AppSettingsBuilder
                 LineEnding: LineEndingEnum.LF,
                 Permissions: FilePermission.UseDefault, 
                 FixTrailingNewline: true,
-                ValidChars: asciiGerman,
+                ValidCharsRegex: asciiGerman,
                 Targets: [ "Prod", "NonProd" ]
             );
 

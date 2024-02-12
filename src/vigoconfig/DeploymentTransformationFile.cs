@@ -1,4 +1,5 @@
-﻿using Ardalis.GuardClauses;
+﻿using System.Text;
+using Ardalis.GuardClauses;
 using Serilog;
 using vigobase;
 
@@ -89,14 +90,87 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
 
     IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.CheckAndTransform()
     {
-        // Todo: apply transformations, creating temp file if necessary
-        //       Set CheckedSuccessfully true if checked OK or no check necessary
-        //       Set _differentTargetFileName to transformed temp file or to source file
-        //       Log validation errors as Errors to the console logger (want them in the github actions log)
-        CheckedSuccessfully = true;
-        _checkedAndTransformedTemporaryFile = SourceFile;
+        var filename = SourceFile.Name;
+        var filepath = _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty);
+        
+        if (!CanDeploy)
+        {
+            CheckedSuccessfully = true;
+            return this;
+        }
 
-        return this;
+        Log.Information("The file {FileName} in {FilePath} was selected for the targets {TheTargets} by the rule {TheRule}",
+            filename,
+            filepath,
+            _handling.Targets,
+            _appliedRule.Id.RuleDescription
+        );
+
+        if (FileType == FileTypeEnum.BinaryFile)
+        {
+            CheckedSuccessfully = true;
+            _checkedAndTransformedTemporaryFile = SourceFile;
+            return this;
+        }
+
+        if (!FileType.IsDefinedAndValid() || 
+            !SourceFileEncoding.IsDefinedAndValid() ||
+            !TargetFileEncoding.IsDefinedAndValid() || 
+            !LineEnding.IsDefinedAndValid())
+        {
+            Log.Fatal("Check failed for {FileName} in {FilePath} due to invalid settings {TheHandling}",
+                SourceFile.Name,
+                _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty),
+                _handling);
+            
+            CheckedSuccessfully = false;
+            return this;
+        }
+
+        try
+        {
+            var fileContent = File.ReadAllText(SourceFile.FullName, SourceFileEncoding.ToEncoding());
+            
+            if (!_handling.ValidCharsRegex.IsMatch(fileContent))
+            {
+                Log.Fatal("Check failed for {FileName} in {FilePath} due to unexpected characters in the file content",
+                    SourceFile.Name,
+                    _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty));
+
+                CheckedSuccessfully = false;
+                return this;
+            }
+
+            var sb = new StringBuilder(fileContent);
+
+            sb.Replace("\r\n", "\n");
+
+            if (0 < sb.Length && _handling.FixTrailingNewline && sb[^1] != '\n')
+            {
+                sb.Append('\n');
+            }
+
+            if (_handling.LineEnding == LineEndingEnum.CR_LF)
+                sb.Replace("\n", "\r\n");
+
+            var tempFilePath = _handling.Settings.GetTemporaryFilePath();
+            
+            File.WriteAllText(tempFilePath, sb.ToString(), _handling.TargetFileEncoding.ToEncoding());
+            
+            CheckedSuccessfully = true;
+            _checkedAndTransformedTemporaryFile = new FileInfo(tempFilePath);
+            
+            return this;
+        }
+        catch (Exception e)
+        {
+            Log.Fatal(e, "Check failed for {FileName} in {FilePath} because an exception occured",
+                SourceFile.Name,
+                _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty));
+
+            CheckedSuccessfully = false;
+            return this;
+        }
     }
     
     internal DeploymentTransformationFile(FileInfo sourceFile, FileHandlingParameters defaults, FileRule appliedRule)

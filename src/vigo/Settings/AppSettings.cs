@@ -39,7 +39,13 @@ internal abstract record AppSettings(
         return Path.GetRelativePath(RepositoryRoot.FullName, file.FullName);
     }
 
+    public string GetTemporaryFilePath()
+    {
+        return Path.Combine(TemporaryDirectory.FullName, $"tempfile_{_tempFileSequence++}");
+    }
+
     private FileHandlingParameters? _defaultFileHandlingParams;
     private StandardFileHandling? _deployConfigRule;
     private StandardFileHandling? _finalCatchAllRule;
+    private int _tempFileSequence = Random.Shared.Next(100000000, 999999999);
 }

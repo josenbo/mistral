@@ -1,4 +1,6 @@
-﻿namespace vigobase;
+﻿using System.Text.RegularExpressions;
+
+namespace vigobase;
 
 public record FileHandlingParameters(
     IAppSettings Settings,
@@ -10,5 +12,5 @@ public record FileHandlingParameters(
     LineEndingEnum LineEnding,
     FilePermission Permissions,
     bool FixTrailingNewline,
-    string ValidChars,
+    Regex ValidCharsRegex,
     IReadOnlyList<string> Targets);

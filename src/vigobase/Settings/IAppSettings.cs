@@ -10,4 +10,5 @@ public interface IAppSettings
     StandardFileHandling FinalCatchAllRule { get; } 
     string GetRepoRelativePath(string path);
     string GetRepoRelativePath(FileSystemInfo file);
+    string GetTemporaryFilePath();
 }

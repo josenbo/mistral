@@ -60,7 +60,7 @@ public class FolderConfigDataHead
         if (ValidCharacters is not null)
             retval = retval with
             {
-                ValidChars = vigobase.ValidCharactersHelper.ParseConfiguration(ValidCharacters)
+                ValidCharsRegex = ValidCharactersHelper.ParseConfiguration(ValidCharacters)
             };
 
         // ReSharper disable once InvertIf

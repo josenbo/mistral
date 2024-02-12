@@ -5,7 +5,7 @@ namespace vigobase;
 
 public static partial class ValidCharactersHelper
 {
-    public static string ParseConfiguration(string configText)
+    public static Regex ParseConfiguration(string configText)
     {
         if (string.IsNullOrWhiteSpace(configText))
         {
@@ -14,7 +14,7 @@ public static partial class ValidCharactersHelper
         }
         
         if (string.IsNullOrWhiteSpace(configText) || configText.Trim().Equals("all", StringComparison.InvariantCultureIgnoreCase))
-            return string.Empty;
+            return new Regex("^.*$", RegexOptions.Singleline);
 
         var match = RexConfigLine.Match(configText);
         
@@ -31,13 +31,13 @@ public static partial class ValidCharactersHelper
         {
             // ReSharper disable StringLiteralTypo
             case "ascii" when string.IsNullOrWhiteSpace(other):
-                return AsciiChars;
+                return new Regex($"^[{AsciiChars}]*$", RegexOptions.Singleline);
             case "ascii":
-                return $"{AsciiChars}{other}";
+                return new Regex($"^[{AsciiChars}{other}]*$", RegexOptions.Singleline);
             case "asciigerman" when string.IsNullOrWhiteSpace(other):
-                return AsciiGermanChars;
+                return new Regex($"^[{AsciiGermanChars}]*$", RegexOptions.Singleline);
             case "asciigerman":
-                return $"{AsciiGermanChars}{other}";
+                return new Regex($"^[{AsciiGermanChars}{other}]*$", RegexOptions.Singleline);
             // ReSharper restore StringLiteralTypo
             default:
                 Log.Fatal("Invalid key value for the allowed characters setting. Value was: {TheValue}", key);
