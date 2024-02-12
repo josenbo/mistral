@@ -14,11 +14,11 @@ internal static class FolderConfigurator
 
         try
         {
-            config.AddRule(BuildSkipDeploymentConfigFileRule(config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DefaultFileHandlingParams));
+            config.AddRule(BuildDeployConfigFileRule(config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DeployConfigRule));
             
             if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.Settings.DeploymentConfigFileName, out var content))
             {
-                config.AddRule(BuildImplicitFinalUnconditionalFileRule(config.NextRuleIndex, appSettings.ImplicitFinalRuleIsSkippingTheFile, appSettings.ImplicitFinalRuleHandling));
+                config.AddRule(BuildFinalCatchAllFileRule(config.NextRuleIndex, appSettings.FinalCatchAllRule));
                 return;
             }
             
@@ -38,7 +38,7 @@ internal static class FolderConfigurator
                 
             ValidateAndAppendRules(config, tomlConfigurationData.Rules);
 
-            config.AddRule(BuildImplicitFinalUnconditionalFileRule(config.NextRuleIndex, appSettings.ImplicitFinalRuleIsSkippingTheFile, appSettings.ImplicitFinalRuleHandling));
+            config.AddRule(BuildFinalCatchAllFileRule(config.NextRuleIndex, appSettings.FinalCatchAllRule));
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -138,23 +138,23 @@ internal static class FolderConfigurator
         // return sb.ToString();
     }
 
-    private static FileRuleMatchingLiteral BuildSkipDeploymentConfigFileRule(int index, string deploymentConfigFileName, FileHandlingParameters handling)
+    private static FileRuleMatchingLiteral BuildDeployConfigFileRule(int index, string deploymentConfigFileName, StandardFileHandling ruleConfig)
     {
         return new FileRuleMatchingLiteral(
             Index: index,
-            Action: FileRuleActionEnum.SkipRule,
+            Action: ruleConfig.DoCopy ? FileRuleActionEnum.CopyRule : FileRuleActionEnum.SkipRule,
             NameToMatch: deploymentConfigFileName,
-            Handling: handling,
+            Handling: ruleConfig.Handling,
             NameReplacement: string.Empty
             );
     }
     
-    private static FileRuleUnconditional BuildImplicitFinalUnconditionalFileRule(int index, bool skipTheFile, FileHandlingParameters handling)
+    private static FileRuleUnconditional BuildFinalCatchAllFileRule(int index, StandardFileHandling ruleConfig)
     {
         return new FileRuleUnconditional(
             Index: index,
-            Action: skipTheFile ? FileRuleActionEnum.SkipRule : FileRuleActionEnum.CopyRule,
-            Handling: handling
+            Action: ruleConfig.DoCopy ? FileRuleActionEnum.CopyRule : FileRuleActionEnum.SkipRule,
+            Handling: ruleConfig.Handling
             );
     }
 }

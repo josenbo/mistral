@@ -9,10 +9,11 @@ internal class AppSettingsBuilder
 {
     #region instance members
 
-    private AppSettings AppSettingsRecord { get; }
-    private FileHandlingParameters DefaultFileHandlingParamsRecord { get; }
+    private AppSettings Settings { get; }
+    private FileHandlingParameters DefaultHandling { get; }
 
-    private FileHandlingParameters ImplicitFinalRuleHandlingRecord { get; }
+    private FileHandlingParameters FinalCatchAllHandling { get; }
+    private FileHandlingParameters DeployConfigHandling { get; }
     
     private AppSettingsBuilder()
     {
@@ -21,7 +22,7 @@ internal class AppSettingsBuilder
             var command = GetCommand();
 
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            AppSettingsRecord = command switch
+            Settings = command switch
             {
                 CommandEnum.DeployToTarball => new AppSettingsDeployToTarball(
                     RepositoryRoot: GetRepositoryRoot(),
@@ -42,8 +43,8 @@ internal class AppSettingsBuilder
             
             var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
     
-            DefaultFileHandlingParamsRecord = new FileHandlingParameters(
-                Settings: AppSettingsRecord,
+            DefaultHandling = new FileHandlingParameters(
+                Settings: Settings,
                 StandardModeForFiles: (UnixFileMode)0b_110_110_100,
                 StandardModeForDirectories: (UnixFileMode)0b_111_111_101,
                 FileType: FileTypeEnum.BinaryFile, 
@@ -56,15 +57,22 @@ internal class AppSettingsBuilder
                 Targets: [ "Prod", "NonProd" ]
             );
 
-            AppSettingsRecord.DefaultFileHandlingParams = DefaultFileHandlingParamsRecord;
+            Settings.DefaultFileHandlingParams = DefaultHandling;
             
-            ImplicitFinalRuleHandlingRecord = DefaultFileHandlingParamsRecord with {
+            FinalCatchAllHandling = DefaultHandling with {
                 FileType = FileTypeEnum.BinaryFile,
                 Permissions = FilePermission.UseDefault
             };
 
-            AppSettingsRecord.ImplicitFinalRuleIsSkippingTheFile = true;
-            AppSettingsRecord.ImplicitFinalRuleHandling = ImplicitFinalRuleHandlingRecord;
+            AppSettings.FinalCatchAllRule = new StandardFileHandling(FinalCatchAllHandling, false);
+
+            DeployConfigHandling = DefaultHandling with
+            {
+                FileType = FileTypeEnum.BinaryFile,
+                Permissions = FilePermission.UseDefault
+            };
+            
+            AppSettings.DeployConfigRule = new StandardFileHandling(DeployConfigHandling, false);
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -79,13 +87,6 @@ internal class AppSettingsBuilder
 
     // "Tarball" or "Check" with case-insensitive comparison 
     private const string EnvVarVigoCommand = "VIGO_COMMAND";
-    // ReSharper disable InconsistentNaming
-    private const string VigoCommand_Tarball = "Tarball";
-    private const string VigoCommandLowerCase_Tarball = "tarball";
-    private const string VigoCommand_Check = "Check";    
-    private const string VigoCommandLowerCase_Check = "check";    
-    // ReSharper restore InconsistentNaming
-
     // Directory must exist 
     private const string EnvVarVigoRepositoryRoot = "VIGO_REPOSITORY_ROOT";
     // Directory must exist, file will be created or overwritten
@@ -102,8 +103,8 @@ internal class AppSettingsBuilder
     // A log level for logging to a file only (Fatal, Error, Warning, *Information*, Debug) case-insensitive
     private const string EnvVarVigoLogLevel = "VIGO_LOGLEVEL";
 
-    public static AppSettings AppSettings => _appSettings ??= Singleton.AppSettingsRecord;
-    public static FileHandlingParameters DefaultFileHandlingParams => _defaultFileHandlingParams ??= Singleton.DefaultFileHandlingParamsRecord;
+    public static AppSettings AppSettings => _appSettings ??= Singleton.Settings;
+    public static FileHandlingParameters DefaultFileHandlingParams => _defaultFileHandlingParams ??= Singleton.DefaultHandling;
     private static AppSettingsBuilder Singleton => _singleton ??= new AppSettingsBuilder();
     
     private static CommandEnum GetCommand()
@@ -124,17 +125,7 @@ internal class AppSettingsBuilder
 
             command = command.Trim().ToLowerInvariant();
 
-            switch (command)
-            {
-                case VigoCommandLowerCase_Tarball:
-                    return CommandEnum.DeployToTarball;
-                case VigoCommandLowerCase_Check:
-                    return CommandEnum.CheckCommit;
-                default:
-                    const string message = $"Expected the command in {EnvVarVigoCommand} to be either \"{VigoCommand_Tarball}\" or \"{VigoCommand_Check}\"";
-                    Console.Error.WriteLine(message);
-                    throw new VigoFatalException(message);
-            }
+            return CommandEnumHelper.Parse(command);
         }
         catch (Exception e) when (e is not VigoException)
         {

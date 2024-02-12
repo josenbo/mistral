@@ -2,13 +2,12 @@
 
 public interface IAppSettings
 {
+    CommandEnum Command { get; }
     DirectoryInfo RepositoryRoot { get; }
     string DeploymentConfigFileName { get; }
     FileHandlingParameters DefaultFileHandlingParams { get; }
-    bool ImplicitFinalRuleIsSkippingTheFile { get;  }
-    FileHandlingParameters ImplicitFinalRuleHandling { get; }
-    bool IsDeploymentRun { get; }
-    bool IsCommitCheck { get; }
+    StandardFileHandling DeployConfigRule { get; } 
+    StandardFileHandling FinalCatchAllRule { get; } 
     string GetRepoRelativePath(string path);
     string GetRepoRelativePath(FileSystemInfo file);
 }

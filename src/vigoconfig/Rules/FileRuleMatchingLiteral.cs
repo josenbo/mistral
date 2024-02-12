@@ -32,7 +32,7 @@ internal record FileRuleMatchingLiteral(
 
         transformation = new DeploymentTransformationFile(file, Handling)
         {
-            CanDeploy = Action is FileRuleActionEnum.CopyRule || (Action is FileRuleActionEnum.CheckRule && Handling.Settings.IsCommitCheck),
+            CanDeploy = Action is FileRuleActionEnum.CopyRule || (Action is FileRuleActionEnum.CheckRule && Handling.Settings.Command.IsCheckCommit()),
             DifferentTargetFileName = newName
         };
         return true;
