@@ -1,1 +1,1 @@
-﻿# Deployment Configuration
+﻿# Folder-Specific Deployment Configuration
