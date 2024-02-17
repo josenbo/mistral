@@ -10,13 +10,12 @@ public class CoreRequirements
 
                                #  [vîgô] Some title
 
-                               markdown hash + key phrase = markdown format
-                               Must be on the first non-empty line to be 
-                               recognized
+                               hash followed by key phrase on the first 
+                               non-empty line = markdown format
                                
                                """;
         
-        var folderConfig = FolderConfigReader.Parse(content, _defaultHandling, _deployConfigRule, _finalCatchAllRule);
+        var folderConfig = FolderConfigReader.Parse(content);
         
         Assert.True(folderConfig is not null);
     }
@@ -28,15 +27,14 @@ public class CoreRequirements
         const string content = """
                                #!/usr/bin/env vigo
                                
-                                //  vîgô some other text
+                                #  vîgô some other text
                                 
-                               native comment token + key phrase = native format
-                               Need not be on the first line but at least once
-                               in the content
+                               # shebang on the first line plus hash followed 
+                               # by key phrase anywhere at least once = native format
 
                                """;
         
-        var folderConfig = FolderConfigReader.Parse(content, _defaultHandling, _deployConfigRule, _finalCatchAllRule);
+        var folderConfig = FolderConfigReader.Parse(content);
         
         Assert.True(folderConfig is not null);
     }
@@ -46,20 +44,126 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               //
-                               vîgô
+                               
+                               other content
                                # vîgô
                                
-                               Has the key phrase but not the native comment 
-                               on the same line. The markdown is not recognized
-                               because hash and key phrase are not on the first
-                               non-empty line
+                               Has hash followed by key phrase alright, but it
+                               is neither on the first non-empty line, nor is 
+                               the shebang present
                                
                                """;
         
-        Assert.Throws<VigoParseFolderConfigException>(() => FolderConfigReader.Parse(content, _defaultHandling, _deployConfigRule, _finalCatchAllRule));
+        Assert.Throws<VigoParseFolderConfigException>(() => FolderConfigReader.Parse(content));
+    }
+
+    [Fact]
+    public void ReadMarkdownWithCommentsOnly()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #vîgô
+
+                               this is no vigo block and will be ignored
+                               
+                               ```
+                               this will be ignored
+                               ```
+                               
+                               this is a bash block which will be ignored
+                               
+                               ```
+                               bash is ignored
+                               ```
+                               
+                               ```   vigo   some other text here
+                               
+                               #comments and empty lines will be ignored
+                               
+                               # end
+                               ```
+                               
+                               end of document
+                               """;
+        
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Null(folderConfig.LocalDefaults);
+        Assert.Empty(folderConfig.PartialRules);
+    }
+
+    [Fact]
+    public void ReadNativeWithCommentsOnly()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                               #vîgô
+
+                               DO IGNORE TEXT FILE
+                                   SomeValue 
+                               DONE
+                               
+                               CONFIGURE FOLDER
+                                   doing folder 
+                                   configuration
+                               DONE
+                               
+                               do deploy text file 
+                                   if name is hubert
+                                   do something with hubert
+                               done
+                               
+                               """;
+        
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        
+        Assert.True(folderConfig is not null);
+    }
+
+    [Fact]
+    public void AtMostOneSingleFolderBlock()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                                   # vîgô.
+                                
+                               configure folder
+                               done
+                               
+                               Configure Folder
+                               DONE
+
+                               """;
+        
+        Assert.Throws<VigoParseFolderConfigException>(() => FolderConfigReader.Parse(content));
     }
     
+    [Fact]
+    public void RunSomeTestData()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                               
+                                #  vîgô some other text
+                                
+                               # comments and empty lines will be ignored
+                                        # indented comment
+
+                               """;
+        
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Null(folderConfig.LocalDefaults);
+        Assert.Empty(folderConfig.PartialRules);
+    }
+
     #region Helpers
 
     public CoreRequirements(ITestOutputHelper testOutputHelper)
@@ -77,41 +181,12 @@ public class CoreRequirements
             .WriteTo.TestOutput(testOutputHelper)
             .MinimumLevel.ControlledBy(_logLevelSwitch)
             .CreateLogger();
-        
-        _defaultHandling = new FileHandlingParameters(
-            Settings: new TestAppSettings(),
-            StandardModeForFiles: (UnixFileMode)0b_110_110_100,
-            StandardModeForDirectories: (UnixFileMode)0b_111_111_101,
-            FileType: FileTypeEnum.BinaryFile, 
-            SourceFileEncoding: FileEncodingEnum.UTF_8,
-            TargetFileEncoding: FileEncodingEnum.UTF_8,
-            LineEnding: LineEndingEnum.LF,
-            Permissions: FilePermission.UseDefault, 
-            FixTrailingNewline: true,
-            ValidCharsRegex: ValidCharactersHelper.ParseConfiguration("AsciiGerman"),
-            Targets: [ "Prod", "NonProd" ]
-        );
-        
-        _deployConfigRule = new StandardFileHandling(
-            Filenames: new string[]{ "deploy.one", "deploy2", "deploy-three" },
-            DoCopy: false,
-            Handling: _defaultHandling
-        );
-
-        _finalCatchAllRule = new StandardFileHandling(
-            Filenames: Array.Empty<string>(),
-            DoCopy: false,
-            Handling: _defaultHandling
-        );
     }
     
     // ReSharper disable once NotAccessedField.Local
     private readonly ITestOutputHelper _testOutputHelper;
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly LoggingLevelSwitch _logLevelSwitch;
-    private readonly FileHandlingParameters _defaultHandling;
-    private readonly StandardFileHandling _deployConfigRule;
-    private readonly StandardFileHandling _finalCatchAllRule;
 
     #endregion
 }

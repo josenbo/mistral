@@ -1,8 +1,11 @@
-﻿namespace vigoconfig;
+﻿using JetBrains.Annotations;
 
+namespace vigoconfig;
+
+[PublicAPI]
 public class FolderConfig
 {
     public bool? KeepEmptyFolder { get; set; }
-    public PartialFileHandlingParameters? LocalDefaults { get; set; }
-    public IList<PartialFileRule> PartialRules { get; } = [];
+    public FolderConfigPartialHandling? LocalDefaults { get; set; }
+    public IList<FolderConfigPartialRule> PartialRules { get; } = [];
 }

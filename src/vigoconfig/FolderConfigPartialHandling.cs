@@ -5,7 +5,7 @@ using vigobase;
 namespace vigoconfig;
 
 [PublicAPI]
-public class PartialFileHandlingParameters
+public class FolderConfigPartialHandling
 {
     public UnixFileMode? StandardModeForFiles { get; set; }
     public UnixFileMode? StandardModeForDirectories { get; set; } 
@@ -19,12 +19,12 @@ public class PartialFileHandlingParameters
     public Regex? ValidCharsRegex { get; set; } 
     public IReadOnlyList<string>? Targets { get; set; }
 
-    public PartialFileHandlingParameters()
+    public FolderConfigPartialHandling()
     {
         
     }
 
-    public PartialFileHandlingParameters(PartialFileHandlingParameters defaultParameters)
+    public FolderConfigPartialHandling(FolderConfigPartialHandling defaultParameters)
     {
         StandardModeForFiles = StandardModeForFiles ?? defaultParameters.StandardModeForFiles;
         StandardModeForDirectories = StandardModeForDirectories ?? defaultParameters.StandardModeForDirectories;
