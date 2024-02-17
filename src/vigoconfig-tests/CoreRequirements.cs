@@ -154,14 +154,30 @@ public class CoreRequirements
                                # comments and empty lines will be ignored
                                         # indented comment
 
+                               CONFIGURE FOLDER
+                                   DEFAULT FOR FILE MODE = 755
+                                   DEFAULT FOR SOURCE ENCODING = UTF-8
+                                   DEFAULT FOR TARGET ENCODING = UTF-8
+                               DONE
+                               
+                               DO DEPLOY TEXT FILE IF NAME PATTERN = weirdo[0-9]{1,3}.zippo-dong
+                                   RENAME TO = abowitz
+                                   NAME REPLACE PATTERN = sino123
+                                   FILE MODE = 755
+                                   SOURCE ENCODING = UTF-8
+                                   TARGET ENCODING = UTF-8
+                                   NEWLINE = LINUX 
+                                   ADD TRAILING NEWLINE = true
+                                   VALID CHARACTERS = AsciiGerman
+                                   BUILD TARGETS = a, b ,c
+                               DONE
+                               
                                """;
         
         var folderConfig = FolderConfigReader.Parse(content);
         
         
         Assert.Null(folderConfig.KeepEmptyFolder);
-        Assert.Null(folderConfig.LocalDefaults);
-        Assert.Empty(folderConfig.PartialRules);
     }
 
     #region Helpers

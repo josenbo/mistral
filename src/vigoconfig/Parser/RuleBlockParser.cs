@@ -9,4 +9,5 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlockR
     
     private readonly FolderConfigPartialRule _partialRule = partialRule;
     private readonly SourceBlockRule _ruleBlock = ruleBlock;
+    private readonly Tokenizer _tokenizer = new Tokenizer(ruleBlock);
 }
