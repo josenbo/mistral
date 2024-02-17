@@ -27,8 +27,7 @@ internal class AppSettingsBuilder
                 CommandEnum.DeployToTarball => new AppSettingsDeployToTarball(
                     RepositoryRoot: GetRepositoryRoot(),
                     Tarball: GetTarballFile(), 
-                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
-                    AdditionalTarRootFolder: GetAdditionalTarRootFolder(), 
+                    DeploymentConfigFileName: GetDeploymentConfigFileName(), 
                     TemporaryDirectory: GetTemporaryDirectory(),
                     Logfile: GetLogfile(),
                     LogLevel: GetLogLevel()),

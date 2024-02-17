@@ -35,9 +35,11 @@ public static class LineEndingEnumHelper
                 "crlf" => LineEndingEnum.CR_LF,
                 "windows" => LineEndingEnum.CR_LF,
                 "win" => LineEndingEnum.CR_LF,
+                "dos" => LineEndingEnum.CR_LF,
                 "lf" => LineEndingEnum.LF,
                 "unix" => LineEndingEnum.LF,
                 "linux" => LineEndingEnum.LF,
+                "nix" => LineEndingEnum.LF,
                 _ => null
             };
         return result.HasValue;

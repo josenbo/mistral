@@ -7,7 +7,6 @@ internal record AppSettingsDeployToTarball(
     DirectoryInfo RepositoryRoot, 
     FileInfo Tarball, 
     string DeploymentConfigFileName,
-    string? AdditionalTarRootFolder,
     DirectoryInfo TemporaryDirectory,
     FileInfo? Logfile,
     LogEventLevel LogLevel

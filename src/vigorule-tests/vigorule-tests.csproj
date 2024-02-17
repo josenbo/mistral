@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <RootNamespace>vigoarchive_tests</RootNamespace>
+        <RootNamespace>vigorule_tests</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
@@ -26,8 +26,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\vigoarchive\vigoarchive.csproj" />
       <ProjectReference Include="..\vigobase\vigobase.csproj" />
+      <ProjectReference Include="..\vigorule\vigorule.csproj" />
     </ItemGroup>
 
 </Project>
