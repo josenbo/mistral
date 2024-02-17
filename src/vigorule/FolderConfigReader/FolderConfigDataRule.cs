@@ -2,7 +2,7 @@
 using Serilog;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 public class FolderConfigDataRule
 {

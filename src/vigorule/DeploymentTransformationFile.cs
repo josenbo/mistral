@@ -3,7 +3,7 @@ using Ardalis.GuardClauses;
 using Serilog;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 internal class DeploymentTransformationFile : IDeploymentTransformationReadWriteFile, IDeploymentTransformationReadOnlyFile
 {

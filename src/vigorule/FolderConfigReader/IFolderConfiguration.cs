@@ -1,6 +1,6 @@
 ﻿using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 internal interface IFolderConfiguration
 {

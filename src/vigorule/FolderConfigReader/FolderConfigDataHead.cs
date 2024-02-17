@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 public class FolderConfigDataHead
 {

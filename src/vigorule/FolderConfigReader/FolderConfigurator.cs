@@ -4,7 +4,7 @@ using Serilog;
 using Tomlyn;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 internal static class FolderConfigurator
 {

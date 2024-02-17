@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 internal record FileRuleMatchingPattern(
     FileRuleId Id,

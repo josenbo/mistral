@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 internal class DeploymentTransformationDirectory(DirectoryInfo sourceDirectory, bool keepEmptyDirectory)

@@ -1,4 +1,4 @@
-﻿namespace vigoconfig;
+﻿namespace vigorule;
 
 internal enum RuleTypeEnum
 {

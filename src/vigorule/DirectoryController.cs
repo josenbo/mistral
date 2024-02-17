@@ -2,7 +2,7 @@
 using Serilog;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 [PublicAPI]
 public class DirectoryController : IFolderConfiguration

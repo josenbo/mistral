@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using vigobase;
 
-namespace vigoconfig;
+namespace vigorule;
 
 internal record FileRuleMatchingLiteral(
     FileRuleId Id,
