@@ -1,11 +1,13 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using Serilog;
 
 namespace vigobase;
 
+[SuppressMessage("Performance", "SYSLIB1045:Convert to \'GeneratedRegexAttribute\'.")]
 public static partial class ValidCharactersHelper
 {
-    public static Regex ParseConfiguration(string configText)
+    public static Regex? ParseConfiguration(string configText)
     {
         if (string.IsNullOrWhiteSpace(configText))
         {
@@ -14,7 +16,7 @@ public static partial class ValidCharactersHelper
         }
         
         if (string.IsNullOrWhiteSpace(configText) || configText.Trim().Equals("all", StringComparison.InvariantCultureIgnoreCase))
-            return new Regex("^.*$", RegexOptions.Singleline);
+            return null;
 
         var match = RexConfigLine.Match(configText);
         

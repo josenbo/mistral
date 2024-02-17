@@ -5,7 +5,6 @@ namespace vigo;
 
 internal abstract record AppSettings(
     DirectoryInfo RepositoryRoot,
-    string DeploymentConfigFileName,
     DirectoryInfo TemporaryDirectory,
     FileInfo? Logfile,
     LogEventLevel LogLevel

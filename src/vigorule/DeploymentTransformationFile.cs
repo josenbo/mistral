@@ -144,7 +144,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         {
             var fileContent = File.ReadAllText(SourceFile.FullName, SourceFileEncoding.ToEncoding());
             
-            if (!_handling.ValidCharsRegex.IsMatch(fileContent))
+            if (_handling.ValidCharsRegex is not null && !_handling.ValidCharsRegex.IsMatch(fileContent))
             {
                 Log.Fatal("Check failed for {FileName} in {FilePath} due to unexpected characters in the file content",
                     SourceFile.Name,

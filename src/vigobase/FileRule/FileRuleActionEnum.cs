@@ -1,6 +1,6 @@
-﻿namespace vigorule;
+﻿namespace vigobase;
 
-internal enum FileRuleActionEnum
+public enum FileRuleActionEnum
 {
     Undefined = 0,
     SkipRule = 2165,

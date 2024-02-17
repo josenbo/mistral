@@ -1,6 +1,6 @@
-﻿namespace vigorule;
+﻿namespace vigobase;
 
-internal enum FileRuleConditionEnum
+public enum FileRuleConditionEnum
 {
     Undefined = 0,
     Unconditional = 3704,

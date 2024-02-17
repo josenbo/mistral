@@ -27,13 +27,11 @@ internal class AppSettingsBuilder
                 CommandEnum.DeployToTarball => new AppSettingsDeployToTarball(
                     RepositoryRoot: GetRepositoryRoot(),
                     Tarball: GetTarballFile(), 
-                    DeploymentConfigFileName: GetDeploymentConfigFileName(), 
                     TemporaryDirectory: GetTemporaryDirectory(),
                     Logfile: GetLogfile(),
                     LogLevel: GetLogLevel()),
                 CommandEnum.CheckCommit => new AppSettingsCheckCommit(
                     RepositoryRoot: GetRepositoryRoot(),
-                    DeploymentConfigFileName: GetDeploymentConfigFileName(),
                     TemporaryDirectory: GetTemporaryDirectory(),
                     Logfile: GetLogfile(),
                     LogLevel: GetLogLevel()),
@@ -63,7 +61,7 @@ internal class AppSettingsBuilder
                 Permissions = FilePermission.UseDefault
             };
 
-            LocalAppSettings.FinalCatchAllRule = new StandardFileHandling(FinalCatchAllHandling, false);
+            LocalAppSettings.FinalCatchAllRule = new StandardFileHandling(Array.Empty<string>(), FinalCatchAllHandling, false);
 
             DeployConfigHandling = DefaultHandling with
             {
@@ -71,7 +69,10 @@ internal class AppSettingsBuilder
                 Permissions = FilePermission.UseDefault
             };
             
-            LocalAppSettings.DeployConfigRule = new StandardFileHandling(DeployConfigHandling, false);
+            LocalAppSettings.DeployConfigRule = new StandardFileHandling(
+                GetDeploymentConfigFileNames("deployment-rules.md", "deployment-rules.vigo"), 
+                DeployConfigHandling, 
+                false);
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -91,11 +92,8 @@ internal class AppSettingsBuilder
     // Directory must exist, file will be created or overwritten
     private const string EnvVarVigoTarballFile = "VIGO_TARBALL_FILE";
     // Filename to look for in each repository folder (and its default value)
-    private const string EnvVarVigoDeployConfigFilename = "VIGO_DEPLOY_CONFIG_FILENAME";
-    private const string DefaultDeploymentConfigFileName = "deployment.toml";
+    private const string EnvVarVigoDeployConfigFilenames = "VIGO_DEPLOY_CONFIG_FILENAMES";
     // The name of a virtual folder to become the root directory in the tarball
-    private const string EnvVarVigoExtraRootFolder = "VIGO_EXTRA_ROOT_FOLDER";
-    // An existing directory where to place temporary files
     private const string EnvVarVigoTempDir = "VIGO_TEMP_DIR";
     // Directory must exist, file will be created or written to
     private const string EnvVarVigoLogfile = "VIGO_LOGFILE";
@@ -106,7 +104,7 @@ internal class AppSettingsBuilder
 
     private static AppSettings CreateAppSettings()
     {
-        lock (_appSettingsLock)
+        lock (AppSettingsLock)
         {
             if (_appSettings is null)
             {
@@ -230,61 +228,43 @@ internal class AppSettingsBuilder
         }
     }
 
-    private static string GetDeploymentConfigFileName()
+    private static List<string> GetDeploymentConfigFileNames(params string[] defaultFilenames)
     {
         try
         {
-            var fileName = GetEnvironmentVariable(EnvVarVigoDeployConfigFilename, DefaultDeploymentConfigFileName);
+            var retval = new List<string>();
+            var listOfFileNames = GetEnvironmentVariable(EnvVarVigoDeployConfigFilenames);
 
-            if (256 < fileName.Length)
-                fileName = fileName[..256];
-
-            if (fileName.Contains(Path.DirectorySeparatorChar) || fileName.Contains(Path.AltDirectorySeparatorChar))
+            if (listOfFileNames is null)
             {
-                const string message = "The deployment configuration file name is not allowed to contain path separators";
-                Console.Error.WriteLine(message);
-                throw new VigoFatalException(message);
+                retval.AddRange(defaultFilenames);
             }
-            
-            // trigger exception on a file name containing illegal characters 
-            File.Exists(fileName);
+            else
+            {
+                if (256 < listOfFileNames.Length)
+                    listOfFileNames = listOfFileNames[..256];
 
-            return fileName;
+                retval.AddRange(listOfFileNames.Split(FilenameSeparators, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+            }
+
+            foreach (var fileName in retval)
+            {
+                if (fileName.Contains(Path.DirectorySeparatorChar) || fileName.Contains(Path.AltDirectorySeparatorChar))
+                {
+                    const string message = "The deployment configuration file name is not allowed to contain path separators";
+                    Console.Error.WriteLine(message);
+                    throw new VigoFatalException(message);
+                }
+            
+                // trigger exception on a file name containing illegal characters 
+                File.Exists(fileName);
+            }
+
+            return retval;
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetDeploymentConfigFileName)}(). Message was: {e.Message}");
-            throw new VigoFatalException("Startup configuration failed", e);
-        }
-    }
-
-    private static string GetAdditionalTarRootFolder()
-    {
-        try
-        {
-            var fileName = GetEnvironmentVariable(EnvVarVigoExtraRootFolder);
-
-            if (string.IsNullOrWhiteSpace(fileName))
-                return string.Empty;
-            
-            if (256 < fileName.Length)
-                fileName = fileName[..256];
-        
-            if (fileName.Contains(Path.DirectorySeparatorChar) || fileName.Contains(Path.AltDirectorySeparatorChar))
-            {
-                const string message = "The name of the extra root folder in the tarball is not allowed to contain path separators";
-                Console.Error.WriteLine(message);
-                throw new VigoFatalException(message);
-            }
-            
-            // trigger exception on a file name containing illegal characters 
-            File.Exists(fileName);
-
-            return fileName;
-        }
-        catch (Exception e) when (e is not VigoException)
-        {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetAdditionalTarRootFolder)}(). Message was: {e.Message}");
+            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetDeploymentConfigFileNames)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -407,8 +387,8 @@ internal class AppSettingsBuilder
  
     
     private static AppSettings? _appSettings;
-    private static string _appSettingsLock = new string("AppSettings");
-    // private static FileHandlingParameters? _defaultFileHandlingParams;
+    private static readonly string AppSettingsLock = new string("AppSettings");
+    private static readonly char[] FilenameSeparators = new char[] { ',', ';', ' ' };
 
     #endregion
 }

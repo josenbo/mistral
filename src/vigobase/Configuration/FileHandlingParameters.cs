@@ -12,5 +12,6 @@ public record FileHandlingParameters(
     LineEndingEnum LineEnding,
     FilePermission Permissions,
     bool FixTrailingNewline,
-    Regex ValidCharsRegex,
+    Regex? ValidCharsRegex,
     IReadOnlyList<string> Targets);
+    

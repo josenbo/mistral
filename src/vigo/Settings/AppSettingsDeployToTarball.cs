@@ -6,13 +6,11 @@ namespace vigo;
 internal record AppSettingsDeployToTarball(
     DirectoryInfo RepositoryRoot, 
     FileInfo Tarball, 
-    string DeploymentConfigFileName,
     DirectoryInfo TemporaryDirectory,
     FileInfo? Logfile,
     LogEventLevel LogLevel
 ) : AppSettings(
     RepositoryRoot, 
-    DeploymentConfigFileName,
     TemporaryDirectory,
     Logfile,
     LogLevel
