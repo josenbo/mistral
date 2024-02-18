@@ -1,5 +1,8 @@
-﻿namespace vigoconfig_tests;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace vigoconfig_tests;
+
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class CoreRequirements
 {
     [Fact]
@@ -145,6 +148,283 @@ public class CoreRequirements
         Assert.Throws<VigoParseFolderConfigException>(() => FolderConfigReader.Parse(content));
     }
     
+    [Fact]
+    public void SolitaryDefaultFileMode()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                   default for file mode = 600
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.NotNull(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.True(folderConfig.LocalDefaults.StandardModeForFiles == (UnixFileMode)0b_110_000_000);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+    
+    [Fact]
+    public void SolitaryDefaultSourceEncoding()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                   DEFAULT for SoUrCe encoding       = win_1252
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.NotNull(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Equal(FileEncodingEnum.Windows_1252, folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+    
+    [Fact]
+    public void SolitaryDefaultTargetEncoding()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                   DEFAULT for tARget encoding       = iso-88_5.9 1
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.NotNull(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Equal(FileEncodingEnum.ISO_8859_1, folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+
+    [Fact]
+    public void SolitaryDefaultNewline()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                   DEFAULT 
+                                     for 
+                                       newline       
+                                         = linux
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.NotNull(folderConfig.LocalDefaults.LineEnding);
+        Assert.Equal(LineEndingEnum.LF, folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+
+    [Fact]
+    public void SolitaryDefaultAddTrailingNewline()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                   DEFAULT for add
+                               trailing
+                                 newline = true
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.NotNull(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.True(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+
+    [Fact]
+    public void SolitaryDefaultValidCharactersAsciiGermanPlus()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                 DEFAULT FOR VALID CHARACTERS    =               AsciiGerman + îô
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.True(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.NotNull(folderConfig.LocalDefaults.ValidCharsRegex);
+        Assert.Equal("^[\\u0000-\\u007FäöüÄÖÜß€îô]*$", folderConfig.LocalDefaults.ValidCharsRegex.ToString());
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+
+    [Fact]
+    public void SolitaryDefaultValidCharactersAll()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                 DEFAULT FOR VALID CHARACTERS=all
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.True(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.ValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+
+    [Fact]
+    public void SolitaryDefaultBuildTargets()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                   DEFAULT BUILD TARGETS = one, two; three four five-5
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.NotNull(folderConfig.LocalDefaults.Targets);
+        Assert.NotEmpty(folderConfig.LocalDefaults.Targets);
+        Assert.Equal(5, folderConfig.LocalDefaults.Targets.Count);
+        Assert.Contains("one", folderConfig.LocalDefaults.Targets);
+        Assert.Contains("two", folderConfig.LocalDefaults.Targets);
+        Assert.Contains("three", folderConfig.LocalDefaults.Targets);
+        Assert.Contains("four", folderConfig.LocalDefaults.Targets);
+        Assert.Contains("five-5", folderConfig.LocalDefaults.Targets);
+    }
+
+
     [Fact]
     public void RunSomeTestData()
     {

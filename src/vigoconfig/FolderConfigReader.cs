@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Serilog;
 using Serilog.Events;
-using vigobase;
 
 namespace vigoconfig;
 
@@ -28,6 +27,8 @@ public static partial class FolderConfigReader
             var parser = new RuleBlockParser(partialRule, ruleBlock);
             parser.Parse();
         }
+        
+        folderConfig.DumpToDebug();
         
         return folderConfig;
     }

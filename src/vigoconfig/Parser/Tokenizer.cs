@@ -9,7 +9,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
 
     public bool Peek(params string[] compareWith)
     {
-        var startpos = _contentPosition;
+        var startPosition = _contentPosition;
         
         foreach (var expected in compareWith)
         {
@@ -21,7 +21,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
             if (expected.Equals(token, StringComparison.InvariantCultureIgnoreCase)) 
                 continue;
             
-            _contentPosition = startpos;
+            _contentPosition = startPosition;
             return false;
         }
 
@@ -31,7 +31,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
     public bool Check(params string[] compareWith)
     {
         var sb = new StringBuilder();
-        var startpos = _contentPosition;
+        var startPosition = _contentPosition;
         
         foreach (var expected in compareWith)
         {
@@ -45,7 +45,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
             {
                 Log.Error("Expected the token sequence {ExpectedSequence} at line {TheLine} but found {ObservedSequence}",
                     compareWith,
-                    GetLineNumberFromPosition(startpos),
+                    GetLineNumberFromPosition(startPosition),
                     sb.ToString());
                 return false;
             }
@@ -69,7 +69,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
             _contentPosition++;
             trim = true;
 			
-            while (!AtEnd && _content[_contentPosition] is not '\r' or '\n')
+            while (!AtEnd && _content[_contentPosition] != '\r' && _content[_contentPosition] != '\n')
             {
                 sb.Append(_content[_contentPosition]);
                 _contentPosition++;
@@ -77,7 +77,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
         }
         else
         {
-            while (!AtEnd && !char.IsWhiteSpace(_content[_contentPosition]))
+            while (!AtEnd && char.IsLetterOrDigit(_content[_contentPosition]))
             {
                 sb.Append(_content[_contentPosition]);
                 _contentPosition++;
@@ -94,7 +94,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
     {
         var sb = new StringBuilder();
 
-        while (!AtEnd && _content[_contentPosition] is not '\r' or '\n')
+        while (!AtEnd && _content[_contentPosition] != '\r' && _content[_contentPosition] != '\n')
         {
             sb.Append(_content[_contentPosition]);
             _contentPosition++;
@@ -131,5 +131,5 @@ internal class Tokenizer(SourceBlock sourceBlock)
     }
 
     private readonly string _content = sourceBlock.Content;
-    private int _contentPosition = 0;
+    private int _contentPosition;
 }
