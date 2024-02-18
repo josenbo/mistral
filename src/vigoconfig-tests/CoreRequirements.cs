@@ -101,19 +101,22 @@ public class CoreRequirements
                                #!/usr/bin/env vigo
                                #vîgô
 
-                               DO IGNORE TEXT FILE
-                                   SomeValue 
-                               DONE
+                               # comments and empty lines will be ignored
+                               # comment lines begin with a hash as the
+                               # first non-whitespace character 
                                
-                               CONFIGURE FOLDER
-                                   doing folder 
-                                   configuration
-                               DONE
+                               # DO IGNORE TEXT FILE
+                                # DONE
                                
-                               do deploy text file 
-                                   if name is hubert
-                                   do something with hubert
-                               done
+                                     #  CONFIGURE FOLDER
+                                     #      doing folder 
+                                     #      configuration
+                                     #  DONE
+                               
+                               #do deploy text file 
+                               #    if name is hubert
+                               #    do something with hubert
+                               #done
                                
                                """;
         

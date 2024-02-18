@@ -1,240 +1,281 @@
-﻿using System.Text;
-using Serilog;
+﻿using Serilog;
 using vigobase;
 
 namespace vigoconfig;
 
-internal class FolderBlockParser(FolderConfig folderConfig, SourceBlockFolder folderBlock)
+internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBlock)
 {
+    #region local private class ConfigPhrase
+
+    private class ConfigPhrase(bool required, Func<Tokenizer, FolderConfig, ConfigPhrase, bool> parseFunc, string name)
+    {
+        public string Name { get; } = name;
+        public bool Required { get; } = required;
+        public bool ParsedSuccessfully { get; set; }
+        public bool PhraseFound { get; set; }
+        public int PhraseOccurenceCount { get; set; }
+        public int NumberOfSuccessfulMatches { get; set; }
+        public Func<Tokenizer, FolderConfig, ConfigPhrase, bool> ParseFunc { get; set; } = parseFunc;
+        public string? ErrorMessage { get; set; }
+        public SourceLine? SourceLine { get; set; }
+
+        public bool HasErrors()
+        {
+            if (NumberOfSuccessfulMatches == 1 && PhraseOccurenceCount == 1)
+                return false;
+            if (Required)
+                return true;
+            return 0 < PhraseOccurenceCount;
+        }
+
+        public bool ReturnPhraseNotFound()
+        {
+            ParsedSuccessfully = false;
+            PhraseFound = false;
+            return PhraseFound;
+        }
+
+        public bool ReturnParseWithErrors(string errorMessage, SourceLine? errorSourceLine = null)
+        {
+            ParsedSuccessfully = false;
+            PhraseFound = true;
+            PhraseOccurenceCount++;
+            ErrorMessage = errorMessage;
+            if (errorSourceLine is not null)
+                SourceLine = errorSourceLine;
+            return PhraseFound;
+        }
+
+        public bool ReturnSuccessfullyParsed()
+        {
+            ParsedSuccessfully = true;
+            PhraseFound = true;
+            PhraseOccurenceCount++;
+            NumberOfSuccessfulMatches++;
+            return PhraseFound;
+        }
+    }
+
+    #endregion
+    
     public void Parse()
     {
         if (!ParseValues())
+        {
+            Log.Fatal("Failed to parse the folder configuration {TheBlockDescription}." +
+                      " There is a syntax error or an unrecognized value in the line {TheLine}." +
+                      " The error message was {TheErrorMessage}",
+                codeBlock.Description,
+                _lastErrorSourceLine,
+                _lastErrorMessage);
+            
             throw new VigoParseFolderConfigException(
-                "Encountered syntax errors or illegal values in the folder configuration");
+                "Failed to parse the folder configuration. Encountered syntax errors or illegal values in the folder configuration");
+        }    
     }
 
     private bool ParseValues()
     {
+        var phrases = new List<ConfigPhrase>()
+        {
+            new ConfigPhrase(false, ParseDefaultForFileMode, "Default File Mode"),
+            new ConfigPhrase(false, ParseDefaultForSourceEncoding, "Default Source Encoding"),
+            new ConfigPhrase(false, ParseDefaultForTargetEncoding, "Default Target Encoding")
+        };
+
         if (!_tokenizer.Check("CONFIGURE", "FOLDER"))
+        {
+            _lastErrorSourceLine = _tokenizer.GetCurrentSourceLine();
+            _lastErrorMessage = "The folder defaults and settings section must start with CONFIGURE FOLDER";
             return false;
+        }
 
         while (!_tokenizer.AtEnd)
         {
             if (_tokenizer.Peek("DONE"))
-                return true;
-
-            if (_tokenizer.Peek("DEFAULT", "FOR", "FILE", "MODE"))
             {
-                var value = _tokenizer.GetNextToken().Trim();
-
-                if (string.IsNullOrWhiteSpace(value))
+                var retval = true;
+                var isFirstError = true;
+                
+                foreach (var phrase in phrases.Where(p => p.HasErrors()))
                 {
-                    Log.Error("Missing value for default unix file mode", value);
-                    return false;
+                    if (isFirstError)
+                    {
+                        Log.Debug("Showing errors for {TheBlockDescription}", codeBlock.Description);
+                        retval = false;
+                        isFirstError = false;
+                    }
+
+                    _lastErrorSourceLine = phrase.SourceLine;
+                    _lastErrorMessage = phrase.ErrorMessage;
+                    
+                    Log.Debug("{TheErrorMessage} on line {TheLine}", phrase.ErrorMessage, phrase.SourceLine);
                 }
                 
-                if (FilePermission.TryParse(value, out var permission) && permission is FilePermissionOctal octalPermission)
-                {
-                    folderConfig.LocalDefaults ??= new FolderConfigPartialHandling();
-
-                    folderConfig.LocalDefaults.StandardModeForFiles =
-                        octalPermission.ComputeUnixFileMode(UnixFileMode.None);
-                    continue;
-                }
-                else
-                {
-                    Log.Error("Could not derive a unix file mode from the value {TheFileModeValue}", value);
-                    return false;
-                }
-            }
-
-            if (_tokenizer.Peek("DEFAULT", "FOR", "SOURCE", "ENCODING"))
-            {
-                var value = _tokenizer.GetNextToken().Trim();
-                
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    Log.Error("Missing value for the default source encoding");
-                    return false;
-                }
-                
-                if (FileEncodingEnumHelper.TryParse(value, out var encoding))
-                {
-                    folderConfig.LocalDefaults ??= new FolderConfigPartialHandling();
-
-                    folderConfig.LocalDefaults.SourceFileEncoding = encoding;
-                    continue;
-                }
-                else
-                {
-                    Log.Error("Did not recognize the default source encoding {TheValue}", value);
-                    return false;
-                }
-            }
-
-            if (_tokenizer.Peek("DEFAULT", "FOR", "TARGET", "ENCODING"))
-            {
-                var value = _tokenizer.GetNextToken().Trim();
-                
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    Log.Error("Missing value for the default target encoding");
-                    return false;
-                }
-                
-                if (FileEncodingEnumHelper.TryParse(value, out var encoding))
-                {
-                    folderConfig.LocalDefaults ??= new FolderConfigPartialHandling();
-
-                    folderConfig.LocalDefaults.TargetFileEncoding = encoding;
-                    continue;
-                }
-                else
-                {
-                    Log.Error("Did not recognize the default target encoding {TheValue}", value);
-                    return false;
-                }
+                return retval;
             }
             
+            // Match the first phrase that has not already been matched
             
-            Log.Error("Could not parse the folder configuration line {TheLine}", _tokenizer.GetCurrentSourceLine());
+            var initialMatch = phrases
+                .Where(e => !e.PhraseFound)
+                .FirstOrDefault(p => p.ParseFunc(_tokenizer, folderConfig, p));
+
+            if (initialMatch is not null)
+            {
+                if (!initialMatch.HasErrors() && initialMatch.ParsedSuccessfully)
+                    continue;
+                
+                _lastErrorSourceLine = initialMatch.SourceLine;
+                _lastErrorMessage = initialMatch.ErrorMessage;
+                    
+                Log.Debug("Parsing failed with the message {TheErrorMessage} on line {TheLine}", initialMatch.ErrorMessage, initialMatch.SourceLine);
+                
+                return false;
+            }
+            
+            // We are definitely in an error state. To give mor information to the user
+            // we check, if an already parsed line appears a second time
+
+            _lastErrorSourceLine = _tokenizer.GetCurrentSourceLine();
+            
+            var duplicateMatch = phrases
+                .Where(e => e.PhraseFound)
+                .FirstOrDefault(p => p.ParseFunc(_tokenizer, folderConfig, p));
+
+            if (duplicateMatch is not null)
+            {
+                _lastErrorMessage = $"Parsing failed because of a duplicate entry for {duplicateMatch.Name} on line {_lastErrorSourceLine.LineNumber}";
+                    
+                Log.Debug("Parsing failed because of a duplicate entry for {ThePhrase} on line {TheLine}", duplicateMatch.Name, _lastErrorSourceLine);
+                
+                return false;
+            }
+
+            _lastErrorMessage = $"There is unrecognized content on line {_lastErrorSourceLine.LineNumber}";
+            
+            Log.Debug("There is unrecognized content on line {TheLine}", _lastErrorSourceLine);
+            
             return false;
         }
 
+        _lastErrorSourceLine = codeBlock.Lines[^1];
+        _lastErrorMessage = "The folder defaults and settings section must be closet with DONE";
         return false;
     }
 
-    private readonly SourceBlockFolder _folderBlock = folderBlock;
-    private readonly Tokenizer _tokenizer = new Tokenizer(folderBlock);
-}
-
-internal class Tokenizer(SourceBlock sourceBlock)
-{
-    public bool AtEnd => _content.Length <= _contentPosition;
-
-    public bool Peek(params string[] compareWith)
+    private static bool ParseDefaultForFileMode(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        var startpos = _contentPosition;
-        
-        foreach (var expected in compareWith)
-        {
-            if (AtEnd)
-                return false;
-        
-            var token = GetNextToken();
+        if (!tokenizer.Peek("DEFAULT", "FOR", "FILE", "MODE"))
+            return phrase.ReturnPhraseNotFound();
 
-            if (expected.Equals(token, StringComparison.InvariantCultureIgnoreCase)) 
-                continue;
-            
-            _contentPosition = startpos;
-            return false;
+        phrase.SourceLine = tokenizer.GetCurrentSourceLine();
+
+        if (tokenizer.AtEnd)
+        {
+            const string message = "Encountered end of source when looking for the default unix file mode"; 
+            Log.Debug(message);
+            return phrase.ReturnParseWithErrors(message);
+        }
+        var value = tokenizer.GetNextToken();
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            const string message = "Missing value for default unix file mode"; 
+            Log.Debug(message);
+            return phrase.ReturnParseWithErrors(message);
         }
 
-        return true;
+        if (!FilePermission.TryParse(value, out var permission) ||
+            permission is not FilePermissionOctal octalPermission)
+        {
+            Log.Debug("Could not derive a unix file mode from the value {TheFileModeValue}. Expecting three octal digits like 644", value);
+            return phrase.ReturnParseWithErrors($"Could not derive a unix file mode from the value {value}. Expecting three octal digits like 644");
+        }
+
+        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+
+        folder.LocalDefaults.StandardModeForFiles =
+            octalPermission.ComputeUnixFileMode(UnixFileMode.None);
+
+        return phrase.ReturnSuccessfullyParsed();
+    }
+
+    private static bool ParseDefaultForSourceEncoding(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    {
+        if (!tokenizer.Peek("DEFAULT", "FOR", "SOURCE", "ENCODING"))
+            return phrase.ReturnPhraseNotFound();
+
+        phrase.SourceLine = tokenizer.GetCurrentSourceLine();
+
+        if (tokenizer.AtEnd)
+        {
+            const string message = "Encountered end of source when looking for the default source encoding"; 
+            Log.Debug(message);
+            return phrase.ReturnParseWithErrors(message);
+        }
+        var value = tokenizer.GetNextToken();
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            const string message = "Missing value for default source encoding"; 
+            Log.Debug(message);
+            return phrase.ReturnParseWithErrors(message);
+        }
+
+        if (!FileEncodingEnumHelper.TryParse(value, out var encoding))
+        {
+            Log.Debug("Could not recognize a source encoding with the name {TheEncodingValue}. Valid names are: {ValidNames}", 
+                value,
+                FileEncodingEnumHelper.ValidNames);
+            return phrase.ReturnParseWithErrors($"Could not recognize a source encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
+        }
+
+        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+
+        folder.LocalDefaults.SourceFileEncoding = encoding;
+
+        return phrase.ReturnSuccessfullyParsed();
     }
     
-    public bool Check(params string[] compareWith)
+    private static bool ParseDefaultForTargetEncoding(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        var sb = new StringBuilder();
-        var startpos = _contentPosition;
-        
-        foreach (var expected in compareWith)
-        {
-            if (AtEnd)
-                return false;
-        
-            var token = GetNextToken();
-            sb.Append(token);
-            
-            if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
-            {
-                Log.Error("Expected the token sequence {ExpectedSequence} at line {TheLine} but found {ObservedSequence}",
-                    compareWith,
-                    GetLineNumberFromPosition(startpos),
-                    sb.ToString());
-                return false;
-            }
+        if (!tokenizer.Peek("DEFAULT", "FOR", "TARGET", "ENCODING"))
+            return phrase.ReturnPhraseNotFound();
 
-            sb.Append(' ');
+        phrase.SourceLine = tokenizer.GetCurrentSourceLine();
+
+        if (tokenizer.AtEnd)
+        {
+            const string message = "Encountered end of source when looking for the default target encoding"; 
+            Log.Debug(message);
+            return phrase.ReturnParseWithErrors(message);
+        }
+        var value = tokenizer.GetNextToken();
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            const string message = "Missing value for default target encoding"; 
+            Log.Debug(message);
+            return phrase.ReturnParseWithErrors(message);
         }
 
-        return true;
-    }
-    
-    public string GetNextToken()
-    {
-        var sb = new StringBuilder();
-        var trim = false;
-
-        while (!AtEnd && char.IsWhiteSpace(_content[_contentPosition]))
-            _contentPosition++;
-
-        if (!AtEnd && _content[_contentPosition] == '=')
+        if (!FileEncodingEnumHelper.TryParse(value, out var encoding))
         {
-            _contentPosition++;
-            trim = true;
-			
-            while (!AtEnd && _content[_contentPosition] is not '\r' or '\n')
-            {
-                sb.Append(_content[_contentPosition]);
-                _contentPosition++;
-            }
+            Log.Debug("Could not recognize a target encoding with the name {TheEncodingValue}. Valid names are: {ValidNames}", 
+                value,
+                FileEncodingEnumHelper.ValidNames);
+            return phrase.ReturnParseWithErrors($"Could not recognize a target encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
-        else
-        {
-            while (!AtEnd && !char.IsWhiteSpace(_content[_contentPosition]))
-            {
-                sb.Append(_content[_contentPosition]);
-                _contentPosition++;
-            }
-        }
-        
-        while (!AtEnd && char.IsWhiteSpace(_content[_contentPosition]))
-            _contentPosition++;
-        
-        return trim ? sb.ToString().Trim( ): sb.ToString();
+
+        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+
+        folder.LocalDefaults.SourceFileEncoding = encoding;
+
+        return phrase.ReturnSuccessfullyParsed();
     }
 
-    public string ReadToEnoOfLineAndTrim()
-    {
-        var sb = new StringBuilder();
-
-        while (!AtEnd && _content[_contentPosition] is not '\r' or '\n')
-        {
-            sb.Append(_content[_contentPosition]);
-            _contentPosition++;
-        }
-
-        while (!AtEnd && char.IsWhiteSpace(_content[_contentPosition]))
-            _contentPosition++;
-
-        return sb.ToString().Trim();
-    }
-
-    public SourceLine GetCurrentSourceLine()
-    {
-        var position = _contentPosition;
-        
-        foreach (var sourceLine in sourceBlock.Lines)
-        {
-            if (position < sourceLine.Content.Length)
-                return sourceLine;
-            position -= sourceLine.Content.Length;
-        }
-        return sourceBlock.Lines[^1];
-    }
-    
-    private int GetLineNumberFromPosition(int position)
-    {
-        foreach (var sourceLine in sourceBlock.Lines)
-        {
-            if (position < sourceLine.Content.Length)
-                return sourceLine.LineNumber;
-            position -= sourceLine.Content.Length;
-        }
-        return sourceBlock.LastLineNumber;
-    }
-
-    private readonly string _content = sourceBlock.Content;
-    private int _contentPosition = 0;
+    private readonly Tokenizer _tokenizer = new Tokenizer(codeBlock);
+    private SourceLine? _lastErrorSourceLine;
+    private string? _lastErrorMessage;
 }

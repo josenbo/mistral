@@ -50,4 +50,6 @@ public static class FileEncodingEnumHelper
         };
         return result.HasValue;
     }
+
+    public static string[] ValidNames => new[] { "ASCII", "ISO-8859-1", "ISO-8859-15", "Windows-1252", "UTF-8" };
 }
