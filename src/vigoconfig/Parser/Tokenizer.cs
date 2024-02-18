@@ -45,21 +45,29 @@ internal class Tokenizer(SourceBlock sourceBlock)
             var token = GetNextToken();
 
             var found = false;
-            
-            foreach (var expected in expectedArray)
-            {
-                if (string.IsNullOrWhiteSpace(expected))
-                {
-                    isOptionalToken = true;
-                    continue;
-                }
-                
-                if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
-                    continue;
 
-                matchedTokens.Add(expected);
+            if (expectedArray is ["*"])
+            {
+                matchedTokens.Add(token);
                 found = true;
-                break;
+            }
+            else
+            {
+                foreach (var expected in expectedArray)
+                {
+                    if (string.IsNullOrWhiteSpace(expected))
+                    {
+                        isOptionalToken = true;
+                        continue;
+                    }
+
+                    if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
+                        continue;
+
+                    matchedTokens.Add(expected);
+                    found = true;
+                    break;
+                }
             }
 
             if (found) 
@@ -67,6 +75,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
 
             if (isOptionalToken)
             {
+                matchedTokens.Add(string.Empty);
                 _contentPosition = currentTokenStart;
                 continue;
             }
