@@ -424,7 +424,41 @@ public class CoreRequirements
         Assert.Contains("five-5", folderConfig.LocalDefaults.Targets);
     }
 
+    [Fact]
+    public void SkipAlwaysRule()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               configure folder
+                                   default for file mode = 600
+                               done
 
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Empty(folderConfig.PartialRules);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Null(folderConfig.LocalDefaults.FileType);
+        Assert.NotNull(folderConfig.LocalDefaults.StandardModeForFiles);
+        Assert.True(folderConfig.LocalDefaults.StandardModeForFiles == (UnixFileMode)0b_110_000_000);
+        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
+        Assert.Null(folderConfig.LocalDefaults.Permissions);
+        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
+        Assert.Null(folderConfig.LocalDefaults.LineEnding);
+        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
+        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.LocalDefaults.Targets);
+    }
+
+
+    
     [Fact]
     public void RunSomeTestData()
     {

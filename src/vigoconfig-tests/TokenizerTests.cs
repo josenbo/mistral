@@ -1,6 +1,6 @@
-namespace vigoconfig_tests;
+﻿namespace vigoconfig_tests;
 
-public class UnitTest1
+public class TokenizerTests
 {
     [Fact]
     public void Test1()
@@ -9,7 +9,7 @@ public class UnitTest1
     
     #region Helpers
 
-    public UnitTest1(ITestOutputHelper testOutputHelper)
+    public TokenizerTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
 

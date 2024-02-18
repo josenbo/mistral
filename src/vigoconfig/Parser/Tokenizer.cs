@@ -28,6 +28,55 @@ internal class Tokenizer(SourceBlock sourceBlock)
         return true;
     }
     
+    public bool Peek(List<string> matchedTokens, params string[][] compareWith)
+    {
+        var startPosition = _contentPosition;
+        
+        matchedTokens.Clear();
+        
+        foreach (var expectedArray in compareWith)
+        {
+            if (AtEnd)
+                return false;
+
+            var currentTokenStart = _contentPosition;
+            var isOptionalToken = false;
+
+            var token = GetNextToken();
+
+            var found = false;
+            
+            foreach (var expected in expectedArray)
+            {
+                if (string.IsNullOrWhiteSpace(expected))
+                {
+                    isOptionalToken = true;
+                    continue;
+                }
+                
+                if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+
+                matchedTokens.Add(expected);
+                found = true;
+                break;
+            }
+
+            if (found) 
+                continue;
+
+            if (isOptionalToken)
+            {
+                _contentPosition = currentTokenStart;
+                continue;
+            }
+            
+            _contentPosition = startPosition;
+            return false;
+        }
+        return true;
+    }
+    
     public bool Check(params string[] compareWith)
     {
         var sb = new StringBuilder();
@@ -40,6 +89,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
         
             var token = GetNextToken();
             sb.Append(token);
+            
             
             if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -129,7 +179,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
         }
         return sourceBlock.LastLineNumber;
     }
-
+    
     private readonly string _content = sourceBlock.Content;
     private int _contentPosition;
 }
