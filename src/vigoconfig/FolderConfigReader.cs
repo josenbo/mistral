@@ -25,6 +25,7 @@ public static partial class FolderConfigReader
         {
             var partialRule = new FolderConfigPartialRule();
             var parser = new RuleBlockParser(partialRule, ruleBlock);
+            folderConfig.PartialRules.Add(partialRule);
             parser.Parse();
         }
         

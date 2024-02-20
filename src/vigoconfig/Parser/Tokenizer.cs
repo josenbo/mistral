@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Serilog;
+using vigobase;
 
 namespace vigoconfig;
 
@@ -7,32 +8,34 @@ internal class Tokenizer(SourceBlock sourceBlock)
 {
     public bool AtEnd => _content.Length <= _contentPosition;
 
-    public bool Peek(params string[] compareWith)
-    {
-        var startPosition = _contentPosition;
-        
-        foreach (var expected in compareWith)
-        {
-            if (AtEnd)
-                return false;
-        
-            var token = GetNextToken();
+    public IReadOnlyList<string> MatchedTokens => _matchedTokens;
 
-            if (expected.Equals(token, StringComparison.InvariantCultureIgnoreCase)) 
-                continue;
-            
-            _contentPosition = startPosition;
-            return false;
-        }
-
-        return true;
-    }
+    // public bool Peek(params string[] compareWith)
+    // {
+    //     var startPosition = _contentPosition;
+    //     
+    //     foreach (var expected in compareWith)
+    //     {
+    //         if (AtEnd)
+    //             return false;
+    //     
+    //         var token = GetNextToken();
+    //
+    //         if (expected.Equals(token, StringComparison.InvariantCultureIgnoreCase)) 
+    //             continue;
+    //         
+    //         _contentPosition = startPosition;
+    //         return false;
+    //     }
+    //
+    //     return true;
+    // }
     
-    public bool Peek(List<string> matchedTokens, params string[][] compareWith)
+    public bool TryReadTokens(params string[][] compareWith)
     {
         var startPosition = _contentPosition;
         
-        matchedTokens.Clear();
+        _matchedTokens.Clear();
         
         foreach (var expectedArray in compareWith)
         {
@@ -42,17 +45,19 @@ internal class Tokenizer(SourceBlock sourceBlock)
             var currentTokenStart = _contentPosition;
             var isOptionalToken = false;
 
-            var token = GetNextToken();
-
             var found = false;
 
             if (expectedArray is ["*"])
-            {
-                matchedTokens.Add(token);
+            {   
+                var token = ReadToEnoOfLineAndTrim();
+
+                _matchedTokens.Add(token);
                 found = true;
             }
             else
             {
+                var token = GetNextToken();
+
                 foreach (var expected in expectedArray)
                 {
                     if (string.IsNullOrWhiteSpace(expected))
@@ -64,7 +69,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
                     if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
                         continue;
 
-                    matchedTokens.Add(expected);
+                    _matchedTokens.Add(expected);
                     found = true;
                     break;
                 }
@@ -75,47 +80,61 @@ internal class Tokenizer(SourceBlock sourceBlock)
 
             if (isOptionalToken)
             {
-                matchedTokens.Add(string.Empty);
+                _matchedTokens.Add(string.Empty);
                 _contentPosition = currentTokenStart;
                 continue;
             }
             
+            _matchedTokens.Clear();
             _contentPosition = startPosition;
             return false;
         }
-        return true;
+        
+        Log.Debug("{TheTokenizer} matched the tokens {MatchedTokens} from the syntax definition {TheSyntaxDefinition}", 
+            nameof(Tokenizer), 
+            _matchedTokens, 
+            compareWith);
+
+        if (_matchedTokens.Count == compareWith.Length) 
+            return true;
+        
+        Log.Error("The matched tokens must be the same number as in the syntax definition, but there were {TheObservedNumber} instead of the expected {TheExpectedNumber}",
+            _matchedTokens.Count,
+            compareWith.Length);
+
+        throw new VigoRecoverableException("The matched tokens do not comply with the syntax tree");
     }
     
-    public bool Check(params string[] compareWith)
-    {
-        var sb = new StringBuilder();
-        var startPosition = _contentPosition;
-        
-        foreach (var expected in compareWith)
-        {
-            if (AtEnd)
-                return false;
-        
-            var token = GetNextToken();
-            sb.Append(token);
-            
-            
-            if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
-            {
-                Log.Error("Expected the token sequence {ExpectedSequence} at line {TheLine} but found {ObservedSequence}",
-                    compareWith,
-                    GetLineNumberFromPosition(startPosition),
-                    sb.ToString());
-                return false;
-            }
+    // public bool Check(params string[] compareWith)
+    // {
+    //     var sb = new StringBuilder();
+    //     var startPosition = _contentPosition;
+    //     
+    //     foreach (var expected in compareWith)
+    //     {
+    //         if (AtEnd)
+    //             return false;
+    //     
+    //         var token = GetNextToken();
+    //         sb.Append(token);
+    //         
+    //         
+    //         if (!expected.Equals(token, StringComparison.InvariantCultureIgnoreCase))
+    //         {
+    //             Log.Error("Expected the token sequence {ExpectedSequence} at line {TheLine} but found {ObservedSequence}",
+    //                 compareWith,
+    //                 GetLineNumberFromPosition(startPosition),
+    //                 sb.ToString());
+    //             return false;
+    //         }
+    //
+    //         sb.Append(' ');
+    //     }
+    //
+    //     return true;
+    // }
 
-            sb.Append(' ');
-        }
-
-        return true;
-    }
-    
-    public string GetNextToken()
+    private string GetNextToken()
     {
         var sb = new StringBuilder();
         var trim = false;
@@ -149,7 +168,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
         return trim ? sb.ToString().Trim( ): sb.ToString();
     }
 
-    public string ReadToEnoOfLineAndTrim()
+    private string ReadToEnoOfLineAndTrim()
     {
         var sb = new StringBuilder();
 
@@ -190,5 +209,6 @@ internal class Tokenizer(SourceBlock sourceBlock)
     }
     
     private readonly string _content = sourceBlock.Content;
+    private readonly List<string> _matchedTokens = [];
     private int _contentPosition;
 }

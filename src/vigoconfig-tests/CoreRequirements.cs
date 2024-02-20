@@ -156,7 +156,7 @@ public class CoreRequirements
                                #!/usr/bin/env vigo
                                 
                                configure folder
-                                   default for file mode = 600
+                                   default for file mode 600
                                done
 
                                # vîgô
@@ -189,7 +189,7 @@ public class CoreRequirements
                                #!/usr/bin/env vigo
                                 
                                configure folder
-                                   DEFAULT for SoUrCe encoding       = win_1252
+                                   DEFAULT for SoUrCe encoding win_1252
                                done
 
                                # vîgô
@@ -222,7 +222,7 @@ public class CoreRequirements
                                #!/usr/bin/env vigo
                                 
                                configure folder
-                                   DEFAULT for tARget encoding       = iso-88_5.9 1
+                                   DEFAULT for tARget encoding       iso-88_5.9 1
                                done
 
                                # vîgô
@@ -248,7 +248,7 @@ public class CoreRequirements
     }
 
     [Fact]
-    public void SolitaryDefaultNewline()
+    public void SolitaryDefaultNewlineStyle()
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
@@ -257,8 +257,7 @@ public class CoreRequirements
                                configure folder
                                    DEFAULT 
                                      for 
-                                       newline       
-                                         = linux
+                                       newline  stYle    linux
                                done
 
                                # vîgô
@@ -293,7 +292,7 @@ public class CoreRequirements
                                configure folder
                                    DEFAULT for add
                                trailing
-                                 newline = true
+                                 newline  true
                                done
 
                                # vîgô
@@ -326,7 +325,7 @@ public class CoreRequirements
                                #!/usr/bin/env vigo
                                 
                                configure folder
-                                 DEFAULT FOR VALID CHARACTERS    =               AsciiGerman + îô
+                                 DEFAULT FOR VALID CHARACTERS                   AsciiGerman + îô
                                done
 
                                # vîgô
@@ -360,7 +359,7 @@ public class CoreRequirements
                                #!/usr/bin/env vigo
                                 
                                configure folder
-                                 DEFAULT FOR VALID CHARACTERS=all
+                                 DEFAULT FOR VALID CHARACTERS all
                                done
 
                                # vîgô
@@ -393,7 +392,7 @@ public class CoreRequirements
                                #!/usr/bin/env vigo
                                 
                                configure folder
-                                   DEFAULT BUILD TARGETS = one, two; three four five-5
+                                   DEFAULT BUILD TARGETS one, two; three four five-5
                                done
 
                                # vîgô
@@ -425,14 +424,13 @@ public class CoreRequirements
     }
 
     [Fact]
-    public void SkipAlwaysRule()
+    public void SolitarySkipAlwaysRule()
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
                                #!/usr/bin/env vigo
                                 
-                               configure folder
-                                   default for file mode = 600
+                               do ignore all files
                                done
 
                                # vîgô
@@ -442,22 +440,87 @@ public class CoreRequirements
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
-        Assert.Empty(folderConfig.PartialRules);
-        Assert.NotNull(folderConfig.LocalDefaults);
-        Assert.Null(folderConfig.LocalDefaults.FileType);
-        Assert.NotNull(folderConfig.LocalDefaults.StandardModeForFiles);
-        Assert.True(folderConfig.LocalDefaults.StandardModeForFiles == (UnixFileMode)0b_110_000_000);
-        Assert.Null(folderConfig.LocalDefaults.StandardModeForDirectories);
-        Assert.Null(folderConfig.LocalDefaults.Permissions);
-        Assert.Null(folderConfig.LocalDefaults.SourceFileEncoding);
-        Assert.Null(folderConfig.LocalDefaults.TargetFileEncoding);
-        Assert.Null(folderConfig.LocalDefaults.LineEnding);
-        Assert.Null(folderConfig.LocalDefaults.FixTrailingNewline);
-        Assert.False(folderConfig.LocalDefaults.IsDefinedValidCharsRegex);
-        Assert.Null(folderConfig.LocalDefaults.Targets);
+        Assert.Single(folderConfig.PartialRules);
+        Assert.Equal(FileRuleActionEnum.SkipRule, folderConfig.PartialRules[0].Action);
+        Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
+        Assert.Null(folderConfig.PartialRules[0].CompareWith);
+        Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
+        Assert.NotNull(folderConfig.PartialRules[0].Handling.FileType);
+        Assert.Equal(FileTypeEnum.BinaryFile, folderConfig.PartialRules[0].Handling.FileType);
+        Assert.Null(folderConfig.PartialRules[0].Handling.Permissions);
+        Assert.Null(folderConfig.PartialRules[0].Handling.SourceFileEncoding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.TargetFileEncoding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.LineEnding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.FixTrailingNewline);
+        Assert.False(folderConfig.PartialRules[0].Handling.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.PartialRules[0].Handling.Targets);
     }
 
+    [Fact]
+    public void SolitaryDeployAlwaysRule()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               do deploy all binary files
+                               done
 
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Single(folderConfig.PartialRules);
+        Assert.Equal(FileRuleActionEnum.CopyRule, folderConfig.PartialRules[0].Action);
+        Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
+        Assert.Null(folderConfig.PartialRules[0].CompareWith);
+        Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
+        Assert.NotNull(folderConfig.PartialRules[0].Handling.FileType);
+        Assert.Equal(FileTypeEnum.BinaryFile, folderConfig.PartialRules[0].Handling.FileType);
+        Assert.Null(folderConfig.PartialRules[0].Handling.Permissions);
+        Assert.Null(folderConfig.PartialRules[0].Handling.SourceFileEncoding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.TargetFileEncoding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.LineEnding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.FixTrailingNewline);
+        Assert.False(folderConfig.PartialRules[0].Handling.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.PartialRules[0].Handling.Targets);
+    }
+
+    [Fact]
+    public void SolitaryCheckAlwaysRule()
+    {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        const string content = """
+                               #!/usr/bin/env vigo
+                                
+                               do check all text files
+                               done
+
+                               # vîgô
+                               """;
+
+        var folderConfig = FolderConfigReader.Parse(content);
+        
+        Assert.NotNull(folderConfig);
+        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.Single(folderConfig.PartialRules);
+        Assert.Equal(FileRuleActionEnum.CheckRule, folderConfig.PartialRules[0].Action);
+        Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
+        Assert.Null(folderConfig.PartialRules[0].CompareWith);
+        Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
+        Assert.NotNull(folderConfig.PartialRules[0].Handling.FileType);
+        Assert.Equal(FileTypeEnum.TextFile, folderConfig.PartialRules[0].Handling.FileType);
+        Assert.Null(folderConfig.PartialRules[0].Handling.Permissions);
+        Assert.Null(folderConfig.PartialRules[0].Handling.SourceFileEncoding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.TargetFileEncoding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.LineEnding);
+        Assert.Null(folderConfig.PartialRules[0].Handling.FixTrailingNewline);
+        Assert.False(folderConfig.PartialRules[0].Handling.IsDefinedValidCharsRegex);
+        Assert.Null(folderConfig.PartialRules[0].Handling.Targets);
+    }
     
     [Fact]
     public void RunSomeTestData()
@@ -471,22 +534,42 @@ public class CoreRequirements
                                # comments and empty lines will be ignored
                                         # indented comment
 
+                               
                                CONFIGURE FOLDER
-                                   DEFAULT FOR FILE MODE = 755
-                                   DEFAULT FOR SOURCE ENCODING = UTF-8
-                                   DEFAULT FOR TARGET ENCODING = UTF-8
+                                   KEEP EMPTY FOLDER         
+                                   DEFAULT FOR FILE MODE 755
+                                   DEFAULT FOR SOURCE ENCODING UTF-8
+                                   DEFAULT FOR TARGET ENCODING UTF-8
+                                   DEFAULT FOR NEWLINE STYLE LINUX 
+                                   DEFAULT FOR ADD TRAILING NEWLINE true
+                                   DEFAULT FOR VALID CHARACTERS AsciiGerman
+                                   DEFAULT BUILD TARGETS NONE
                                DONE
                                
-                               DO DEPLOY TEXT FILE IF NAME PATTERN = weirdo[0-9]{1,3}.zippo-dong
-                                   RENAME TO = abowitz
-                                   NAME REPLACE PATTERN = sino123
-                                   FILE MODE = 755
-                                   SOURCE ENCODING = UTF-8
-                                   TARGET ENCODING = UTF-8
-                                   NEWLINE = LINUX 
-                                   ADD TRAILING NEWLINE = true
-                                   VALID CHARACTERS = AsciiGerman
-                                   BUILD TARGETS = a, b ,c
+                               DO DEPLOY TEXT FILE IF NAME MATCHES ^weirdo[0-9]{1,3}.zippo-dong$
+                                   NAME REPLACE PATTERN $1.renamed
+                                   FILE MODE 755
+                                   SOURCE ENCODING ISO-8859-15
+                                   TARGET ENCODING Windows1252
+                                   NEWLINE STYLE LINUX 
+                                   ADD TRAILING NEWLINE true
+                                   VALID CHARACTERS AsciiGerman
+                                   BUILD TARGETS two-2
+                               DONE
+                               
+                               DO DEPLOY BINARY FILE IF NAME EQUALS sample.bin
+                                   RENAME TO abowitz
+                                   FILE MODE 755
+                                   BUILD TARGETS one.1, two-2 ,three3333
+                               DONE
+                               
+                               DO IGNORE ALL FILES
+                               DONE
+                               
+                               DO DEPLOY ALL TEXT FILES
+                               DONE
+                               
+                               DO CHECK ALL BINARY FILES
                                DONE
                                
                                """;
@@ -494,7 +577,10 @@ public class CoreRequirements
         var folderConfig = FolderConfigReader.Parse(content);
         
         
-        Assert.Null(folderConfig.KeepEmptyFolder);
+        Assert.NotNull(folderConfig);
+        Assert.NotNull(folderConfig.KeepEmptyFolder);
+        Assert.NotNull(folderConfig.LocalDefaults);
+        Assert.Equal(5, folderConfig.PartialRules.Count);
     }
 
     #region Helpers

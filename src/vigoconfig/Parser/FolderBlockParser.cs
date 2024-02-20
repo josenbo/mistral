@@ -79,16 +79,17 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
     {
         var phrases = new List<ConfigPhrase>()
         {
+            new ConfigPhrase(false, ParseKeepEmptyFolder, "Keep Empty Folder"),
             new ConfigPhrase(false, ParseDefaultForFileMode, "Default File Mode"),
             new ConfigPhrase(false, ParseDefaultForSourceEncoding, "Default Source Encoding"),
             new ConfigPhrase(false, ParseDefaultForTargetEncoding, "Default Target Encoding"),
-            new ConfigPhrase(false, ParseDefaultForNewline, "Default Newline"),
+            new ConfigPhrase(false, ParseDefaultForNewlineStyle, "Default Newline"),
             new ConfigPhrase(false, ParseDefaultForAddTrailingNewline, "Default Add Trailing Newline"),
             new ConfigPhrase(false, ParseDefaultForValidCharacters, "Default Valid Characters"),
             new ConfigPhrase(false, ParseDefaultForBuildTargets, "Default Build Targets")
         };
 
-        if (!_tokenizer.Check("CONFIGURE", "FOLDER"))
+        if (!_tokenizer.TryReadTokens(["CONFIGURE"], ["FOLDER"]))
         {
             _lastErrorSourceLine = _tokenizer.GetCurrentSourceLine();
             _lastErrorMessage = "The folder defaults and settings section must start with CONFIGURE FOLDER";
@@ -97,7 +98,7 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
 
         while (!_tokenizer.AtEnd)
         {
-            if (_tokenizer.Peek("DONE"))
+            if (_tokenizer.TryReadTokens(["DONE"]))
             {
                 var retval = true;
                 var isFirstError = true;
@@ -169,27 +170,26 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
         return false;
     }
 
-    private static bool ParseDefaultForFileMode(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseKeepEmptyFolder(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("DEFAULT", "FOR", "FILE", "MODE"))
+        if (!tokenizer.TryReadTokens(["KEEP"], ["EMPTY"], ["FOLDER"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the default unix file mode"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
+        folder.KeepEmptyFolder = true;
 
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for default unix file mode"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        return phrase.ReturnSuccessfullyParsed();
+    }
+
+    private static bool ParseDefaultForFileMode(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    {
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["FILE"], ["MODE"], ["*"]))
+            return phrase.ReturnPhraseNotFound();
+
+        phrase.SourceLine = tokenizer.GetCurrentSourceLine();
+
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!FilePermission.TryParse(value, out var permission) ||
             permission is not FilePermissionOctal octalPermission)
@@ -208,25 +208,12 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
 
     private static bool ParseDefaultForSourceEncoding(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("DEFAULT", "FOR", "SOURCE", "ENCODING"))
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["SOURCE"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the default source encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for default source encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!FileEncodingEnumHelper.TryParse(value, out var encoding))
         {
@@ -245,25 +232,12 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
     
     private static bool ParseDefaultForTargetEncoding(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("DEFAULT", "FOR", "TARGET", "ENCODING"))
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["TARGET"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the default target encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for default target encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!FileEncodingEnumHelper.TryParse(value, out var encoding))
         {
@@ -280,27 +254,14 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseDefaultForNewline(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForNewlineStyle(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("DEFAULT", "FOR", "NEWLINE"))
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["NEWLINE"], ["STYLE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the default newline"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for default newline"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!LineEndingEnumHelper.TryParse(value, out var lineEnding))
         {
@@ -319,25 +280,12 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
 
     private static bool ParseDefaultForAddTrailingNewline(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("DEFAULT", "FOR", "ADD", "TRAILING", "NEWLINE"))
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["ADD"], ["TRAILING"], ["NEWLINE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the default for adding the trailing newline"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for the add trailing newline default"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         bool addTrailingNewline;
             
@@ -371,25 +319,12 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
 
     private static bool ParseDefaultForValidCharacters(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("DEFAULT", "FOR", "VALID", "CHARACTERS"))
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["VALID"], ["CHARACTERS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the default valid characters"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for default valid characters"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         Regex? regexValidCharacters;
         
@@ -413,22 +348,16 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
 
     private static bool ParseDefaultForBuildTargets(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("DEFAULT", "BUILD", "TARGETS"))
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["BUILD"], ["TARGETS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for default build targets"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
+        var value = tokenizer.MatchedTokens[^1];
 
         var buildTargets = new List<string>();
         
-        if (!string.IsNullOrWhiteSpace(value))
+        if (!value.Equals("NONE", StringComparison.InvariantCultureIgnoreCase))
         {
             try
             {

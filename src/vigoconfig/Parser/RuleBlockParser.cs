@@ -79,10 +79,12 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
     {
         var phrases = new List<ConfigPhrase>()
         {
+            new ConfigPhrase(false, ParseRenameTo, "Rename To"),
+            new ConfigPhrase(false, ParseNameReplacePattern, "Name Replace Pattern"),
             new ConfigPhrase(false, ParseFileMode, "File Mode"),
             new ConfigPhrase(false, ParseSourceEncoding, "Source Encoding"),
             new ConfigPhrase(false, ParseTargetEncoding, "Target Encoding"),
-            new ConfigPhrase(false, ParseNewline, "Newline Style"),
+            new ConfigPhrase(false, ParseNewlineStyle, "Newline Style"),
             new ConfigPhrase(false, ParseAddTrailingNewline, "Add Trailing Newline"),
             new ConfigPhrase(false, ParseValidCharacters, "Valid Characters"),
             new ConfigPhrase(false, ParseBuildTargets, "Build Targets")
@@ -97,7 +99,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
         while (!_tokenizer.AtEnd)
         {
-            if (_tokenizer.Peek("DONE"))
+            if (_tokenizer.TryReadTokens(["DONE"]))
             {
                 var retval = true;
                 var isFirstError = true;
@@ -171,41 +173,107 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
     private static bool ParseRuleHeader(Tokenizer tokenizer, FolderConfigPartialRule rule)
     {
-        // ToDo - Extract action, condition, file type and the file name or pattern
-        //        See TokenizerTests for an outline. Do logging here, but do not set 
-        //        _lastErrorMessage or _lastErrorSourceLine. Just return false (or success)
-        return false;
+        try
+        {
+            var fileType = "";
+            
+            if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["ALL"], ["TEXT", "", "BINARY"], ["FILES"]))
+            {
+                fileType = tokenizer.MatchedTokens[3];
+            }
+            else if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"], ["*"]))
+            {
+                fileType = tokenizer.MatchedTokens[2];
+            }
+            else return false;
+        
+            rule.Action = tokenizer.MatchedTokens[1] switch
+            {
+                "IGNORE" => FileRuleActionEnum.SkipRule,
+                "DEPLOY" => FileRuleActionEnum.CopyRule,
+                "CHECK" => FileRuleActionEnum.CheckRule,
+                _ => throw new VigoRecoverableException($"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}")
+            };
+
+            rule.Handling.FileType = fileType switch
+            {
+                "TEXT" => FileTypeEnum.TextFile,
+                "BINARY" => FileTypeEnum.BinaryFile,
+                "" when rule.Action == FileRuleActionEnum.SkipRule => FileTypeEnum.BinaryFile,
+                _ => throw new VigoRecoverableException(
+                    $"Expected the file type of the rule to be in [TEST, BINARY] but found {(string.IsNullOrWhiteSpace(fileType) ? "a missing value which is only accepted for the IGNORE action" : $"the value {fileType}")}")
+            };
+
+            switch (tokenizer.MatchedTokens.Count)
+            {
+                case 8:
+                
+                    rule.Condition = tokenizer.MatchedTokens[^2] switch
+                    {
+                        "EQUALS" => FileRuleConditionEnum.MatchName,
+                        "MATCHES" => FileRuleConditionEnum.MatchPattern,
+                        _ => throw new VigoRecoverableException(
+                            $"Expected the condition clause of the rule to be either 'IF NAME EQUALS <name>' or 'IF NAME MATCHES <pattern>', but found '{string.Join(", ", tokenizer.MatchedTokens.Skip(4))}'")
+                    };
+
+                    rule.CompareWith = tokenizer.MatchedTokens[^1];
+                    break;
+                case 5:
+                    rule.Condition = FileRuleConditionEnum.Unconditional;
+                    break;
+            }
+
+            return true;
+        }
+        catch (VigoRecoverableException e)
+        {
+            Log.Error(e, "Parsing the file rule header failed");
+            return false;
+        }
     }
 
-    private static bool ParseFileMode(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseRenameTo(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("FILE", "MODE"))
+        if (!tokenizer.TryReadTokens(["RENAME"], ["TO"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the unix file mode"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
+        var value = tokenizer.MatchedTokens[^1];
 
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for unix file mode"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        rule.ReplaceWith = value;
+
+        return phrase.ReturnSuccessfullyParsed();
+    }
+
+    private static bool ParseNameReplacePattern(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    {
+        if (!tokenizer.TryReadTokens(["NAME"], ["REPLACE"], ["PATTERN"], ["*"]))
+            return phrase.ReturnPhraseNotFound();
+
+        phrase.SourceLine = tokenizer.GetCurrentSourceLine();
+
+        var value = tokenizer.MatchedTokens[^1];
+
+        rule.ReplaceWith = value;
+
+        return phrase.ReturnSuccessfullyParsed();
+    }
+    
+    private static bool ParseFileMode(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    {
+        if (!tokenizer.TryReadTokens(["FILE"], ["MODE"], ["*"]))
+            return phrase.ReturnPhraseNotFound();
+
+        phrase.SourceLine = tokenizer.GetCurrentSourceLine();
+
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!FilePermission.TryParse(value, out var permission))
         {
             Log.Debug("Could not derive a unix file mode from the value {TheFileModeValue}. Expecting three octal digits like 644 or a symbolic notation like ug+rw", value);
             return phrase.ReturnParseWithErrors($"Could not derive a unix file mode from the value {value}. Expecting three octal digits like 644 or a symbolic notation like ug+rw");
         }
-
-        rule.Handling ??= new FolderConfigPartialHandling();
 
         rule.Handling.Permissions = permission;;
 
@@ -214,25 +282,12 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
     private static bool ParseSourceEncoding(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("SOURCE", "ENCODING"))
+        if (!tokenizer.TryReadTokens(["SOURCE"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the source encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for the source encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!FileEncodingEnumHelper.TryParse(value, out var encoding))
         {
@@ -242,8 +297,6 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize a source encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
-
         rule.Handling.SourceFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -251,25 +304,12 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
     
     private static bool ParseTargetEncoding(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("TARGET", "ENCODING"))
+        if (!tokenizer.TryReadTokens(["TARGET"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the target encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for the target encoding"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!FileEncodingEnumHelper.TryParse(value, out var encoding))
         {
@@ -279,34 +319,19 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize a target encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
-
         rule.Handling.TargetFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseNewline(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseNewlineStyle(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("NEWLINE", "STYLE"))
+        if (!tokenizer.TryReadTokens(["NEWLINE"], ["STYLE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the newline style"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for newline style"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         if (!LineEndingEnumHelper.TryParse(value, out var lineEnding))
         {
@@ -316,8 +341,6 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize the newline style with the name {value}. Valid names are: {string.Join(", ", LineEndingEnumHelper.ValidNames)}");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
-
         rule.Handling.LineEnding = lineEnding;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -325,25 +348,12 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
     private static bool ParseAddTrailingNewline(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("ADD", "TRAILING", "NEWLINE"))
+        if (!tokenizer.TryReadTokens(["ADD"], ["TRAILING"], ["NEWLINE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the add trailing newline setting"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for the add trailing newline setting"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         bool addTrailingNewline;
             
@@ -368,8 +378,6 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
                 return phrase.ReturnParseWithErrors($"Could read the boolean value {value} for the add trailing newline setting. Expecting one of: true, false, yes, no");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
-
         rule.Handling.FixTrailingNewline = addTrailingNewline;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -377,25 +385,12 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
     private static bool ParseValidCharacters(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("VALID", "CHARACTERS"))
+        if (!tokenizer.TryReadTokens(["VALID"], ["CHARACTERS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for the valid characters setting"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            const string message = "Missing value for the valid characters setting"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
+        var value = tokenizer.MatchedTokens[^1];
 
         Regex? regexValidCharacters;
         
@@ -409,8 +404,6 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not build a regular expression for the valid characters setting {value}. Expecting All, Ascii or AsciiGerman, where Ascii and AsciiGerman may be followed by a plus sign and a sequence of additional characters");
         }
         
-        rule.Handling ??= new FolderConfigPartialHandling();
-
         rule.Handling.IsDefinedValidCharsRegex = true;
         rule.Handling.ValidCharsRegex = regexValidCharacters;
 
@@ -419,22 +412,16 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
     private static bool ParseBuildTargets(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
     {
-        if (!tokenizer.Peek("BUILD", "TARGETS"))
+        if (!tokenizer.TryReadTokens(["BUILD"], ["TARGETS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        if (tokenizer.AtEnd)
-        {
-            const string message = "Encountered end of source when looking for build targets"; 
-            Log.Debug(message);
-            return phrase.ReturnParseWithErrors(message);
-        }
-        var value = tokenizer.GetNextToken();
+        var value = tokenizer.MatchedTokens[^1];
 
         var buildTargets = new List<string>();
         
-        if (!string.IsNullOrWhiteSpace(value))
+        if (!value.Equals("NONE", StringComparison.InvariantCultureIgnoreCase))
         {
             try
             {
@@ -449,8 +436,6 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
                     $"Failed to read the list of build targets {value}. Expecting names separated by space, comma or semicolon, where the names themselves are composed of letters, digits, dash, underscore and period");
             }
         }        
-
-        rule.Handling ??= new FolderConfigPartialHandling();
 
         rule.Handling.Targets = buildTargets;
 

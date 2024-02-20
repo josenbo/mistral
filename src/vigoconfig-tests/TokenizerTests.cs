@@ -6,64 +6,41 @@ public class TokenizerTests
     public void Alternatives()
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
-        var matchedTokens = new List<string>();
-        var expectedTokens = new List<string>() { "DO", "DEPLOY", "TEXT", "FILE", "IF", "NAME", "MATCHES" };
-        var tokenizer = PrepareTokenizer("DO DEPLOY  TEXT    FILE IF NAME MATCHES PATTERN IS = weirdo[0-9]{1,3}.zippo-dong"
-);
+        var expectedTokens = new List<string>() { "DO", "DEPLOY", "TEXT", "FILE", "IF", "NAME", "EQUALS", "." };
+        var tokenizer = PrepareTokenizer("DO DEPLOY  TEXT    FILE IF NAME EQUALS                    .");
 
-        var isMatch = tokenizer.Peek(
-            matchedTokens,
-            new string[][]
-            {
-                ["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"]
-            }
-        );
+        var isMatch = tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"], ["*"]);
         
         Assert.True(isMatch);
-        Assert.Equal(expectedTokens, matchedTokens);
+        Assert.Equal(expectedTokens, tokenizer.MatchedTokens);
     }
     
     [Fact]
     public void OptionalAlternative()
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
-        var matchedTokens = new List<string>();
-        var expectedTokens = new List<string>() { "DO", "DEPLOY", "", "FILE", "IF", "NAME", "MATCHES" };
-        var tokenizer = PrepareTokenizer("DO DEPLOY             FILE IF NAME MATCHES PATTERN IS = weirdo[0-9]{1,3}.zippo-dong"
+        var expectedTokens = new List<string>() { "DO", "DEPLOY", "", "FILE", "IF", "NAME", "MATCHES", "a" };
+        var tokenizer = PrepareTokenizer("DO DEPLOY             FILE IF NAME MATCHES a"
         );
 
-        var isMatch = tokenizer.Peek(
-            matchedTokens,
-            new string[][]
-            {
-                ["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"]
-            }
-        );
+        var isMatch = tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"], ["*"]);
         
         Assert.True(isMatch);
-        Assert.Equal(expectedTokens, matchedTokens);
+        Assert.Equal(expectedTokens, tokenizer.MatchedTokens);
     }
 
     [Fact]
     public void MatchWildcard()
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
-        var matchedTokens = new List<string>();
         var expectedTokens = new List<string>() { "DO", "DEPLOY", "", "FILE", "IF", "NAME", "MATCHES", "weirdo[0-9]{1,3}.zippo-dong"};
-        var tokenizer = PrepareTokenizer("DO DEPLOY             FILE IF NAME MATCHES = weirdo[0-9]{1,3}.zippo-dong"
+        var tokenizer = PrepareTokenizer("DO DEPLOY             FILE IF NAME MATCHES weirdo[0-9]{1,3}.zippo-dong"
         );
 
-        var isMatch = tokenizer.Peek(
-            matchedTokens,
-            new string[][]
-            {
-                ["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"], ["*"]
-            }
-        );
-        Log.Debug("Matched tokens: {MatchedTokens}", matchedTokens);
+        var isMatch = tokenizer.TryReadTokens( ["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"], ["*"]);
 
         Assert.True(isMatch);
-        Assert.Equal(expectedTokens, matchedTokens);
+        Assert.Equal(expectedTokens, tokenizer.MatchedTokens);
         
     }
     
