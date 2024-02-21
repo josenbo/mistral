@@ -15,9 +15,14 @@ internal static class FolderConfigurator
         
         try
         {
-            config.AddRule(BuildDeployConfigFileRule(relativePath, config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DeployConfigRule));
+            // ToDo - support for alternative file names (deployment.md or deployment.vigo) 
+            const string theConfigfile = "todo-need-to-fix-this";
             
-            if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.Settings.DeploymentConfigFileName, out var content))
+            // config.AddRule(BuildDeployConfigFileRule(relativePath, config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DeployConfigRule));
+            config.AddRule(BuildDeployConfigFileRule(relativePath, config.NextRuleIndex, theConfigfile, appSettings.DeployConfigRule));
+            
+            // if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.Settings.DeploymentConfigFileName, out var content))
+            if (!TryReadFileContent(config.Location, theConfigfile, out var content))
             {
                 config.AddRule(BuildFinalCatchAllFileRule(relativePath, config.NextRuleIndex, appSettings.FinalCatchAllRule));
                 return;
@@ -29,7 +34,8 @@ internal static class FolderConfigurator
             if (!TryParseConfiguration(content, out var tomlConfigurationData))
             {
                 Log.Fatal("Could not read the configuration file {TheFileName}",
-                    appSettings.DeploymentConfigFileName);
+                    theConfigfile);
+                    //appSettings.DeploymentConfigFileName);
 
                 throw new VigoFatalException("Could not read the folder configuration");
             }

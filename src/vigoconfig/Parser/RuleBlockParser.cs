@@ -175,7 +175,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
     {
         try
         {
-            var fileType = "";
+            string fileType;
             
             if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["ALL"], ["TEXT", "", "BINARY"], ["FILES"]))
             {
@@ -195,14 +195,18 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
                 _ => throw new VigoRecoverableException($"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}")
             };
 
-            rule.Handling.FileType = fileType switch
+            if (!string.IsNullOrWhiteSpace(fileType))
             {
-                "TEXT" => FileTypeEnum.TextFile,
-                "BINARY" => FileTypeEnum.BinaryFile,
-                "" when rule.Action == FileRuleActionEnum.SkipRule => FileTypeEnum.BinaryFile,
-                _ => throw new VigoRecoverableException(
-                    $"Expected the file type of the rule to be in [TEST, BINARY] but found {(string.IsNullOrWhiteSpace(fileType) ? "a missing value which is only accepted for the IGNORE action" : $"the value {fileType}")}")
-            };
+                rule.Handling ??= new FolderConfigPartialHandling();
+                
+                rule.Handling.FileType = fileType switch
+                {
+                    "TEXT" => FileTypeEnum.TextFile,
+                    "BINARY" => FileTypeEnum.BinaryFile,
+                    _ => throw new VigoRecoverableException(
+                        $"Expected the file type of the rule to be in [TEST, BINARY] but found the value {fileType}")
+                };
+            }
 
             switch (tokenizer.MatchedTokens.Count)
             {
@@ -218,7 +222,9 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
                     rule.CompareWith = tokenizer.MatchedTokens[^1];
                     break;
+                
                 case 5:
+                    
                     rule.Condition = FileRuleConditionEnum.Unconditional;
                     break;
             }
@@ -241,6 +247,14 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
         var value = tokenizer.MatchedTokens[^1];
 
+        if (rule.Condition != FileRuleConditionEnum.MatchName)
+        {
+            Log.Error("The RENAME TO statement is only valid, when then rule's condition is {TheExpectedCondition}, not {TheObservedCondition}",
+                FileRuleConditionEnum.MatchName,
+                rule.Condition);
+            return phrase.ReturnParseWithErrors("The RENAME TO statement is only valid, when then rule's condition is IF NAME EQUALS");    
+        }
+            
         rule.ReplaceWith = value;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -255,6 +269,14 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
         var value = tokenizer.MatchedTokens[^1];
 
+        if (rule.Condition != FileRuleConditionEnum.MatchPattern)
+        {
+            Log.Error("The NAME REPLACE PATTERN statement is only valid, when then rule's condition is {TheExpectedCondition}, not {TheObservedCondition}",
+                FileRuleConditionEnum.MatchPattern,
+                rule.Condition);
+            return phrase.ReturnParseWithErrors("The NAME REPLACE PATTERN statement is only valid, when then rule's condition is IF NAME MATCHES");    
+        }
+            
         rule.ReplaceWith = value;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -275,7 +297,9 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not derive a unix file mode from the value {value}. Expecting three octal digits like 644 or a symbolic notation like ug+rw");
         }
 
-        rule.Handling.Permissions = permission;;
+        rule.Handling ??= new FolderConfigPartialHandling();
+        
+        rule.Handling.Permissions = permission;
 
         return phrase.ReturnSuccessfullyParsed();
     }
@@ -297,6 +321,8 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize a source encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
+        rule.Handling ??= new FolderConfigPartialHandling();
+        
         rule.Handling.SourceFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -319,6 +345,8 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize a target encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
+        rule.Handling ??= new FolderConfigPartialHandling();
+        
         rule.Handling.TargetFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -341,6 +369,8 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize the newline style with the name {value}. Valid names are: {string.Join(", ", LineEndingEnumHelper.ValidNames)}");
         }
 
+        rule.Handling ??= new FolderConfigPartialHandling();
+        
         rule.Handling.LineEnding = lineEnding;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -378,6 +408,8 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
                 return phrase.ReturnParseWithErrors($"Could read the boolean value {value} for the add trailing newline setting. Expecting one of: true, false, yes, no");
         }
 
+        rule.Handling ??= new FolderConfigPartialHandling();
+        
         rule.Handling.FixTrailingNewline = addTrailingNewline;
 
         return phrase.ReturnSuccessfullyParsed();
@@ -403,6 +435,8 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             Log.Debug(e, "Could not build a regular expression for the valid characters setting {TheFileModeValue}. Expecting All, Ascii or AsciiGerman, where Ascii and AsciiGerman may be followed by a plus sign and a sequence of additional characters", value);
             return phrase.ReturnParseWithErrors($"Could not build a regular expression for the valid characters setting {value}. Expecting All, Ascii or AsciiGerman, where Ascii and AsciiGerman may be followed by a plus sign and a sequence of additional characters");
         }
+        
+        rule.Handling ??= new FolderConfigPartialHandling();
         
         rule.Handling.IsDefinedValidCharsRegex = true;
         rule.Handling.ValidCharsRegex = regexValidCharacters;
@@ -437,6 +471,8 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             }
         }        
 
+        rule.Handling ??= new FolderConfigPartialHandling();
+        
         rule.Handling.Targets = buildTargets;
 
         return phrase.ReturnSuccessfullyParsed();

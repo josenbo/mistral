@@ -10,7 +10,7 @@ public class FolderConfigPartialRule
     public FileRuleConditionEnum Condition { get; set; } = FileRuleConditionEnum.Undefined;
     public string? CompareWith { get; set; } 
     public string? ReplaceWith { get; set; }
-    public FolderConfigPartialHandling Handling { get; } = new FolderConfigPartialHandling(); 
+    public FolderConfigPartialHandling? Handling { get; set; } 
 
     public void Deconstruct(out FileRuleActionEnum action, out FileRuleConditionEnum condition, out string? compareWith, out string? replaceWith, out FolderConfigPartialHandling? handling)
     {

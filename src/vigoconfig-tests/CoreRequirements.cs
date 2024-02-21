@@ -445,15 +445,7 @@ public class CoreRequirements
         Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
         Assert.Null(folderConfig.PartialRules[0].CompareWith);
         Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
-        Assert.NotNull(folderConfig.PartialRules[0].Handling.FileType);
-        Assert.Equal(FileTypeEnum.BinaryFile, folderConfig.PartialRules[0].Handling.FileType);
-        Assert.Null(folderConfig.PartialRules[0].Handling.Permissions);
-        Assert.Null(folderConfig.PartialRules[0].Handling.SourceFileEncoding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.TargetFileEncoding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.LineEnding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.FixTrailingNewline);
-        Assert.False(folderConfig.PartialRules[0].Handling.IsDefinedValidCharsRegex);
-        Assert.Null(folderConfig.PartialRules[0].Handling.Targets);
+        Assert.Null(folderConfig.PartialRules[0].Handling);
     }
 
     [Fact]
@@ -478,15 +470,23 @@ public class CoreRequirements
         Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
         Assert.Null(folderConfig.PartialRules[0].CompareWith);
         Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
-        Assert.NotNull(folderConfig.PartialRules[0].Handling.FileType);
-        Assert.Equal(FileTypeEnum.BinaryFile, folderConfig.PartialRules[0].Handling.FileType);
-        Assert.Null(folderConfig.PartialRules[0].Handling.Permissions);
-        Assert.Null(folderConfig.PartialRules[0].Handling.SourceFileEncoding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.TargetFileEncoding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.LineEnding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.FixTrailingNewline);
-        Assert.False(folderConfig.PartialRules[0].Handling.IsDefinedValidCharsRegex);
-        Assert.Null(folderConfig.PartialRules[0].Handling.Targets);
+        
+        Assert.NotNull(folderConfig.PartialRules[0].Handling);
+        // ReSharper disable once InconsistentNaming
+        var rule_0_handling = folderConfig.PartialRules[0].Handling;
+
+        if (rule_0_handling is null)
+            throw new Exception("Hey, we just checked this. How can it be null?");
+        
+        Assert.NotNull(rule_0_handling.FileType);
+        Assert.Equal(FileTypeEnum.BinaryFile, rule_0_handling.FileType);
+        Assert.Null(rule_0_handling.Permissions);
+        Assert.Null(rule_0_handling.SourceFileEncoding);
+        Assert.Null(rule_0_handling.TargetFileEncoding);
+        Assert.Null(rule_0_handling.LineEnding);
+        Assert.Null(rule_0_handling.FixTrailingNewline);
+        Assert.False(rule_0_handling.IsDefinedValidCharsRegex);
+        Assert.Null(rule_0_handling.Targets);
     }
 
     [Fact]
@@ -511,16 +511,46 @@ public class CoreRequirements
         Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
         Assert.Null(folderConfig.PartialRules[0].CompareWith);
         Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
-        Assert.NotNull(folderConfig.PartialRules[0].Handling.FileType);
-        Assert.Equal(FileTypeEnum.TextFile, folderConfig.PartialRules[0].Handling.FileType);
-        Assert.Null(folderConfig.PartialRules[0].Handling.Permissions);
-        Assert.Null(folderConfig.PartialRules[0].Handling.SourceFileEncoding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.TargetFileEncoding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.LineEnding);
-        Assert.Null(folderConfig.PartialRules[0].Handling.FixTrailingNewline);
-        Assert.False(folderConfig.PartialRules[0].Handling.IsDefinedValidCharsRegex);
-        Assert.Null(folderConfig.PartialRules[0].Handling.Targets);
+        
+        Assert.NotNull(folderConfig.PartialRules[0].Handling);
+        // ReSharper disable once InconsistentNaming
+        var rule_0_handling = folderConfig.PartialRules[0].Handling;
+
+        if (rule_0_handling is null)
+            throw new Exception("Hey, we just checked this. How can it be null?");
+        
+        Assert.NotNull(rule_0_handling.FileType);
+        Assert.Equal(FileTypeEnum.TextFile, rule_0_handling.FileType);
+        Assert.Null(rule_0_handling.Permissions);
+        Assert.Null(rule_0_handling.SourceFileEncoding);
+        Assert.Null(rule_0_handling.TargetFileEncoding);
+        Assert.Null(rule_0_handling.LineEnding);
+        Assert.Null(rule_0_handling.FixTrailingNewline);
+        Assert.False(rule_0_handling.IsDefinedValidCharsRegex);
+        Assert.Null(rule_0_handling.Targets);
     }
+    
+    // ToDo - DO DEPLOY FILE IF NAME EQUALS
+    // ToDo - DO DEPLOY BINARY FILE IF NAME EQUALS
+    // ToDo - DO CHECK TEXT FILE IF NAME MATCHES
+    
+    // ToDo - When IF NAME EQUALS, then NAME REPLACE PATTERN throws exception
+    // ToDo - When IF NAME MATCHES, then RENAME TO throws exception
+    
+    // Todo - When IGNORE and IF NAME EQUALS, then RENAME TO throws exception
+    // ToDo - When IGNORE and IF NAME MATCHES, then NAME REPLACE PATTERN throws exception
+    
+    // Todo - Solitary rule property FileMode 204
+    // Todo - Solitary rule property FileMode uo-x
+    // Todo - Solitary rule property SourceEncoding Ascii
+    // Todo - Solitary rule property TargetEncoding ISO-8859-1
+    // Todo - Solitary rule property NewlineStyle
+    // Todo - Solitary rule property AddTrailingNewline false
+    // Todo - Solitary rule property ValidCharacters ALL 
+    // Todo - Solitary rule property ValidCharacters Ascii + chinese
+    // Todo - Solitary rule property BuildTargets NONE 
+    // Todo - Solitary rule property BuildTargets one
+    // Todo - Solitary rule property BuildTargets one_1, two-2
     
     [Fact]
     public void RunSomeTestData()
