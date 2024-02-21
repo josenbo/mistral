@@ -61,16 +61,22 @@ internal class AppSettingsBuilder
                 Permissions = FilePermission.UseDefault
             };
 
-            LocalAppSettings.FinalCatchAllRule = new StandardFileHandling(Array.Empty<string>(), FinalCatchAllHandling, false);
+            LocalAppSettings.FinalCatchAllRule = new StandardFileHandling(Array.Empty<ConfigurationFilename>(), FinalCatchAllHandling, false);
 
             DeployConfigHandling = DefaultHandling with
             {
                 FileType = FileTypeEnum.BinaryFile,
                 Permissions = FilePermission.UseDefault
             };
+
+            var configurationFilenames = new List<ConfigurationFilename>()
+            {
+                new ConfigurationFilename("deployment-rules.md", ConfigurationFileTypeEnum.MarkdownFormat),
+                new ConfigurationFilename("deployment-rules.vigo", ConfigurationFileTypeEnum.NativeFormat)
+            };
             
             LocalAppSettings.DeployConfigRule = new StandardFileHandling(
-                GetDeploymentConfigFileNames("deployment-rules.md", "deployment-rules.vigo"), 
+                GetDeploymentConfigFileNames(configurationFilenames), 
                 DeployConfigHandling, 
                 false);
         }
@@ -228,11 +234,11 @@ internal class AppSettingsBuilder
         }
     }
 
-    private static List<string> GetDeploymentConfigFileNames(params string[] defaultFilenames)
+    private static List<ConfigurationFilename> GetDeploymentConfigFileNames(IEnumerable<ConfigurationFilename> defaultFilenames)
     {
         try
         {
-            var retval = new List<string>();
+            var retval = new List<ConfigurationFilename>();
             var listOfFileNames = GetEnvironmentVariable(EnvVarVigoDeployConfigFilenames);
 
             if (listOfFileNames is null)
@@ -244,12 +250,34 @@ internal class AppSettingsBuilder
                 if (256 < listOfFileNames.Length)
                     listOfFileNames = listOfFileNames[..256];
 
-                retval.AddRange(listOfFileNames.Split(FilenameSeparators, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+                foreach (var filename in listOfFileNames.Split(FilenameSeparators, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var extension = Path.GetExtension(filename);
+
+                    switch (extension)
+                    {
+                        case ".md":
+                            retval.Add(new ConfigurationFilename(filename, ConfigurationFileTypeEnum.MarkdownFormat));
+                            break;
+                        case ".vigo":
+                            retval.Add(new ConfigurationFilename(filename, ConfigurationFileTypeEnum.NativeFormat));
+                            break;
+                        default:
+                            throw new VigoFatalException($"Do not know how to handle the configuration file name {filename}");
+                    }
+                }
             }
 
-            foreach (var fileName in retval)
+            if (retval.Count == 0)
             {
-                if (fileName.Contains(Path.DirectorySeparatorChar) || fileName.Contains(Path.AltDirectorySeparatorChar))
+                const string message = "There is no configuration filename to look for in repository folders";
+                Console.Error.WriteLine(message);
+                throw new VigoFatalException(message);
+            }
+            
+            foreach (var configurationFilename in retval)
+            {
+                if (configurationFilename.FileName.Contains(Path.DirectorySeparatorChar) || configurationFilename.FileName.Contains(Path.AltDirectorySeparatorChar))
                 {
                     const string message = "The deployment configuration file name is not allowed to contain path separators";
                     Console.Error.WriteLine(message);
@@ -257,7 +285,7 @@ internal class AppSettingsBuilder
                 }
             
                 // trigger exception on a file name containing illegal characters 
-                File.Exists(fileName);
+                File.Exists(configurationFilename.FileName);
             }
 
             return retval;

@@ -1,9 +1,10 @@
 ﻿using JetBrains.Annotations;
+using vigobase;
 
 namespace vigoconfig;
 
 [PublicAPI]
-public class VigoParseFolderConfigException : Exception
+internal class VigoParseFolderConfigException : VigoException
 {
     public VigoParseFolderConfigException()
     {
