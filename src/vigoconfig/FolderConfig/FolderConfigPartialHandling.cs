@@ -1,11 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using JetBrains.Annotations;
 using vigobase;
 
 namespace vigoconfig;
 
-[PublicAPI]
-public class FolderConfigPartialHandling
+internal class FolderConfigPartialHandling
 {
     public UnixFileMode? StandardModeForFiles { get; set; }
     public UnixFileMode? StandardModeForDirectories { get; set; } 

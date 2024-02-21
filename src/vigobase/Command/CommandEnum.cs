@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace vigobase;
+﻿namespace vigobase;
 
 public enum CommandEnum
 {

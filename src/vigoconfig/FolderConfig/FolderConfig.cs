@@ -1,11 +1,9 @@
-﻿using JetBrains.Annotations;
-using Serilog;
+﻿using Serilog;
 using Serilog.Events;
 
 namespace vigoconfig;
 
-[PublicAPI]
-public class FolderConfig
+internal class FolderConfig
 {
     public bool? KeepEmptyFolder { get; set; }
     public FolderConfigPartialHandling? LocalDefaults { get; set; }

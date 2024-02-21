@@ -1,13 +1,11 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
-using JetBrains.Annotations;
 using Serilog;
 using Serilog.Events;
 
 namespace vigoconfig;
 
-[PublicAPI]
-public static partial class FolderConfigReader
+internal static partial class FolderConfigReader
 {
     public static FolderConfig Parse(string content)
     {

@@ -1,10 +1,8 @@
-﻿using JetBrains.Annotations;
-using vigobase;
+﻿using vigobase;
 
 namespace vigoconfig;
 
-[PublicAPI]
-public class FolderConfigPartialRule
+internal class FolderConfigPartialRule
 {
     public FileRuleActionEnum Action { get; set; } = FileRuleActionEnum.Undefined;
     public FileRuleConditionEnum Condition { get; set; } = FileRuleConditionEnum.Undefined;
