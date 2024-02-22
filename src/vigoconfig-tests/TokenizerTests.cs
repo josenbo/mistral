@@ -57,7 +57,7 @@ public class TokenizerTests
             lineNumber += 2;
         }
 
-        var sourceBlock = new SourceBlockRule(sourceLines, codeToTest);
+        var sourceBlock = new SourceBlockRule(sourceLines, codeToTest, "Unit test script block", 1, 1);
 
         var tokenizer = new Tokenizer(sourceBlock);
 

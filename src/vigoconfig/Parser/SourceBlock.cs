@@ -1,8 +1,13 @@
 ﻿namespace vigoconfig;
 
-internal abstract record SourceBlock(IReadOnlyList<SourceLine> Lines, string Content)
+internal abstract record SourceBlock(
+    IReadOnlyList<SourceLine> Lines, 
+    string Content, 
+    string ConfigurationFile, 
+    int Position
+    ) : IConfigurationScriptExtract
 {
-    public int FirstLineNumber => Lines[0].LineNumber;
-    public int LastLineNumber => Lines[^1].LineNumber;
+    public int FromLineNumber => Lines[0].LineNumber;
+    public int ToLineNumber => Lines[^1].LineNumber;
     public abstract string Description { get; }
 }

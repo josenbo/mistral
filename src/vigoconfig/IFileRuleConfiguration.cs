@@ -78,5 +78,23 @@ public interface IFileRuleConfiguration
     /// rules for which this information is not
     /// available.
     /// </summary>
-    string? BasedOnTheConfigurationText { get; }
+    IConfigurationScriptExtract? BasedOn { get; }
+
+    /// <summary>
+    /// The configuration of rules should only
+    /// specify the noteworthy and rely on defaults
+    /// for the rest. To this end the global default
+    /// can be refined in the folder before being
+    /// modified by the rule. The <see cref="Handling">Handling</see>
+    /// property holds the effective settings for
+    /// the rule and this member lists the defaults
+    /// that went into deriving the effective settings.
+    /// The defaults are listed in descending order
+    /// with the global defaults coming last and
+    /// the local folder defaults first.
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<FileHandlingParameters> GetHandlingDefaultsChain();
 }
+
+

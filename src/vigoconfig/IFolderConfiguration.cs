@@ -24,12 +24,6 @@ public interface IFolderConfiguration
     bool KeepEmptyFolder { get; }
     
     /// <summary>
-    /// The default values for file handling passed in
-    /// when building th folder configuration
-    /// </summary>
-    FileHandlingParameters InitialDefaults { get; }
-    
-    /// <summary>
     /// The initial values with the folder-specific
     /// defaults added. These are the defaults used
     /// for building the file rules 
@@ -41,5 +35,18 @@ public interface IFolderConfiguration
     /// the configuration file, its content can
     /// be accessed here.
     /// </summary>
-    string? BasedOnTheConfigurationText { get; }
+    IConfigurationScriptExtract? BasedOn { get; }
+
+    /// <summary>
+    /// The configuration of rules should only
+    /// specify the noteworthy and rely on defaults
+    /// for the rest. To this end the global default
+    /// can be refined in folders before being
+    /// modified by the rule. This member lists the
+    /// defaults that were successively applied in
+    /// descending order with the global defaults
+    /// coming last.
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<FileHandlingParameters> GetHandlingDefaultsChain();
 }

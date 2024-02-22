@@ -205,7 +205,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
                 return sourceLine.LineNumber;
             position -= sourceLine.Content.Length;
         }
-        return sourceBlock.LastLineNumber;
+        return sourceBlock.ToLineNumber;
     }
     
     private readonly string _content = sourceBlock.Content;

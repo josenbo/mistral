@@ -2,26 +2,43 @@
 using System.Text.RegularExpressions;
 using Serilog;
 using Serilog.Events;
+using vigobase;
 
 namespace vigoconfig;
 
 internal static partial class FolderConfigReader
 {
-    public static FolderConfig Parse(string content)
+    public static FolderConfig Parse(
+        string content, 
+        string? configurationFile = null, 
+        ConfigurationFileTypeEnum? configurationType = null)
     {
-        var (folderBlock, ruleBlocks) = ReadSourceBlocks(content);
+        var lines = content.Split(LineSeparators, StringSplitOptions.None).ToList();
+
+        configurationFile ??= "anonymous text block";
+
+        configurationType ??= GuessConfigurationTypeFromContent(lines);
+
+        if (!configurationType.Value.IsDefinedAndValid())
+        {
+            Log.Error("The content of the folder configuration script '{TheConfigurationFile}' was not recognized as markdown, nor as native format", configurationFile);
+            throw new VigoParseFolderConfigException($"The format of the folder configuration script '{configurationFile}' was not recognized");
+        }
+            
+        var (folderBlock, ruleBlocks) = ReadSourceBlocks(lines, configurationFile, configurationType.Value);
 
         var folderConfig = new FolderConfig();
         
         if (folderBlock is not null)
         {
+            folderConfig.Block = folderBlock;
             var parser = new FolderBlockParser(folderConfig, folderBlock);
             parser.Parse();
         }
 
         foreach (var ruleBlock in ruleBlocks)
         {
-            var partialRule = new FolderConfigPartialRule();
+            var partialRule = new FolderConfigPartialRule(ruleBlock);
             var parser = new RuleBlockParser(partialRule, ruleBlock);
             folderConfig.PartialRules.Add(partialRule);
             parser.Parse();
@@ -32,44 +49,39 @@ internal static partial class FolderConfigReader
         return folderConfig;
     }
 
-    private static (SourceBlockFolder? folderConfig,  IReadOnlyList<SourceBlockRule> rulesConfig) ReadSourceBlocks(string content)
+    private static ConfigurationFileTypeEnum GuessConfigurationTypeFromContent(IReadOnlyCollection<string> lines)
     {
-        var lines = content.Split(LineSeparators, StringSplitOptions.None).ToArray();
-
-        var isMarkdown = false;
-
         if (ProbeMarkdown(lines))
-            isMarkdown = true;
-        else if (!ProbeNative(lines))
-        {
-            Log.Error("The content of the folder configuration script was not recognized as markdown, nor as native format");
-            throw new VigoParseFolderConfigException("The format of the folder configuration script was not recognized");
-        }
+            return ConfigurationFileTypeEnum.MarkdownFormat;
 
-        // var sourceLines = isMarkdown ? GetSourceLinesFromMarkdown(lines) : GetSourceLinesFromNative(lines);
-        //
-        // if (Log.IsEnabled(LogEventLevel.Debug))
-        // {
-        //     Log.Debug("Retrieved source lines from {TheFormat} format",
-        //         isMarkdown ? "markdown" : "native");
-        //     foreach (var sourceLine in sourceLines)
-        //     {
-        //         Log.Debug("{TheLineNumber,-3}: {TheLine}",
-        //             sourceLine.LineNumber,
-        //             sourceLine.Content);
-        //     }
-        // }
+        return ProbeNative(lines) 
+            ? ConfigurationFileTypeEnum.NativeFormat 
+            : ConfigurationFileTypeEnum.Undefined;
+    }
 
-        var blocks = GroupSourceBlocks(isMarkdown ? GetSourceLinesFromMarkdown(lines) : GetSourceLinesFromNative(lines));
+    private static (SourceBlockFolder? folderConfig,  IReadOnlyList<SourceBlockRule> rulesConfig) ReadSourceBlocks(
+        IEnumerable<string> lines,
+        string configurationFile,
+        ConfigurationFileTypeEnum configurationType
+        )
+    {
+        var blocks = GroupSourceBlocks(
+            configurationFile,
+            configurationType.IsMarkdownFormat() 
+            ? GetSourceLinesFromMarkdown(lines) 
+            : GetSourceLinesFromNative(lines));
         
         if (Log.IsEnabled(LogEventLevel.Debug))
         {
-            Log.Debug("Retrieved source lines from {TheFormat} format and grouped code blocks",
-                isMarkdown ? "markdown" : "native");
+            Log.Debug("Retrieved source lines from the {TheFormat} configuration '{TheConfigurationFile}' and grouped code blocks",
+                configurationType.IsMarkdownFormat() ? "markdown" : "native",
+                configurationFile);
 
             foreach (var block in blocks)
             {
-                Log.Debug("Showing the {TheBlockType}", block.GetType().Name);
+                Log.Debug("Showing configuration block #{ThePosition} of type {TheBlockType}",
+                    block.Position,
+                    block.GetType().Name);
                 
                 foreach (var sourceLine in block.Lines)
                 {
@@ -86,13 +98,40 @@ internal static partial class FolderConfigReader
             throw new VigoParseFolderConfigException("There can be no more than a single folder configuration block");
         }
 
-        return (blocks.OfType<SourceBlockFolder>().SingleOrDefault(), blocks.OfType<SourceBlockRule>().ToList());
+        var folderBlock = blocks.OfType<SourceBlockFolder>().SingleOrDefault();
+        var ruleBlocks = blocks.OfType<SourceBlockRule>().ToList();
+
+        if (ruleBlocks.Count == 0)
+            return (folderBlock, ruleBlocks);
+
+        var lastRuleBlock = ruleBlocks[0];
+        for (var i = 1; i < ruleBlocks.Count; i++)
+        {
+            var currentRuleBlock = ruleBlocks[i];
+
+            if (currentRuleBlock.Position <= lastRuleBlock.Position || 
+                currentRuleBlock.FromLineNumber <= lastRuleBlock.ToLineNumber || 
+                lastRuleBlock.ToLineNumber <= lastRuleBlock.FromLineNumber ||
+                currentRuleBlock.ToLineNumber <= currentRuleBlock.FromLineNumber)
+            {
+                Log.Error("The order of configuration sections and source lines is not sequential");
+                throw new VigoParseFolderConfigException("Could not establish the order of configuration sections");
+            }
+
+            lastRuleBlock = currentRuleBlock;
+        }
+
+        return (folderBlock, ruleBlocks);
     }
 
-    private static IReadOnlyList<SourceBlock> GroupSourceBlocks(IEnumerable<SourceLine> sourceLines)
+    private static IReadOnlyList<SourceBlock> GroupSourceBlocks(
+        string configurationFile,
+        IEnumerable<SourceLine> sourceLines)
     {
         var retval = new List<SourceBlock>();
         var tempLines = new List<SourceLine>();
+        var position = 1;
+        var ruleIndex = 1;
         var sb = new StringBuilder();
         var inBlock = false;
         var isRuleBlock = false;
@@ -105,18 +144,18 @@ internal static partial class FolderConfigReader
             if (inBlock)
             {
                 tempLines.Add(sourceLine);
-                sb.AppendLine(sourceLine.Content);
+                sb.Append(sourceLine.Content).Append(('\n'));
+
+                if (!RexEndBlock.IsMatch(sourceLine.Content)) 
+                    continue;
                 
-                if (RexEndBlock.IsMatch(sourceLine.Content))
-                {
-                    retval.Add(isRuleBlock
-                        ? new SourceBlockRule(tempLines.ToList(), sb.ToString())
-                        : new SourceBlockFolder(tempLines.ToList(), sb.ToString())
-                    );
-                    tempLines.Clear();
-                    sb.Clear();
-                    inBlock = false;
-                }
+                retval.Add(isRuleBlock
+                    ? new SourceBlockRule(tempLines.ToList(), sb.ToString(), configurationFile, position++, ruleIndex++)
+                    : new SourceBlockFolder(tempLines.ToList(), sb.ToString(), configurationFile, position++)
+                );
+                tempLines.Clear();
+                sb.Clear();
+                inBlock = false;
             }
             else
             {
@@ -139,18 +178,17 @@ internal static partial class FolderConfigReader
                 tempLines.Clear();
                 tempLines.Add(sourceLine);
                 sb.Clear();
-                sb.AppendLine(sourceLine.Content);
+                sb.Append(sourceLine.Content).Append('\n');
             }
         }
 
-        if (inBlock)
-        {
-            Log.Error("The last block was not closed properly");
-            throw new VigoParseFolderConfigException(
-                $"Syntax error in the folder configuration. The block beginning at line {tempLines[0].LineNumber} was not closed. Expecting DONE.");
-        }
-
-        return retval;
+        if (!inBlock) 
+            return retval;
+        
+        
+        Log.Error("The last block was not closed properly");
+        throw new VigoParseFolderConfigException(
+            $"Syntax error in the folder configuration. The block beginning at line {tempLines[0].LineNumber} was not closed. Expecting DONE.");
     }
 
     private static bool ProbeMarkdown(IEnumerable<string> lines)

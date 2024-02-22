@@ -1,6 +1,11 @@
 ﻿namespace vigoconfig;
 
-internal record SourceBlockFolder(IReadOnlyList<SourceLine> Lines, string Content) : SourceBlock(Lines, Content)
+internal record SourceBlockFolder(
+    IReadOnlyList<SourceLine> Lines,
+    string Content, 
+    string ConfigurationFile, 
+    int Position
+    ) : SourceBlock(Lines, Content, ConfigurationFile, Position)
 {
-    public override string Description => $"Folder configuration at lines {FirstLineNumber}..{LastLineNumber}";
+    public override string Description => $"Folder configuration #{Position} at lines {FromLineNumber}..{ToLineNumber} of {ConfigurationFile}";
 }

@@ -8,6 +8,8 @@ internal class FolderConfig
     public bool? KeepEmptyFolder { get; set; }
     public FolderConfigPartialHandling? LocalDefaults { get; set; }
     public IList<FolderConfigPartialRule> PartialRules { get; } = [];
+    
+    public SourceBlockFolder? Block { get; set; }
 
     internal void DumpToDebug()
     {
