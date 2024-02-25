@@ -1,13 +1,14 @@
 using System.Formats.Tar;
 using System.IO.Compression;
+using JetBrains.Annotations;
 using Serilog;
 
 namespace vigoarchive;
 
-public class Tarball()
+[PublicAPI]
+public class Tarball
 {
     public UnixFileMode DirectoryFileMode { get; set; } = (UnixFileMode)0b_111_101_101;
-    
     public DateTimeOffset DirectoryModificationTime { get; set; } = DateTimeOffset.Now;
     public void AddItem(TarItem item)
     {

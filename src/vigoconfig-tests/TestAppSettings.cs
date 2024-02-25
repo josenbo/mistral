@@ -2,16 +2,16 @@
 
 internal class TestAppSettings : IAppSettings
 {
-    public CommandEnum Command => throw new NotImplementedException();
+    public CommandEnum Command => throw new VigoFatalException("Unit tests must not use this property");
 
-    public DirectoryInfo RepositoryRoot => throw new NotImplementedException();
+    public DirectoryInfo RepositoryRoot => throw new VigoFatalException("Unit tests must not use this property");
 
     public FileHandlingParameters DefaultFileHandlingParams { get; set; }
     public StandardFileHandling DeployConfigRule { get; set; }
     public StandardFileHandling FinalCatchAllRule { get; set; }
-    public string GetRepoRelativePath(string path) => throw new NotImplementedException();
-    public string GetRepoRelativePath(FileSystemInfo file) => throw new NotImplementedException();
-    public string GetTemporaryFilePath() => throw new NotImplementedException();
+    public string GetRepoRelativePath(string path) => throw new VigoFatalException("Unit tests must not use this method");
+    public string GetRepoRelativePath(FileSystemInfo file) => throw new VigoFatalException("Unit tests must not use this method");
+    public string GetTemporaryFilePath() => throw new VigoFatalException("Unit tests must not use this method");
 
     public TestAppSettings()
     {

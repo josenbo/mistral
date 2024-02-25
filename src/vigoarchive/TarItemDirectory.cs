@@ -12,7 +12,7 @@ public record TarItemDirectory(
     ModificationTime
 )
 {
-    public override IEnumerable<string> FolderPaths
+    internal override IEnumerable<string> FolderPaths
     {
         get
         {
