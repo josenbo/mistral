@@ -3,7 +3,7 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal class FolderConfigPartialHandling
+internal class PartialFolderConfigHandling
 {
     public UnixFileMode? StandardModeForFiles { get; set; }
     public UnixFileMode? StandardModeForDirectories { get; set; } 
@@ -17,12 +17,12 @@ internal class FolderConfigPartialHandling
     public Regex? ValidCharsRegex { get; set; } 
     public IReadOnlyList<string>? Targets { get; set; }
 
-    public FolderConfigPartialHandling()
+    public PartialFolderConfigHandling()
     {
         
     }
 
-    public FolderConfigPartialHandling(FolderConfigPartialHandling defaultParameters)
+    public PartialFolderConfigHandling(PartialFolderConfigHandling defaultParameters)
     {
         StandardModeForFiles = StandardModeForFiles ?? defaultParameters.StandardModeForFiles;
         StandardModeForDirectories = StandardModeForDirectories ?? defaultParameters.StandardModeForDirectories;

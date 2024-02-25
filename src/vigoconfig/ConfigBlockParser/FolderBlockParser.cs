@@ -4,11 +4,11 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBlock)
+internal class FolderBlockParser(PartialFolderConfig partialFolderConfig, SourceBlock codeBlock)
 {
     #region local private class ConfigPhrase
 
-    private class ConfigPhrase(bool required, Func<Tokenizer, FolderConfig, ConfigPhrase, bool> parseFunc, string name)
+    private class ConfigPhrase(bool required, Func<Tokenizer, PartialFolderConfig, ConfigPhrase, bool> parseFunc, string name)
     {
         public string Name { get; } = name;
         private bool Required { get; } = required;
@@ -16,7 +16,7 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
         public bool PhraseFound { get; private set; }
         private int PhraseOccurenceCount { get; set; }
         private int NumberOfSuccessfulMatches { get; set; }
-        public Func<Tokenizer, FolderConfig, ConfigPhrase, bool> ParseFunc { get; set; } = parseFunc;
+        public Func<Tokenizer, PartialFolderConfig, ConfigPhrase, bool> ParseFunc { get; set; } = parseFunc;
         public string? ErrorMessage { get; private set; }
         public SourceLine? SourceLine { get; set; }
 
@@ -125,7 +125,7 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             
             var initialMatch = phrases
                 .Where(e => !e.PhraseFound)
-                .FirstOrDefault(p => p.ParseFunc(_tokenizer, folderConfig, p));
+                .FirstOrDefault(p => p.ParseFunc(_tokenizer, partialFolderConfig, p));
 
             if (initialMatch is not null)
             {
@@ -147,7 +147,7 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             
             var duplicateMatch = phrases
                 .Where(e => e.PhraseFound)
-                .FirstOrDefault(p => p.ParseFunc(_tokenizer, folderConfig, p));
+                .FirstOrDefault(p => p.ParseFunc(_tokenizer, partialFolderConfig, p));
 
             if (duplicateMatch is not null)
             {
@@ -170,19 +170,19 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
         return false;
     }
 
-    private static bool ParseKeepEmptyFolder(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseKeepEmptyFolder(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["KEEP"], ["EMPTY"], ["FOLDER"]))
             return phrase.ReturnPhraseNotFound();
 
         phrase.SourceLine = tokenizer.GetCurrentSourceLine();
 
-        folder.KeepEmptyFolder = true;
+        partialFolder.KeepEmptyFolder = true;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseDefaultForFileMode(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForFileMode(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["FILE"], ["MODE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -198,15 +198,15 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             return phrase.ReturnParseWithErrors($"Could not derive a unix file mode from the value {value}. Expecting three octal digits like 644");
         }
 
-        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
 
-        folder.LocalDefaults.StandardModeForFiles =
+        partialFolder.LocalDefaults.StandardModeForFiles =
             octalPermission.ComputeUnixFileMode(UnixFileMode.None);
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseDefaultForSourceEncoding(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForSourceEncoding(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["SOURCE"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -223,14 +223,14 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             return phrase.ReturnParseWithErrors($"Could not recognize a source encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
-        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
 
-        folder.LocalDefaults.SourceFileEncoding = encoding;
+        partialFolder.LocalDefaults.SourceFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
     }
     
-    private static bool ParseDefaultForTargetEncoding(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForTargetEncoding(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["TARGET"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -247,14 +247,14 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             return phrase.ReturnParseWithErrors($"Could not recognize a target encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
-        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
 
-        folder.LocalDefaults.TargetFileEncoding = encoding;
+        partialFolder.LocalDefaults.TargetFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseDefaultForNewlineStyle(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForNewlineStyle(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["NEWLINE"], ["STYLE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -271,14 +271,14 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             return phrase.ReturnParseWithErrors($"Could not recognize the newline setting with the name {value}. Valid names are: {string.Join(", ", LineEndingEnumHelper.ValidNames)}");
         }
 
-        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
 
-        folder.LocalDefaults.LineEnding = lineEnding;
+        partialFolder.LocalDefaults.LineEnding = lineEnding;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseDefaultForAddTrailingNewline(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForAddTrailingNewline(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["ADD"], ["TRAILING"], ["NEWLINE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -310,14 +310,14 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
                 return phrase.ReturnParseWithErrors($"Could read the boolean value {value}. Expecting one of: true, false, yes, no");
         }
 
-        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
 
-        folder.LocalDefaults.FixTrailingNewline = addTrailingNewline;
+        partialFolder.LocalDefaults.FixTrailingNewline = addTrailingNewline;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseDefaultForValidCharacters(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForValidCharacters(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["VALID"], ["CHARACTERS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -338,15 +338,15 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             return phrase.ReturnParseWithErrors($"Could not build a regular expression for the valid characters definition {value}. Expecting All, Ascii or AsciiGerman, where Ascii and AsciiGerman may be followed by a plus sign and a sequence of additional characters");
         }
         
-        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
 
-        folder.LocalDefaults.IsDefinedValidCharsRegex = true;
-        folder.LocalDefaults.ValidCharsRegex = regexValidCharacters;
+        partialFolder.LocalDefaults.IsDefinedValidCharsRegex = true;
+        partialFolder.LocalDefaults.ValidCharsRegex = regexValidCharacters;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseDefaultForBuildTargets(Tokenizer tokenizer, FolderConfig folder, ConfigPhrase phrase)
+    private static bool ParseDefaultForBuildTargets(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["BUILD"], ["TARGETS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -373,9 +373,9 @@ internal class FolderBlockParser(FolderConfig folderConfig, SourceBlock codeBloc
             }
         }        
 
-        folder.LocalDefaults ??= new FolderConfigPartialHandling();
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
 
-        folder.LocalDefaults.Targets = buildTargets;
+        partialFolder.LocalDefaults.Targets = buildTargets;
 
         return phrase.ReturnSuccessfullyParsed();
     }

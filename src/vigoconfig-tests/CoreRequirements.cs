@@ -18,7 +18,7 @@ public class CoreRequirements
                                
                                """;
         
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.True(folderConfig is not null);
     }
@@ -37,7 +37,7 @@ public class CoreRequirements
 
                                """;
         
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.True(folderConfig is not null);
     }
@@ -57,7 +57,7 @@ public class CoreRequirements
                                
                                """;
         
-        Assert.Throws<VigoParseFolderConfigException>(() => FolderConfigReader.Parse(content));
+        Assert.Throws<VigoParseFolderConfigException>(() => PartialFolderConfigReader.Parse(content));
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class CoreRequirements
                                end of document
                                """;
         
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.Null(folderConfig.KeepEmptyFolder);
         Assert.Null(folderConfig.LocalDefaults);
@@ -123,7 +123,7 @@ public class CoreRequirements
                                
                                """;
         
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         
         Assert.True(folderConfig is not null);
@@ -145,7 +145,7 @@ public class CoreRequirements
 
                                """;
         
-        Assert.Throws<VigoParseFolderConfigException>(() => FolderConfigReader.Parse(content));
+        Assert.Throws<VigoParseFolderConfigException>(() => PartialFolderConfigReader.Parse(content));
     }
     
     [Fact]
@@ -162,7 +162,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -195,7 +195,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -228,7 +228,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -263,7 +263,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -298,7 +298,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -331,7 +331,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -365,7 +365,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -398,7 +398,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -436,7 +436,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -461,7 +461,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -502,7 +502,7 @@ public class CoreRequirements
                                # vîgô
                                """;
 
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
@@ -604,7 +604,7 @@ public class CoreRequirements
                                
                                """;
         
-        var folderConfig = FolderConfigReader.Parse(content);
+        var folderConfig = PartialFolderConfigReader.Parse(content);
         
         
         Assert.NotNull(folderConfig);

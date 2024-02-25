@@ -4,11 +4,11 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock codeBlock)
+internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock codeBlock)
 {
     #region local private class ConfigPhrase
 
-    private class ConfigPhrase(bool required, Func<Tokenizer, FolderConfigPartialRule, ConfigPhrase, bool> parseFunc, string name)
+    private class ConfigPhrase(bool required, Func<Tokenizer, PartialFolderConfigRule, ConfigPhrase, bool> parseFunc, string name)
     {
         public string Name { get; } = name;
         private bool Required { get; } = required;
@@ -16,7 +16,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
         public bool PhraseFound { get; private set; }
         private int PhraseOccurenceCount { get; set; }
         private int NumberOfSuccessfulMatches { get; set; }
-        public Func<Tokenizer, FolderConfigPartialRule, ConfigPhrase, bool> ParseFunc { get; set; } = parseFunc;
+        public Func<Tokenizer, PartialFolderConfigRule, ConfigPhrase, bool> ParseFunc { get; set; } = parseFunc;
         public string? ErrorMessage { get; private set; }
         public SourceLine? SourceLine { get; set; }
 
@@ -171,7 +171,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
         return false;
     }
 
-    private static bool ParseRuleHeader(Tokenizer tokenizer, FolderConfigPartialRule rule)
+    private static bool ParseRuleHeader(Tokenizer tokenizer, PartialFolderConfigRule rule)
     {
         try
         {
@@ -197,7 +197,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
 
             if (!string.IsNullOrWhiteSpace(fileType))
             {
-                rule.Handling ??= new FolderConfigPartialHandling();
+                rule.Handling ??= new PartialFolderConfigHandling();
                 
                 rule.Handling.FileType = fileType switch
                 {
@@ -238,7 +238,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
         }
     }
 
-    private static bool ParseRenameTo(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseRenameTo(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["RENAME"], ["TO"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -260,7 +260,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseNameReplacePattern(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseNameReplacePattern(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["NAME"], ["REPLACE"], ["PATTERN"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -282,7 +282,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
         return phrase.ReturnSuccessfullyParsed();
     }
     
-    private static bool ParseFileMode(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseFileMode(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["FILE"], ["MODE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -297,14 +297,14 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not derive a unix file mode from the value {value}. Expecting three octal digits like 644 or a symbolic notation like ug+rw");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
+        rule.Handling ??= new PartialFolderConfigHandling();
         
         rule.Handling.Permissions = permission;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseSourceEncoding(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseSourceEncoding(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["SOURCE"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -321,14 +321,14 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize a source encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
+        rule.Handling ??= new PartialFolderConfigHandling();
         
         rule.Handling.SourceFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
     }
     
-    private static bool ParseTargetEncoding(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseTargetEncoding(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["TARGET"], ["ENCODING"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -345,14 +345,14 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize a target encoding with the name {value}. Valid names are: {string.Join(", ", FileEncodingEnumHelper.ValidNames)}");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
+        rule.Handling ??= new PartialFolderConfigHandling();
         
         rule.Handling.TargetFileEncoding = encoding;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseNewlineStyle(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseNewlineStyle(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["NEWLINE"], ["STYLE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -369,14 +369,14 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not recognize the newline style with the name {value}. Valid names are: {string.Join(", ", LineEndingEnumHelper.ValidNames)}");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
+        rule.Handling ??= new PartialFolderConfigHandling();
         
         rule.Handling.LineEnding = lineEnding;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseAddTrailingNewline(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseAddTrailingNewline(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["ADD"], ["TRAILING"], ["NEWLINE"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -408,14 +408,14 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
                 return phrase.ReturnParseWithErrors($"Could read the boolean value {value} for the add trailing newline setting. Expecting one of: true, false, yes, no");
         }
 
-        rule.Handling ??= new FolderConfigPartialHandling();
+        rule.Handling ??= new PartialFolderConfigHandling();
         
         rule.Handling.FixTrailingNewline = addTrailingNewline;
 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseValidCharacters(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseValidCharacters(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["VALID"], ["CHARACTERS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -436,7 +436,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             return phrase.ReturnParseWithErrors($"Could not build a regular expression for the valid characters setting {value}. Expecting All, Ascii or AsciiGerman, where Ascii and AsciiGerman may be followed by a plus sign and a sequence of additional characters");
         }
         
-        rule.Handling ??= new FolderConfigPartialHandling();
+        rule.Handling ??= new PartialFolderConfigHandling();
         
         rule.Handling.IsDefinedValidCharsRegex = true;
         rule.Handling.ValidCharsRegex = regexValidCharacters;
@@ -444,7 +444,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
         return phrase.ReturnSuccessfullyParsed();
     }
 
-    private static bool ParseBuildTargets(Tokenizer tokenizer, FolderConfigPartialRule rule, ConfigPhrase phrase)
+    private static bool ParseBuildTargets(Tokenizer tokenizer, PartialFolderConfigRule rule, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["BUILD"], ["TARGETS"], ["*"]))
             return phrase.ReturnPhraseNotFound();
@@ -471,7 +471,7 @@ internal class RuleBlockParser(FolderConfigPartialRule partialRule, SourceBlock 
             }
         }        
 
-        rule.Handling ??= new FolderConfigPartialHandling();
+        rule.Handling ??= new PartialFolderConfigHandling();
         
         rule.Handling.Targets = buildTargets;
 

@@ -3,11 +3,11 @@ using Serilog.Events;
 
 namespace vigoconfig;
 
-internal class FolderConfig
+internal class PartialFolderConfig
 {
     public bool? KeepEmptyFolder { get; set; }
-    public FolderConfigPartialHandling? LocalDefaults { get; set; }
-    public IList<FolderConfigPartialRule> PartialRules { get; } = [];
+    public PartialFolderConfigHandling? LocalDefaults { get; set; }
+    public IList<PartialFolderConfigRule> PartialRules { get; } = [];
     
     public SourceBlockFolder? Block { get; set; }
 
@@ -16,7 +16,7 @@ internal class FolderConfig
         if (!Log.IsEnabled(LogEventLevel.Debug))
             return;
         
-        Log.Debug("Showing the non-null properties in {TheObject}", nameof(FolderConfig));
+        Log.Debug("Showing the non-null properties in {TheObject}", nameof(PartialFolderConfig));
         if (KeepEmptyFolder is not null)
             Log.Debug("{ThePropertyName} = {ThePropertyValue}", nameof(KeepEmptyFolder), KeepEmptyFolder);
 

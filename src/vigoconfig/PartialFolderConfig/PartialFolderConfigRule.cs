@@ -4,13 +4,13 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal class FolderConfigPartialRule(SourceBlockRule block)
+internal class PartialFolderConfigRule(SourceBlockRule block)
 {
     public FileRuleActionEnum Action { get; set; } = FileRuleActionEnum.Undefined;
     public FileRuleConditionEnum Condition { get; set; } = FileRuleConditionEnum.Undefined;
     public string? CompareWith { get; set; } 
     public string? ReplaceWith { get; set; }
-    public FolderConfigPartialHandling? Handling { get; set; } 
+    public PartialFolderConfigHandling? Handling { get; set; } 
     public SourceBlockRule Block { get; } = block;
 
     public string Description
@@ -59,7 +59,7 @@ internal class FolderConfigPartialRule(SourceBlockRule block)
         }
     }
 
-    public void Deconstruct(out FileRuleActionEnum action, out FileRuleConditionEnum condition, out string? compareWith, out string? replaceWith, out FolderConfigPartialHandling? handling)
+    public void Deconstruct(out FileRuleActionEnum action, out FileRuleConditionEnum condition, out string? compareWith, out string? replaceWith, out PartialFolderConfigHandling? handling)
     {
         action = Action;
         condition = Condition;

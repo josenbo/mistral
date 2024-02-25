@@ -11,7 +11,7 @@ public interface IConfigurationScriptExtract
 {
     /// <summary>
     /// The sequence number of the configuration section
-    /// in the configruation script. The first section in
+    /// in the configuration script. The first section in
     /// the script gets the number 1.
     /// </summary>
     int Position { get; }

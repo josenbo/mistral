@@ -4,9 +4,9 @@ namespace vigoconfig;
 
 internal class FolderConfiguration : IFolderConfiguration
 {
-    bool IFolderConfiguration.KeepEmptyFolder => _partialFolderConfig.KeepEmptyFolder ?? false;
+    bool IFolderConfiguration.KeepEmptyFolder => _partialPartialFolderConfig.KeepEmptyFolder ?? false;
 
-    IConfigurationScriptExtract? IFolderConfiguration.BasedOn => _partialFolderConfig.Block;
+    IConfigurationScriptExtract? IFolderConfiguration.BasedOn => _partialPartialFolderConfig.Block;
     
     IEnumerable<IFileRuleConfiguration> IFolderConfiguration.RuleConfigurations => _rules;
 
@@ -19,27 +19,27 @@ internal class FolderConfiguration : IFolderConfiguration
 
     public FolderConfiguration(
         FileHandlingParameters initialDefaults,
-        FolderConfig partialFolderConfig)
+        PartialFolderConfig partialPartialFolderConfig)
     {
         _initialDefaults = initialDefaults;
-        _partialFolderConfig = partialFolderConfig;
+        _partialPartialFolderConfig = partialPartialFolderConfig;
         
         var handlingDefaultsChain = new List<FileHandlingParameters>();
         
-        if (_partialFolderConfig.LocalDefaults is null)
+        if (_partialPartialFolderConfig.LocalDefaults is null)
         {
             _folderDefaults = initialDefaults;
             handlingDefaultsChain.Add(_initialDefaults);
         }
         else
         {
-            _folderDefaults = _partialFolderConfig.LocalDefaults.Apply(_initialDefaults);
+            _folderDefaults = _partialPartialFolderConfig.LocalDefaults.Apply(_initialDefaults);
             if (_folderDefaults != _initialDefaults)
                 handlingDefaultsChain.Add(_folderDefaults);
             handlingDefaultsChain.Add(initialDefaults);
         }
 
-        foreach (var partialRule in _partialFolderConfig.PartialRules)
+        foreach (var partialRule in _partialPartialFolderConfig.PartialRules)
         {
             _rules.Add(new FileRuleConfiguration(partialRule, _folderDefaults, handlingDefaultsChain));    
         }
@@ -48,5 +48,5 @@ internal class FolderConfiguration : IFolderConfiguration
     private readonly List<IFileRuleConfiguration> _rules = [];
     private readonly FileHandlingParameters _initialDefaults;
     private readonly FileHandlingParameters _folderDefaults;
-    private readonly FolderConfig _partialFolderConfig;
+    private readonly PartialFolderConfig _partialPartialFolderConfig;
 }

@@ -6,9 +6,9 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal static partial class FolderConfigReader
+internal static partial class PartialFolderConfigReader
 {
-    public static FolderConfig Parse(
+    public static PartialFolderConfig Parse(
         string content, 
         string? configurationFile = null, 
         ConfigurationFileTypeEnum? configurationType = null)
@@ -27,7 +27,7 @@ internal static partial class FolderConfigReader
             
         var (folderBlock, ruleBlocks) = ReadSourceBlocks(lines, configurationFile, configurationType.Value);
 
-        var folderConfig = new FolderConfig();
+        var folderConfig = new PartialFolderConfig();
         
         if (folderBlock is not null)
         {
@@ -38,7 +38,7 @@ internal static partial class FolderConfigReader
 
         foreach (var ruleBlock in ruleBlocks)
         {
-            var partialRule = new FolderConfigPartialRule(ruleBlock);
+            var partialRule = new PartialFolderConfigRule(ruleBlock);
             var parser = new RuleBlockParser(partialRule, ruleBlock);
             folderConfig.PartialRules.Add(partialRule);
             parser.Parse();

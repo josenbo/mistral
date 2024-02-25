@@ -69,10 +69,10 @@ public interface IFileRuleConfiguration
     /// derived additional rules like 'the skip
     /// the rest rule' would this be false.
     /// </summary>
-    bool IsExplicitelyDefined { get; }
+    bool IsExplicitlyDefined { get; }
 
     /// <summary>
-    /// If the rule was explicitely defined in
+    /// If the rule was explicitly defined in
     /// the configuration file, this content can
     /// be accessed here. There may be implicit
     /// rules for which this information is not

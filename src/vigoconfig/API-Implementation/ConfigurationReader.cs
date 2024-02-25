@@ -16,7 +16,7 @@ internal class ConfigurationReader : IConfigurationReader
 
         try
         {
-            var partialFolderConfig = FolderConfigReader.Parse(configurationScript, configurationFile, configurationType);
+            var partialFolderConfig = PartialFolderConfigReader.Parse(configurationScript, configurationFile, configurationType);
 
             folderConfiguration = new FolderConfiguration(initialDefaults, partialFolderConfig);
 

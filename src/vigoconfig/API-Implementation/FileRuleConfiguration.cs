@@ -24,7 +24,7 @@ internal class FileRuleConfiguration : IFileRuleConfiguration
 
     IEnumerable<FileHandlingParameters> IFileRuleConfiguration.GetHandlingDefaultsChain() => _handlingDefaultsChain;
 
-    public FileRuleConfiguration(FolderConfigPartialRule partialRule, FileHandlingParameters folderDefaults, List<FileHandlingParameters> handlingDefaultsChain)
+    public FileRuleConfiguration(PartialFolderConfigRule partialRule, FileHandlingParameters folderDefaults, List<FileHandlingParameters> handlingDefaultsChain)
     {
         _partialRule = partialRule;
         _handlingDefaultsChain = handlingDefaultsChain;
@@ -33,7 +33,7 @@ internal class FileRuleConfiguration : IFileRuleConfiguration
             : _partialRule.Handling.Apply(folderDefaults);
     }
 
-    private readonly FolderConfigPartialRule _partialRule;
+    private readonly PartialFolderConfigRule _partialRule;
     private readonly FileHandlingParameters _handling;
     private readonly List<FileHandlingParameters> _handlingDefaultsChain;
 }
