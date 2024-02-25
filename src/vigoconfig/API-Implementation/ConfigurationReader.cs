@@ -22,7 +22,7 @@ internal class ConfigurationReader : IConfigurationReader
 
             return true;
         }
-        catch (VigoException e)
+        catch (VigoRecoverableException e)
         {
             Log.Error(e, "Parsing the configuration failed");
             folderConfiguration = null;

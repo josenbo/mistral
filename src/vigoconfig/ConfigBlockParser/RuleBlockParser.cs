@@ -192,7 +192,7 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                 "IGNORE" => FileRuleActionEnum.SkipRule,
                 "DEPLOY" => FileRuleActionEnum.CopyRule,
                 "CHECK" => FileRuleActionEnum.CheckRule,
-                _ => throw new VigoRecoverableException($"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}")
+                _ => throw new VigoParseFolderConfigException($"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}")
             };
 
             if (!string.IsNullOrWhiteSpace(fileType))
@@ -203,7 +203,7 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                 {
                     "TEXT" => FileTypeEnum.TextFile,
                     "BINARY" => FileTypeEnum.BinaryFile,
-                    _ => throw new VigoRecoverableException(
+                    _ => throw new VigoParseFolderConfigException(
                         $"Expected the file type of the rule to be in [TEST, BINARY] but found the value {fileType}")
                 };
             }
@@ -216,7 +216,7 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                     {
                         "EQUALS" => FileRuleConditionEnum.MatchName,
                         "MATCHES" => FileRuleConditionEnum.MatchPattern,
-                        _ => throw new VigoRecoverableException(
+                        _ => throw new VigoParseFolderConfigException(
                             $"Expected the condition clause of the rule to be either 'IF NAME EQUALS <name>' or 'IF NAME MATCHES <pattern>', but found '{string.Join(", ", tokenizer.MatchedTokens.Skip(4))}'")
                     };
 

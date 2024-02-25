@@ -102,7 +102,7 @@ internal class Tokenizer(SourceBlock sourceBlock)
             _matchedTokens.Count,
             compareWith.Length);
 
-        throw new VigoRecoverableException("The matched tokens do not comply with the syntax tree");
+        throw new VigoParseFolderConfigException("The matched tokens do not comply with the syntax tree");
     }
     
     // public bool Check(params string[] compareWith)

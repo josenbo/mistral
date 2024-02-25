@@ -18,7 +18,7 @@ internal class FileRuleConfiguration : IFileRuleConfiguration
 
     FileHandlingParameters IFileRuleConfiguration.Handling => _handling;
 
-    bool IFileRuleConfiguration.IsExplicitelyDefined => true;
+    bool IFileRuleConfiguration.IsExplicitlyDefined => true;
 
     IConfigurationScriptExtract IFileRuleConfiguration.BasedOn => _partialRule.Block;
 

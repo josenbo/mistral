@@ -4,7 +4,7 @@ using vigobase;
 namespace vigoconfig;
 
 [PublicAPI]
-internal class VigoParseFolderConfigException : VigoException
+internal class VigoParseFolderConfigException : VigoRecoverableException
 {
     public VigoParseFolderConfigException()
     {
