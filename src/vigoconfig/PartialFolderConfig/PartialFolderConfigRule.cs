@@ -23,13 +23,13 @@ internal class PartialFolderConfigRule(SourceBlockRule block)
             
             switch (Action)
             {
-                case FileRuleActionEnum.SkipRule:
+                case FileRuleActionEnum.IgnoreFile:
                     sb.Append("IGNORE");
                     break;
-                case FileRuleActionEnum.CopyRule:
+                case FileRuleActionEnum.DeployFile:
                     sb.Append("DEPLOY");
                     break;
-                case FileRuleActionEnum.CheckRule:
+                case FileRuleActionEnum.CheckFile:
                     sb.Append("CHECK");
                     break;
                 case FileRuleActionEnum.Undefined:

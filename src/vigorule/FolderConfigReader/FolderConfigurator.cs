@@ -149,7 +149,7 @@ internal static class FolderConfigurator
     {
         return new FileRuleMatchingLiteral(
             Id: new FileRuleId(repoDirectory, index, $"[Predefined initial rule] {(ruleConfig.DoCopy ? "Copy" : "Skip")} when name equals '{deploymentConfigFileName}'"),
-            Action: ruleConfig.DoCopy ? FileRuleActionEnum.CopyRule : FileRuleActionEnum.SkipRule,
+            Action: ruleConfig.DoCopy ? FileRuleActionEnum.DeployFile : FileRuleActionEnum.IgnoreFile,
             NameToMatch: deploymentConfigFileName,
             Handling: ruleConfig.Handling,
             NameReplacement: string.Empty
@@ -160,7 +160,7 @@ internal static class FolderConfigurator
     {
         return new FileRuleUnconditional(
             Id: new FileRuleId(repoDirectory, index, $"[Predefined final catch-all rule] {(ruleConfig.DoCopy ? "Copy" : "Skip")} unconditionally"),
-            Action: ruleConfig.DoCopy ? FileRuleActionEnum.CopyRule : FileRuleActionEnum.SkipRule,
+            Action: ruleConfig.DoCopy ? FileRuleActionEnum.DeployFile : FileRuleActionEnum.IgnoreFile,
             Handling: ruleConfig.Handling
             );
     }

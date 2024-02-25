@@ -79,9 +79,9 @@ public class FolderConfigDataRule
         
         var actionName = action switch
         {
-            FileRuleActionEnum.SkipRule => "Skip",
-            FileRuleActionEnum.CopyRule => "Copy",
-            FileRuleActionEnum.CheckRule => "Check",
+            FileRuleActionEnum.IgnoreFile => "Skip",
+            FileRuleActionEnum.DeployFile => "Copy",
+            FileRuleActionEnum.CheckFile => "Check",
             FileRuleActionEnum.Undefined => throw new ArgumentException($"Invalid action enum \"{action}\""),
             _ => throw new ArgumentException($"Unknown action enum \"{action}\"")
         };
@@ -122,9 +122,9 @@ public class FolderConfigDataRule
         
         return ruleType switch
         {
-            "copy" => FileRuleActionEnum.CopyRule,
-            "check" => FileRuleActionEnum.CheckRule,
-            "skip" => FileRuleActionEnum.SkipRule,
+            "copy" => FileRuleActionEnum.DeployFile,
+            "check" => FileRuleActionEnum.CheckFile,
+            "skip" => FileRuleActionEnum.IgnoreFile,
             _ => throw new ArgumentException($"Invalid or missing action (Value: {RuleType})", nameof(ruleType))
         };
     }

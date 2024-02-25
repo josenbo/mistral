@@ -32,7 +32,7 @@ internal record FileRuleMatchingLiteral(
 
         transformation = new DeploymentTransformationFile(file, Handling, this)
         {
-            CanDeploy = Action is FileRuleActionEnum.CopyRule,
+            CanDeploy = Action is FileRuleActionEnum.DeployFile,
             DifferentTargetFileName = newName
         };
         return true;

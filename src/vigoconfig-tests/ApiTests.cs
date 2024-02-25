@@ -32,7 +32,7 @@ public class ApiTests
         Assert.Empty(folderConfiguration.FolderDefaults.Targets);
         Assert.Equal(FileEncodingEnum.ISO_8859_15, folderConfiguration.FolderDefaults.SourceFileEncoding);
         Assert.Single(folderConfiguration.RuleConfigurations);
-        Assert.Equal(FileRuleActionEnum.CopyRule, folderConfiguration.RuleConfigurations.First().Action);
+        Assert.Equal(FileRuleActionEnum.DeployFile, folderConfiguration.RuleConfigurations.First().Action);
         Assert.Equal(FileRuleConditionEnum.MatchName, folderConfiguration.RuleConfigurations.First().Condition);
         Assert.Equal("sample.bin", folderConfiguration.RuleConfigurations.First().CompareWith);
         Assert.Equal("babwire", folderConfiguration.RuleConfigurations.First().ReplaceWith);

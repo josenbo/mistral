@@ -18,7 +18,7 @@ internal record FileRuleUnconditional(
     {
         transformation = new DeploymentTransformationFile(file, Handling, this)
         {
-            CanDeploy = Action is FileRuleActionEnum.CopyRule,
+            CanDeploy = Action is FileRuleActionEnum.DeployFile,
             DifferentTargetFileName = string.Empty
         };
         return true;

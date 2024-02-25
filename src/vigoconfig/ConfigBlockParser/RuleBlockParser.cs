@@ -189,9 +189,9 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
         
             rule.Action = tokenizer.MatchedTokens[1] switch
             {
-                "IGNORE" => FileRuleActionEnum.SkipRule,
-                "DEPLOY" => FileRuleActionEnum.CopyRule,
-                "CHECK" => FileRuleActionEnum.CheckRule,
+                "IGNORE" => FileRuleActionEnum.IgnoreFile,
+                "DEPLOY" => FileRuleActionEnum.DeployFile,
+                "CHECK" => FileRuleActionEnum.CheckFile,
                 _ => throw new VigoParseFolderConfigException($"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}")
             };
 

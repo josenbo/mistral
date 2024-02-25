@@ -441,7 +441,7 @@ public class CoreRequirements
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
         Assert.Single(folderConfig.PartialRules);
-        Assert.Equal(FileRuleActionEnum.SkipRule, folderConfig.PartialRules[0].Action);
+        Assert.Equal(FileRuleActionEnum.IgnoreFile, folderConfig.PartialRules[0].Action);
         Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
         Assert.Null(folderConfig.PartialRules[0].CompareWith);
         Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
@@ -466,7 +466,7 @@ public class CoreRequirements
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
         Assert.Single(folderConfig.PartialRules);
-        Assert.Equal(FileRuleActionEnum.CopyRule, folderConfig.PartialRules[0].Action);
+        Assert.Equal(FileRuleActionEnum.DeployFile, folderConfig.PartialRules[0].Action);
         Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
         Assert.Null(folderConfig.PartialRules[0].CompareWith);
         Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
@@ -507,7 +507,7 @@ public class CoreRequirements
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
         Assert.Single(folderConfig.PartialRules);
-        Assert.Equal(FileRuleActionEnum.CheckRule, folderConfig.PartialRules[0].Action);
+        Assert.Equal(FileRuleActionEnum.CheckFile, folderConfig.PartialRules[0].Action);
         Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
         Assert.Null(folderConfig.PartialRules[0].CompareWith);
         Assert.Null(folderConfig.PartialRules[0].ReplaceWith);
