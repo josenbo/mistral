@@ -54,10 +54,10 @@ internal class JobRunner(AppConfigRepo configRepo)
     {
         try
         {
-            if (Success && ConfigRepo is AppConfigRepoDeploy configTarball && File.Exists(configTarball.TemporaryTarballPath))
-                File.Move(configTarball.TemporaryTarballPath, configTarball.Tarball.FullName);
+            if (Success && ConfigRepo is AppConfigRepoDeploy configTarball && File.Exists(AppConfigRepo.TemporaryTarballPath))
+                File.Move(AppConfigRepo.TemporaryTarballPath, configTarball.Tarball.FullName);
             
-            ConfigRepo.TemporaryDirectory.Delete(true);
+            AppEnv.TemporaryDirectory.Delete(true);
         }
         catch (Exception e)
         {

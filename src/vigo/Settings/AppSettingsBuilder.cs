@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
 using Ardalis.GuardClauses;
 using Serilog.Events;
 using vigobase;
@@ -16,22 +16,17 @@ internal class AppSettingsBuilder
         try
         {
             var command = GetCommand();
-            var tempDir = GetTemporaryDirectory();
 
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
             LocalAppConfigRepo = command switch
             {
                 CommandEnum.Deploy => new AppConfigRepoDeploy(
                     RepositoryRoot: GetRepositoryRoot(),
-                    Tarball: GetTarballFile(), 
-                    TemporaryDirectory: tempDir,
-                    Logfile: GetLogfile(),
-                    LogLevel: GetLogLevel()),
+                    Tarball: GetTarballFile()
+                    ),
                 CommandEnum.Check => new AppConfigRepoCheck(
-                    RepositoryRoot: GetRepositoryRoot(),
-                    TemporaryDirectory: tempDir,
-                    Logfile: GetLogfile(),
-                    LogLevel: GetLogLevel()),
+                    RepositoryRoot: GetRepositoryRoot()
+                    ),
                 _ => throw new ArgumentException($"The command {command} is not handled", nameof(command))
             };
         }
@@ -52,13 +47,18 @@ internal class AppSettingsBuilder
     private const string EnvVarVigoRepositoryRoot = "VIGO_REPOSITORY_ROOT";
     // Directory must exist, file will be created or overwritten
     private const string EnvVarVigoTarballFile = "VIGO_TARBALL_FILE";
-    // The name of a virtual folder to become the root directory in the tarball
-    private const string EnvVarVigoTempDir = "VIGO_TEMP_DIR";
     // Directory must exist, file will be created or written to
     private const string EnvVarVigoLogfile = "VIGO_LOGFILE";
     // A log level for logging to a file only (Fatal, Error, Warning, *Information*, Debug) case-insensitive
     private const string EnvVarVigoLogLevel = "VIGO_LOGLEVEL";
 
+    public static bool TryGetSingleRunLogConfiguration(out LogEventLevel loglevel, [NotNullWhen(true)] out FileInfo? logfile)
+    {
+        loglevel = GetLogLevel();
+        logfile = GetLogfile();
+        return (logfile is not null);
+    }
+        
     public static AppConfigRepo AppConfigRepo => _appSettings ?? CreateAppSettings();
 
     private static AppConfigRepo CreateAppSettings()
@@ -186,55 +186,6 @@ internal class AppSettingsBuilder
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
-
-    private static DirectoryInfo GetTemporaryDirectory()
-    {
-        try
-        {
-            var path = GetEnvironmentVariable(EnvVarVigoTempDir) ?? Path.GetTempPath();
-
-            if (4096 < path.Length)
-                path = path[..4096];
-
-            if (!Directory.Exists(path))
-            {
-                const string message = "Could not locate the directory for temporary files";
-                Console.Error.WriteLine(message);
-                throw new VigoFatalException(message);
-            }
-                
-            if (!Path.IsPathRooted(path))
-                path = Path.GetFullPath(path);
-            
-            var formatProvider = CultureInfo.GetCultureInfo("en-US");
-            // ReSharper disable StringLiteralTypo
-            var timestamp = DateTime.Now.ToString("DyyyyMMdd_THHmmss", formatProvider);
-            // ReSharper restore StringLiteralTypo
-            var random = Random.Shared.Next(1,99999).ToString("00000", formatProvider);
-            var name = $"VIGO_{timestamp}_R{random}";
-
-            path = Path.Combine(path, name);
-            
-            var directoryInfo = new DirectoryInfo(path);
-
-            if (directoryInfo.Exists)
-            {
-                const string message = "Could not set up the directory for temporary files";
-                Console.Error.WriteLine(message);
-                throw new VigoFatalException(message);
-            }
-            
-            directoryInfo.Create();
-            
-            return directoryInfo;
-        }
-        catch (Exception e) when (e is not VigoException)
-        {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetTemporaryDirectory)}(). Message was: {e.Message}");
-            throw new VigoFatalException("Startup configuration failed", e);
-        }
-            
-    }
     
     private static FileInfo? GetLogfile()
     {
@@ -251,7 +202,14 @@ internal class AppSettingsBuilder
         
             var fileInfo = new FileInfo(path);
 
-            if (fileInfo.Directory is not null && fileInfo.Directory.Exists) return fileInfo;
+            if (fileInfo.Directory is not null && fileInfo.Directory.Exists)
+            {
+                if (!fileInfo.Exists) 
+                    return fileInfo;
+                fileInfo.Delete();
+                fileInfo.Refresh();
+                return fileInfo;
+            }
         
             Console.Error.WriteLine($"Warning: The logfile directory does mot exist");
             return null;

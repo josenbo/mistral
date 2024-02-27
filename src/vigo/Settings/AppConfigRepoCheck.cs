@@ -1,19 +1,10 @@
-﻿using Serilog.Events;
-using vigobase;
+﻿using vigobase;
 
 namespace vigo;
 
 internal record AppConfigRepoCheck(
-    DirectoryInfo RepositoryRoot, 
-    DirectoryInfo TemporaryDirectory,
-    FileInfo? Logfile,
-    LogEventLevel LogLevel
-) : AppConfigRepo(
-    RepositoryRoot, 
-    TemporaryDirectory,
-    Logfile,
-    LogLevel
-)
+    DirectoryInfo RepositoryRoot
+) : AppConfigRepo(RepositoryRoot)
 {
     public override CommandEnum Command => CommandEnum.Check;
 }

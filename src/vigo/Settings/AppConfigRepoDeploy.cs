@@ -1,20 +1,11 @@
-﻿using Serilog.Events;
-using vigobase;
+﻿using vigobase;
 
 namespace vigo;
 
 internal record AppConfigRepoDeploy(
     DirectoryInfo RepositoryRoot, 
-    FileInfo Tarball, 
-    DirectoryInfo TemporaryDirectory,
-    FileInfo? Logfile,
-    LogEventLevel LogLevel
-) : AppConfigRepo(
-    RepositoryRoot, 
-    TemporaryDirectory,
-    Logfile,
-    LogLevel
-)
+    FileInfo Tarball
+) : AppConfigRepo(RepositoryRoot)
 {
     public override CommandEnum Command => CommandEnum.Deploy;
 }

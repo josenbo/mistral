@@ -8,12 +8,9 @@ try
     var stopwatch = new Stopwatch();
     stopwatch.Start();
 
+    ConfigureLogging();
+
     var settings = AppSettingsBuilder.AppConfigRepo;
-
-    if (settings.Logfile is not null && File.Exists(settings.Logfile.FullName))
-        settings.Logfile.Delete();
-
-    ConfigureLogging(settings.Logfile, settings.LogLevel);
     
     Log.Information("Running the command {TheCommand} with the repository root folder {TheRepositoryRoot}",
         settings.Command,
@@ -47,13 +44,22 @@ return;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void ConfigureLogging(FileInfo? logfile, LogEventLevel logLevelFile, LogEventLevel logLevelConsole = LogEventLevel.Warning)
+void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 {
-    var loggerConfiguration = new LoggerConfiguration()
-        .MinimumLevel.Debug()
-        .WriteTo.Console(restrictedToMinimumLevel: logLevelConsole);
+    var hasSingleRunLogConfiguration = AppSettingsBuilder.TryGetSingleRunLogConfiguration(out var logLevelFile, out var logfile);
 
-    if (logfile is not null)
+    if (!hasSingleRunLogConfiguration && !logLevelConsole.HasValue)
+        return;
+    
+    var loggerConfiguration = new LoggerConfiguration()
+        .MinimumLevel.Debug();
+
+    if (logLevelConsole.HasValue)
+    {
+        loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: logLevelConsole.Value);
+    }
+
+    if (hasSingleRunLogConfiguration && logfile is not null)
     {
         // loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 4);
         loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile);

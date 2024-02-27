@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Globalization;
+using JetBrains.Annotations;
 
 namespace vigobase;
 
@@ -69,8 +70,51 @@ public static class AppEnv
             }, 
             DoCopy: false);
 
-        TemporaryDirectory = new DirectoryInfo(Path.GetTempPath());
+        TemporaryDirectory = GetTemporaryDirectory();
     }
+
+    public static DirectoryInfo GetTemporaryDirectory()
+    {
+        var envValue = Environment.GetEnvironmentVariable(EnvVarVigoTempDir);
+        var path = envValue ?? Path.GetTempPath();
+
+        if (4096 < path.Length)
+            path = path[..4096];
+
+        if (!Directory.Exists(path))
+        {
+            const string message = "Could not locate the directory for temporary files";
+            Console.Error.WriteLine(message);
+            throw new VigoFatalException(message);
+        }
+            
+        if (!Path.IsPathRooted(path))
+            path = Path.GetFullPath(path);
+        
+        var formatProvider = CultureInfo.GetCultureInfo("en-US");
+        // ReSharper disable StringLiteralTypo
+        var timestamp = DateTime.Now.ToString("DyyyyMMdd_THHmmss", formatProvider);
+        // ReSharper restore StringLiteralTypo
+        var random = Random.Shared.Next(1,99999).ToString("00000", formatProvider);
+        var name = $"VIGO_{timestamp}_R{random}";
+
+        path = Path.Combine(path, name);
+        
+        var directoryInfo = new DirectoryInfo(path);
+
+        if (directoryInfo.Exists)
+        {
+            const string message = "Could not set up the directory for temporary files";
+            Console.Error.WriteLine(message);
+            throw new VigoFatalException(message);
+        }
+        
+        directoryInfo.Create();
+        
+        return directoryInfo;
+    }
+    
+    private const string EnvVarVigoTempDir = "VIGO_TEMP_DIR";
     
     private static DirectoryInfo? _topLevelDirectory;
     private static int _tempFileSequence = Random.Shared.Next(100000000, 999999999);

@@ -1,18 +1,11 @@
-﻿using Serilog.Events;
-using vigobase;
+﻿using vigobase;
 
 namespace vigo;
 
 internal record AppConfigFolderExplain(
     FileInfo FolderConfiguration, 
-    DirectoryInfo TemporaryDirectory,
-    FileInfo? Logfile,
-    LogEventLevel LogLevel
-) : AppConfig(
-    TemporaryDirectory,
-    Logfile,
-    LogLevel
-)
+    IReadOnlyCollection<string> Filenames
+) : AppConfig
 {
     public override CommandEnum Command => CommandEnum.Explain;
 }
