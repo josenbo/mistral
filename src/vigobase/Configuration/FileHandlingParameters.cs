@@ -3,7 +3,6 @@
 namespace vigobase;
 
 public record FileHandlingParameters(
-    IAppSettings Settings,
     UnixFileMode StandardModeForFiles,
     UnixFileMode StandardModeForDirectories,
     FileTypeEnum FileType,

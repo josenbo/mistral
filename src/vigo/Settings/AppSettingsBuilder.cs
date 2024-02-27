@@ -9,76 +9,31 @@ internal class AppSettingsBuilder
 {
     #region instance members
 
-    private AppSettings LocalAppSettings { get; }
-    private FileHandlingParameters DefaultHandling { get; }
-
-    private FileHandlingParameters FinalCatchAllHandling { get; }
-    private FileHandlingParameters DeployConfigHandling { get; }
+    private AppConfigRepo LocalAppConfigRepo { get; }
     
     private AppSettingsBuilder()
     {
         try
         {
             var command = GetCommand();
+            var tempDir = GetTemporaryDirectory();
 
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-            LocalAppSettings = command switch
+            LocalAppConfigRepo = command switch
             {
-                CommandEnum.DeployToTarball => new AppSettingsDeployToTarball(
+                CommandEnum.Deploy => new AppConfigRepoDeploy(
                     RepositoryRoot: GetRepositoryRoot(),
                     Tarball: GetTarballFile(), 
-                    TemporaryDirectory: GetTemporaryDirectory(),
+                    TemporaryDirectory: tempDir,
                     Logfile: GetLogfile(),
                     LogLevel: GetLogLevel()),
-                CommandEnum.CheckCommit => new AppSettingsCheckCommit(
+                CommandEnum.Check => new AppConfigRepoCheck(
                     RepositoryRoot: GetRepositoryRoot(),
-                    TemporaryDirectory: GetTemporaryDirectory(),
+                    TemporaryDirectory: tempDir,
                     Logfile: GetLogfile(),
                     LogLevel: GetLogLevel()),
                 _ => throw new ArgumentException($"The command {command} is not handled", nameof(command))
             };
-            
-            var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
-    
-            DefaultHandling = new FileHandlingParameters(
-                Settings: LocalAppSettings,
-                StandardModeForFiles: (UnixFileMode)0b_110_110_100,
-                StandardModeForDirectories: (UnixFileMode)0b_111_111_101,
-                FileType: FileTypeEnum.BinaryFile, 
-                SourceFileEncoding: FileEncodingEnum.UTF_8,
-                TargetFileEncoding: FileEncodingEnum.UTF_8,
-                LineEnding: LineEndingEnum.LF,
-                Permissions: FilePermission.UseDefault, 
-                FixTrailingNewline: true,
-                ValidCharsRegex: asciiGerman,
-                Targets: [ "Prod", "NonProd" ]
-            );
-
-            LocalAppSettings.DefaultFileHandlingParams = DefaultHandling;
-            
-            FinalCatchAllHandling = DefaultHandling with {
-                FileType = FileTypeEnum.BinaryFile,
-                Permissions = FilePermission.UseDefault
-            };
-
-            LocalAppSettings.FinalCatchAllRule = new StandardFileHandling(Array.Empty<ConfigurationFilename>(), FinalCatchAllHandling, false);
-
-            DeployConfigHandling = DefaultHandling with
-            {
-                FileType = FileTypeEnum.BinaryFile,
-                Permissions = FilePermission.UseDefault
-            };
-
-            var configurationFilenames = new List<ConfigurationFilename>()
-            {
-                new ConfigurationFilename("deployment-rules.md", ConfigurationFileTypeEnum.MarkdownFormat),
-                new ConfigurationFilename("deployment-rules.vigo", ConfigurationFileTypeEnum.NativeFormat)
-            };
-            
-            LocalAppSettings.DeployConfigRule = new StandardFileHandling(
-                GetDeploymentConfigFileNames(configurationFilenames), 
-                DeployConfigHandling, 
-                false);
         }
         catch (Exception e) when (e is not VigoException)
         {
@@ -97,8 +52,6 @@ internal class AppSettingsBuilder
     private const string EnvVarVigoRepositoryRoot = "VIGO_REPOSITORY_ROOT";
     // Directory must exist, file will be created or overwritten
     private const string EnvVarVigoTarballFile = "VIGO_TARBALL_FILE";
-    // Filename to look for in each repository folder (and its default value)
-    private const string EnvVarVigoDeployConfigFilenames = "VIGO_DEPLOY_CONFIG_FILENAMES";
     // The name of a virtual folder to become the root directory in the tarball
     private const string EnvVarVigoTempDir = "VIGO_TEMP_DIR";
     // Directory must exist, file will be created or written to
@@ -106,16 +59,16 @@ internal class AppSettingsBuilder
     // A log level for logging to a file only (Fatal, Error, Warning, *Information*, Debug) case-insensitive
     private const string EnvVarVigoLogLevel = "VIGO_LOGLEVEL";
 
-    public static AppSettings AppSettings => _appSettings ?? CreateAppSettings();
+    public static AppConfigRepo AppConfigRepo => _appSettings ?? CreateAppSettings();
 
-    private static AppSettings CreateAppSettings()
+    private static AppConfigRepo CreateAppSettings()
     {
         lock (AppSettingsLock)
         {
             if (_appSettings is null)
             {
                 var builder = new AppSettingsBuilder();
-                _appSettings = builder.LocalAppSettings;
+                _appSettings = builder.LocalAppConfigRepo;
             }
 
             return _appSettings;
@@ -230,69 +183,6 @@ internal class AppSettingsBuilder
         catch (Exception e) when (e is not VigoException)
         {
             Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetTarballFile)}(). Message was: {e.Message}");
-            throw new VigoFatalException("Startup configuration failed", e);
-        }
-    }
-
-    private static List<ConfigurationFilename> GetDeploymentConfigFileNames(IEnumerable<ConfigurationFilename> defaultFilenames)
-    {
-        try
-        {
-            var retval = new List<ConfigurationFilename>();
-            var listOfFileNames = GetEnvironmentVariable(EnvVarVigoDeployConfigFilenames);
-
-            if (listOfFileNames is null)
-            {
-                retval.AddRange(defaultFilenames);
-            }
-            else
-            {
-                if (256 < listOfFileNames.Length)
-                    listOfFileNames = listOfFileNames[..256];
-
-                foreach (var filename in listOfFileNames.Split(FilenameSeparators, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
-                {
-                    var extension = Path.GetExtension(filename);
-
-                    switch (extension)
-                    {
-                        case ".md":
-                            retval.Add(new ConfigurationFilename(filename, ConfigurationFileTypeEnum.MarkdownFormat));
-                            break;
-                        case ".vigo":
-                            retval.Add(new ConfigurationFilename(filename, ConfigurationFileTypeEnum.NativeFormat));
-                            break;
-                        default:
-                            throw new VigoFatalException($"Do not know how to handle the configuration file name {filename}");
-                    }
-                }
-            }
-
-            if (retval.Count == 0)
-            {
-                const string message = "There is no configuration filename to look for in repository folders";
-                Console.Error.WriteLine(message);
-                throw new VigoFatalException(message);
-            }
-            
-            foreach (var configurationFilename in retval)
-            {
-                if (configurationFilename.FileName.Contains(Path.DirectorySeparatorChar) || configurationFilename.FileName.Contains(Path.AltDirectorySeparatorChar))
-                {
-                    const string message = "The deployment configuration file name is not allowed to contain path separators";
-                    Console.Error.WriteLine(message);
-                    throw new VigoFatalException(message);
-                }
-            
-                // trigger exception on a file name containing illegal characters 
-                File.Exists(configurationFilename.FileName);
-            }
-
-            return retval;
-        }
-        catch (Exception e) when (e is not VigoException)
-        {
-            Console.Error.WriteLine($"{e.GetType().Name} in startup configuration in {nameof(AppSettingsBuilder)}.{nameof(GetDeploymentConfigFileNames)}(). Message was: {e.Message}");
             throw new VigoFatalException("Startup configuration failed", e);
         }
     }
@@ -414,9 +304,8 @@ internal class AppSettingsBuilder
     }
  
     
-    private static AppSettings? _appSettings;
+    private static AppConfigRepo? _appSettings;
     private static readonly string AppSettingsLock = new string("AppSettings");
-    private static readonly char[] FilenameSeparators = new char[] { ',', ';', ' ' };
 
     #endregion
 }

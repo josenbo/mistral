@@ -11,9 +11,9 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
     public FileInfo SourceFile { get; }
     public FileInfo CheckedAndTransformedTemporaryFile => _checkedAndTransformedTemporaryFile ??
                                                           throw new VigoFatalException(
-                                                              $"The checked and transformed file is not (yet) available ({_handling.Settings.GetRepoRelativePath(SourceFile)})");
+                                                              $"The checked and transformed file is not (yet) available ({AppEnv.GetTopLevelRelativePath(SourceFile)})");
     public bool CheckedSuccessfully { get; private set; }
-    public string RelativePathSourceFile => _handling.Settings.GetRepoRelativePath(SourceFile.FullName);
+    public string RelativePathSourceFile => AppEnv.GetTopLevelRelativePath(SourceFile.FullName);
     public string? DifferentTargetFileName
     {
         get => _differentTargetFileName;
@@ -35,7 +35,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
                 {
                     Log.Error("Setting the new name {NewName} for the repository file {TheSourceFile} failed, because the repository file has no parent directory",
                         _differentTargetFileName,
-                        _handling.Settings.GetRepoRelativePath(SourceFile.FullName));                    
+                        AppEnv.GetTopLevelRelativePath(SourceFile.FullName));                    
                     throw new VigoFatalException("The DirectoryName of a repository file should never be null");
                 }
         
@@ -45,7 +45,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
             {
                 Log.Error(e,"Setting the new name {NewName} for the repository file {TheSourceFile} failed with an Exception",
                     _differentTargetFileName,
-                    _handling.Settings.GetRepoRelativePath(SourceFile.FullName));                    
+                    AppEnv.GetTopLevelRelativePath(SourceFile.FullName));                    
                 throw new VigoFatalException("Failed to set a new name for a repository file", e);
             }
         }
@@ -93,7 +93,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
     IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.CheckAndTransform()
     {
         var filename = SourceFile.Name;
-        var filepath = _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty);
+        var filepath = AppEnv.GetTopLevelRelativePath(SourceFile.DirectoryName ?? string.Empty);
         
         if (!CanDeploy)
         {
@@ -122,7 +122,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         {
             Log.Fatal("Check failed for {FileName} in {FilePath} due to invalid settings {TheHandling}",
                 SourceFile.Name,
-                _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty),
+                AppEnv.GetTopLevelRelativePath(SourceFile.DirectoryName ?? string.Empty),
                 _handling);
             
             CheckedSuccessfully = false;
@@ -133,7 +133,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         {
             Log.Fatal("Check failed for {FileName} in {FilePath} because no targets were specified",
                 SourceFile.Name,
-                _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty),
+                AppEnv.GetTopLevelRelativePath(SourceFile.DirectoryName ?? string.Empty),
                 _handling);
             
             CheckedSuccessfully = false;
@@ -148,7 +148,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
             {
                 Log.Fatal("Check failed for {FileName} in {FilePath} due to unexpected characters in the file content",
                     SourceFile.Name,
-                    _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty));
+                    AppEnv.GetTopLevelRelativePath(SourceFile.DirectoryName ?? string.Empty));
 
                 CheckedSuccessfully = false;
                 return this;
@@ -166,7 +166,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
             if (_handling.LineEnding == LineEndingEnum.CR_LF)
                 sb.Replace("\n", "\r\n");
 
-            var tempFilePath = _handling.Settings.GetTemporaryFilePath();
+            var tempFilePath = AppEnv.GetTemporaryFilePath();
             
             File.WriteAllText(tempFilePath, sb.ToString(), _handling.TargetFileEncoding.ToEncoding());
             
@@ -179,7 +179,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         {
             Log.Fatal(e, "Check failed for {FileName} in {FilePath} because an exception occured",
                 SourceFile.Name,
-                _handling.Settings.GetRepoRelativePath(SourceFile.DirectoryName ?? string.Empty));
+                AppEnv.GetTopLevelRelativePath(SourceFile.DirectoryName ?? string.Empty));
 
             CheckedSuccessfully = false;
             return this;

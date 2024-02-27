@@ -7,10 +7,10 @@ namespace vigo;
 
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-internal class JobRunner(AppSettings settings)
+internal class JobRunner(AppConfigRepo configRepo)
 {
     public IRepositoryReader RepositoryReader => _reader;
-    private AppSettings Settings { get; } = settings;
+    private AppConfigRepo ConfigRepo { get; } = configRepo;
     public bool Success { get; private set; }
     
     public bool Prepare()
@@ -33,10 +33,10 @@ internal class JobRunner(AppSettings settings)
     {
         try
         {
-            Success = Settings switch
+            Success = ConfigRepo switch
             {
-                AppSettingsDeployToTarball configurationDeployToTarball => BuildTarball(_reader, configurationDeployToTarball),
-                AppSettingsCheckCommit configurationCheckCommit => RunCommitChecks(_reader, configurationCheckCommit),
+                AppConfigRepoDeploy configurationDeployToTarball => BuildTarball(_reader, configurationDeployToTarball),
+                AppConfigRepoCheck configurationCheckCommit => RunCommitChecks(_reader, configurationCheckCommit),
                 _ => false
             };
         }
@@ -54,10 +54,10 @@ internal class JobRunner(AppSettings settings)
     {
         try
         {
-            if (Success && Settings is AppSettingsDeployToTarball configTarball && File.Exists(configTarball.TemporaryTarballPath))
+            if (Success && ConfigRepo is AppConfigRepoDeploy configTarball && File.Exists(configTarball.TemporaryTarballPath))
                 File.Move(configTarball.TemporaryTarballPath, configTarball.Tarball.FullName);
             
-            Settings.TemporaryDirectory.Delete(true);
+            ConfigRepo.TemporaryDirectory.Delete(true);
         }
         catch (Exception e)
         {
@@ -65,18 +65,17 @@ internal class JobRunner(AppSettings settings)
         }
     }
 
-    private readonly RepositoryReader _reader = new RepositoryReader(settings);
+    private readonly RepositoryReader _reader = new RepositoryReader(configRepo);
     
-    private static bool RunCommitChecks(RepositoryReader reader, AppSettingsCheckCommit config)
+    private static bool RunCommitChecks(RepositoryReader reader, AppConfigRepoCheck configRepo)
     {
         return true;
     }
 
-    private static bool BuildTarball(RepositoryReader reader, AppSettingsDeployToTarball config)
+    private static bool BuildTarball(RepositoryReader reader, AppConfigRepoDeploy configRepo)
     {
         try
         {
-            var settings = config.DefaultFileHandlingParams.Settings;
             var directoryTimestamp = DateTimeOffset.Now;
             
             var targets = reader
@@ -94,9 +93,9 @@ internal class JobRunner(AppSettings settings)
                 foreach (var transformation in reader.FileTransformations)
                 {
                     requests.Add(new TarItemFile(
-                        TarRelativePath: Path.Combine(target, settings.GetRepoRelativePath(transformation.TargetFile)),
+                        TarRelativePath: Path.Combine(target, AppEnv.GetTopLevelRelativePath(transformation.TargetFile)),
                         TransformedContent: transformation.CheckedAndTransformedTemporaryFile,
-                        FileMode: transformation.FilePermission.ComputeUnixFileMode(config.DefaultFileHandlingParams.StandardModeForFiles),
+                        FileMode: transformation.FilePermission.ComputeUnixFileMode(AppEnv.DefaultFileHandlingParams.StandardModeForFiles),
                         ModificationTime: DateTimeOffset.FromFileTime(transformation.SourceFile.LastWriteTime.ToFileTime())
                         ));
                 }
@@ -104,8 +103,8 @@ internal class JobRunner(AppSettings settings)
                 foreach (var transformation in reader.DirectoryTransformations)
                 {
                     requests.Add(new TarItemDirectory(
-                        TarRelativePath: Path.Combine(target, settings.GetRepoRelativePath(transformation.SourceDirectory)),
-                        FileMode: config.DefaultFileHandlingParams.StandardModeForDirectories,
+                        TarRelativePath: Path.Combine(target, AppEnv.GetTopLevelRelativePath(transformation.SourceDirectory)),
+                        FileMode: AppEnv.DefaultFileHandlingParams.StandardModeForDirectories,
                         ModificationTime: directoryTimestamp
                         ));
                 }
@@ -115,7 +114,7 @@ internal class JobRunner(AppSettings settings)
 
             var tarball = new Tarball()
             {
-                DirectoryFileMode = config.DefaultFileHandlingParams.StandardModeForDirectories
+                DirectoryFileMode = AppEnv.DefaultFileHandlingParams.StandardModeForDirectories
             };
 
             foreach (var request in requests)
@@ -123,7 +122,7 @@ internal class JobRunner(AppSettings settings)
                 tarball.AddItem(request);
             }
         
-            tarball.Save(config.Tarball);
+            tarball.Save(configRepo.Tarball);
             
             return true;
         }
@@ -134,9 +133,9 @@ internal class JobRunner(AppSettings settings)
 
             try
             {
-                config.Tarball.Refresh();
-                if (config.Tarball.Exists)
-                    config.Tarball.Delete();
+                configRepo.Tarball.Refresh();
+                if (configRepo.Tarball.Exists)
+                    configRepo.Tarball.Delete();
             }
             catch (Exception)
             {

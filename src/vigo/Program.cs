@@ -8,7 +8,7 @@ try
     var stopwatch = new Stopwatch();
     stopwatch.Start();
 
-    var settings = AppSettingsBuilder.AppSettings;
+    var settings = AppSettingsBuilder.AppConfigRepo;
 
     if (settings.Logfile is not null && File.Exists(settings.Logfile.FullName))
         settings.Logfile.Delete();
@@ -19,7 +19,7 @@ try
         settings.Command,
         settings.RepositoryRoot.FullName);
 
-    var jobRunner = new JobRunner(settings);
+    var jobRunner = new JobRunnerDoNothing(settings);
     
     if (jobRunner.Prepare())
         jobRunner.Run();

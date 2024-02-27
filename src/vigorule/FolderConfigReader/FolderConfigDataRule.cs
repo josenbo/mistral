@@ -47,7 +47,7 @@ public class FolderConfigDataRule
     
     internal FileRule GetFileRule(IFolderConfiguration folderConfig, FileHandlingParameters handlingDefaults)
     {
-        var relativePath = handlingDefaults.Settings.GetRepoRelativePath(folderConfig.Location);
+        var relativePath = AppEnv.GetTopLevelRelativePath(folderConfig.Location);
         
         var handling = handlingDefaults;
 

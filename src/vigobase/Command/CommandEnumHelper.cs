@@ -6,8 +6,8 @@ public static class CommandEnumHelper
     public static bool IsDefined(this CommandEnum value) => Enum.IsDefined(typeof(CommandEnum), value);
     public static bool IsDefinedAndValid(int value) => Enum.IsDefined(typeof(CommandEnum), value) && (CommandEnum)value != CommandEnum.Undefined;
     public static bool IsDefinedAndValid(this CommandEnum value) => Enum.IsDefined(typeof(CommandEnum), value) && value != CommandEnum.Undefined;
-    public static bool IsDeployToTarball(this CommandEnum value) => value == CommandEnum.DeployToTarball;
-    public static bool IsCheckCommit(this CommandEnum value) => value == CommandEnum.CheckCommit;
+    public static bool IsDeployToTarball(this CommandEnum value) => value == CommandEnum.Deploy;
+    public static bool IsCheckCommit(this CommandEnum value) => value == CommandEnum.Check;
     public static CommandEnum Parse(string? command)
     {
         command = command?.Trim().ToLowerInvariant() ?? string.Empty;
@@ -15,9 +15,9 @@ public static class CommandEnumHelper
         switch (command)
         {
             case "tarball":
-                return CommandEnum.DeployToTarball;
+                return CommandEnum.Deploy;
             case "check":
-                return CommandEnum.CheckCommit;
+                return CommandEnum.Check;
             default:
                 var message = $"Unknown command name \"{command}\". Valid names are \"Tarball\" and \"Check\"";
                 Console.Error.WriteLine(message);

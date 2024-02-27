@@ -3,17 +3,18 @@ using vigobase;
 
 namespace vigo;
 
-internal record AppSettingsCheckCommit(
+internal record AppConfigRepoDeploy(
     DirectoryInfo RepositoryRoot, 
+    FileInfo Tarball, 
     DirectoryInfo TemporaryDirectory,
     FileInfo? Logfile,
     LogEventLevel LogLevel
-) : AppSettings(
+) : AppConfigRepo(
     RepositoryRoot, 
     TemporaryDirectory,
     Logfile,
     LogLevel
 )
 {
-    public override CommandEnum Command => CommandEnum.CheckCommit;
+    public override CommandEnum Command => CommandEnum.Deploy;
 }

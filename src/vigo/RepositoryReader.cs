@@ -15,16 +15,16 @@ internal class RepositoryReader : IRepositoryReader
     
     public void ReadRepository()
     {
-        Console.WriteLine($"Collecting files for deployment in the repository folder tree at {_appSettings.RepositoryRoot}");
+        Console.WriteLine($"Collecting files for deployment in the repository folder tree at {_appConfigRepo.RepositoryRoot}");
         
-        var rules = new DirectoryController(_appSettings.RepositoryRoot, _appSettings.DefaultFileHandlingParams);
+        var rules = new DirectoryController(_appConfigRepo.RepositoryRoot, AppEnv.DefaultFileHandlingParams);
 
         ProcessDirectory(rules);
     }
     
-    internal RepositoryReader(AppSettings appSettings)
+    internal RepositoryReader(AppConfigRepo appConfigRepo)
     {
-        _appSettings = appSettings;
+        _appConfigRepo = appConfigRepo;
     }
     
     private void ProcessDirectory(DirectoryController controller)
@@ -58,6 +58,6 @@ internal class RepositoryReader : IRepositoryReader
         }
     }
 
-    private readonly AppSettings _appSettings;
+    private readonly AppConfigRepo _appConfigRepo;
     private readonly List<IDeploymentTransformationReadOnly> _transformations = [];
 }

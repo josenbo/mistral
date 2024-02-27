@@ -26,7 +26,7 @@ public class DirectoryController : IFolderConfiguration
         
         Log.Fatal("There is no rule matching the file name {TheFileName} in the directory {TheDirectory}",
             file.Name,
-            LocalFileHandlingParams.Settings.GetRepoRelativePath(file.FullName));
+            AppEnv.GetTopLevelRelativePath(file.FullName));
         throw new VigoFatalException("Could not find a file rule");
     }
     

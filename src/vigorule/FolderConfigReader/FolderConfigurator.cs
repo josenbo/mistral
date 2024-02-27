@@ -10,8 +10,7 @@ internal static class FolderConfigurator
 {
     public static void Configure(IFolderConfiguration config)
     {
-        var appSettings = config.ParentFileHandlingParams.Settings;
-        var relativePath = appSettings.GetRepoRelativePath(config.Location);
+        var relativePath = AppEnv.GetTopLevelRelativePath(config.Location);
         
         try
         {
@@ -19,17 +18,17 @@ internal static class FolderConfigurator
             const string theConfigfile = "todo-need-to-fix-this";
             
             // config.AddRule(BuildDeployConfigFileRule(relativePath, config.NextRuleIndex, appSettings.DeploymentConfigFileName, appSettings.DeployConfigRule));
-            config.AddRule(BuildDeployConfigFileRule(relativePath, config.NextRuleIndex, theConfigfile, appSettings.DeployConfigRule));
+            config.AddRule(BuildDeployConfigFileRule(relativePath, config.NextRuleIndex, theConfigfile, AppEnv.DeployConfigRule));
             
             // if (!TryReadFileContent(config.Location, config.ParentFileHandlingParams.Settings.DeploymentConfigFileName, out var content))
             if (!TryReadFileContent(config.Location, theConfigfile, out var content))
             {
-                config.AddRule(BuildFinalCatchAllFileRule(relativePath, config.NextRuleIndex, appSettings.FinalCatchAllRule));
+                config.AddRule(BuildFinalCatchAllFileRule(relativePath, config.NextRuleIndex, AppEnv.FinalCatchAllRule));
                 return;
             }
             
             Log.Information("Found a deployment configuration file in the directory {TheDirectory}",
-                appSettings.GetRepoRelativePath(config.Location.FullName));
+                AppEnv.GetTopLevelRelativePath(config.Location.FullName));
         
             if (!TryParseConfiguration(content, out var tomlConfigurationData))
             {
@@ -45,12 +44,12 @@ internal static class FolderConfigurator
                 
             ValidateAndAppendRules(config, tomlConfigurationData.Rules);
 
-            config.AddRule(BuildFinalCatchAllFileRule(relativePath, config.NextRuleIndex, appSettings.FinalCatchAllRule));
+            config.AddRule(BuildFinalCatchAllFileRule(relativePath, config.NextRuleIndex, AppEnv.FinalCatchAllRule));
         }
         catch (Exception e) when (e is not VigoException)
         {
             Log.Fatal(e,"Could not read the configuration in the directory {TheDir}",
-                appSettings.GetRepoRelativePath(config.Location.FullName));
+                AppEnv.GetTopLevelRelativePath(config.Location.FullName));
             throw new VigoFatalException("Failed to read the deployment configuration in the repository folder");
         }
     }

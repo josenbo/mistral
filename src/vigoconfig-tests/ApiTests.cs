@@ -7,7 +7,6 @@ public class ApiTests
     public void FolderAndOneRule()
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
-        var appSettings = new TestAppSettings();
         
         var success = FolderConfigurationApi.Reader.TryParse(
             configurationScript: """
@@ -24,7 +23,7 @@ public class ApiTests
                                  """,
             configurationFile: $"{nameof(ApiTests)}.{nameof(FolderAndOneRule)}",
             configurationType: ConfigurationFileTypeEnum.NativeFormat,
-            initialDefaults: appSettings.DefaultFileHandlingParams,
+            initialDefaults: AppEnv.DefaultFileHandlingParams,
             folderConfiguration: out var folderConfiguration);
 
         Assert.True(success);
