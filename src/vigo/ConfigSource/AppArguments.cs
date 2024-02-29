@@ -8,7 +8,7 @@ internal record AppArguments(
     bool? ShowVersion,
     CommandEnum? CommandToShowHelpFor,
     DirectoryInfo? RepositoryRoot,
-    FileInfo? DeploymentBundle,
+    FileInfo? OutputFile,
     IReadOnlyList<string>? Targets,
     FileInfo? ConfigurationFile,
     IReadOnlyList<string>? Names

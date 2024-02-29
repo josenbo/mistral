@@ -51,7 +51,7 @@ internal static class AppConfigBuilder
         var repositoryRoot = appArgs.RepositoryRoot
                              ?? throw new VigoFatalException(AppEnv.Faults.Fatal("The repository root is mandatory for the deploy action"));
         
-        var deploymentBundle = appArgs.DeploymentBundle
+        var deploymentBundle = appArgs.OutputFile
                                ?? throw new VigoFatalException(AppEnv.Faults.Fatal("The output file is mandatory for the deploy action"));
         
         var targets = appArgs.Targets ?? Array.Empty<string>();

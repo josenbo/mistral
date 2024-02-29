@@ -15,8 +15,8 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
         if (result.RepositoryRoot is null)
             result = result with { RepositoryRoot = GetRepositoryRoot(EnvVarSource) };
 
-        if (result.DeploymentBundle is null) 
-            result = result with { DeploymentBundle = GetOutputFile(EnvVarSource) };
+        if (result.OutputFile is null) 
+            result = result with { OutputFile = GetOutputFile(EnvVarSource) };
         
         if (result.Targets is null) 
             result = result with { Targets = GetTargets(EnvVarSource) };

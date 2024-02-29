@@ -23,8 +23,14 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
     {
         var cmdArgsWithoutOptions = new List<string>();
 
+        Log.Debug("Parsing the command line {TheCommandLine}", cmdArgs);
+        
         var result = ExtractOptionsAndWords(initial, cmdArgs, cmdArgsWithoutOptions);
 
+        Log.Debug("Extracted the program options {TheOptions} and the still unmatched arguments {TheArguments}",
+            result,
+            cmdArgsWithoutOptions);
+        
         var firstCmdArg = 0 < cmdArgsWithoutOptions.Count
             ? cmdArgsWithoutOptions[0]
             : string.Empty;
@@ -37,8 +43,14 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             _ => CommandEnum.Undefined
         };
         
+        Log.Debug("Parsed the action {TheAction} from the first command line argument {TheFirst}",
+            command,
+            firstCmdArg);
+        
         if (result.ShowHelp.HasValue && result.ShowHelp.Value)
         {
+            Log.Debug("Prioritizing the HELP action with the help context {TheContext}", command);
+            
             return result with
             {
                 Command = CommandEnum.Help,
@@ -48,6 +60,8 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
 
         if (result.ShowVersion.HasValue && result.ShowVersion.Value)
         {
+            Log.Debug("Prioritizing the VERSION action");
+
             return result with
             {
                 Command = CommandEnum.Version
@@ -62,6 +76,8 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             if (string.IsNullOrWhiteSpace(firstCmdArg) || !File.Exists(firstCmdArg))
                 throw new VigoFatalException(AppEnv.Faults.Fatal("No command specified"));
 
+            Log.Debug("This might be the command line that you get from the shell, when you run the configuration file as a script CONFIGURATION-FILE [Name 1] .. [Name n]. Will translate this to the corresponding EXPLAIN action.");
+            
             var configurationFile = new FileInfo(Path.GetFullPath(firstCmdArg));
             
             if (!configurationFile.Exists || configurationFile.Directory is null || !configurationFile.Directory.Exists)
@@ -73,9 +89,26 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             for (var i = 1; i < cmdArgsWithoutOptions.Count; i++)
             {
                 var name = Path.GetFileName(cmdArgsWithoutOptions[i]);
-                if (!string.IsNullOrWhiteSpace(name))
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    Log.Warning(
+                        "Ignoring the name parameter on the command line, because it is not a valid file name: {TheValue}",
+                        cmdArgsWithoutOptions[i]);
+                }
+                else
+                {
+                    if (name != cmdArgsWithoutOptions[i])
+                        Log.Warning("Dropping the path from the name parameter on the command line: New is {TheNewValue}, old was {TheOldValue}", 
+                            name,
+                            cmdArgsWithoutOptions[i]);
+
                     names.Add(name);
+                }
             }
+            
+            Log.Debug("Transformed the shell command line to an EXPLAIN action. Configuration file is {TheConfigFile} and names are {TheNames}",
+                configurationFile,
+                names);
 
             result = result with
             {
@@ -88,6 +121,12 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             var unexpected = cmdArgsWithoutOptions[1..];
             Log.Error("Unexpected command line arguments {TheUnexpectedArguments}", unexpected);
             throw new VigoFatalException(AppEnv.Faults.Fatal("Encountered unexpected command line arguments"));
+        }
+        else
+        {
+            Log.Debug("Setting the action {TheAction} after handling all edge cases", command);
+            
+            result = result with { Command = command };
         }
         
         return result;
@@ -106,18 +145,24 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
 
             if (MatchesOneOf(options, "H", current, "-h", "--help"))
             {
+                Log.Debug("Saw the HELP command line option {TheOption}", current);
+                
                 if (retval.ShowHelp.HasValue)
                     continue;
                 retval = retval with { ShowHelp = true };
             }
             else if (MatchesOneOf(options, "V", current, "-v", "--version"))
             {
+                Log.Debug("Saw the VERSION command line option {TheOption}", current);
+                
                 if (retval.ShowVersion.HasValue)
                     continue;
                 retval = retval with { ShowVersion = true };
             }
             else if (MatchesOneOf(options, "R", current, "-r", "--repository-root"))
             {
+                Log.Debug("Saw the REPOSITORY-ROOT command line option {TheOption} with the value {TheValue}", current, next);
+
                 i++; // eat the next argument
                 
                 if (retval.RepositoryRoot is not null)
@@ -135,9 +180,11 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             }
             else if (MatchesOneOf(options, "O", current, "-o", "--output-file"))
             {
+                Log.Debug("Saw the OUTPUT-FILE command line option {TheOption} with the value {TheValue}", current, next);
+
                 i++; // eat the next argument
                 
-                if (retval.DeploymentBundle is not null)
+                if (retval.OutputFile is not null)
                     continue;
                 
                 if (string.IsNullOrEmpty(next))
@@ -148,10 +195,12 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
                 if (deploymentBundle.Directory is null || !deploymentBundle.Directory.Exists)
                     throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -o or --output-file must be file in an existing directory"));
 
-                retval = retval with { DeploymentBundle = deploymentBundle };
+                retval = retval with { OutputFile = deploymentBundle };
             }
             else if (MatchesOneOf(options, "T", current, "-t", "--targets"))
             {
+                Log.Debug("Saw the TARGETS command line option {TheOption} with the value {TheValue}", current, next);
+
                 i++; // eat the next argument
                 
                 if (retval.Targets is not null)
@@ -175,6 +224,8 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             }
             else if (MatchesOneOf(options, "C", current, "-c", "--configuration-file"))
             {
+                Log.Debug("Saw the CONFIGURATION-FILE command line option {TheOption} with the value {TheValue}", current, next);
+
                 i++; // eat the next argument
                 
                 if (retval.ConfigurationFile is not null)
@@ -192,6 +243,8 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             }
             else if (MatchesOneOf(options, "N", current, "-n", "--names"))
             {
+                Log.Debug("Saw the NAMES command line option {TheOption} with the value {TheValue}", current, next);
+
                 i++; // eat the next argument
                 
                 if (retval.Names is not null)
@@ -212,10 +265,14 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             }
             else if (current.StartsWith('-'))
             {
+                Log.Debug("Saw an unknown command line option {TheOption}", current);
+
                 throw new VigoFatalException(AppEnv.Faults.Fatal($"Unknown command line option {current}"));
             }
             else
             {
+                Log.Debug("Registered a command line argument for handling in the next step {TheArg}", current);
+
                 cmdArgsWithoutOptions.Add(current);
             }
         }
