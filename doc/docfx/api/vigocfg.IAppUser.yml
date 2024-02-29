@@ -1,0 +1,448 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.IAppUser
+  commentId: T:vigocfg.IAppUser
+  id: IAppUser
+  parent: vigocfg
+  children:
+  - vigocfg.IAppUser.ActiveTags
+  - vigocfg.IAppUser.CleanTargetFolder
+  - vigocfg.IAppUser.FileStores
+  - vigocfg.IAppUser.SourceFolder
+  - vigocfg.IAppUser.TargetFolder
+  - vigocfg.IAppUser.UserName
+  langs:
+  - csharp
+  - vb
+  name: IAppUser
+  nameWithType: IAppUser
+  fullName: vigocfg.IAppUser
+  type: Interface
+  source:
+    remote:
+      path: src/vigocfg/IAppUser.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: IAppUser
+    path: ../src/vigocfg/IAppUser.cs
+    startLine: 2
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: public interface IAppUser
+    content.vb: Public Interface IAppUser
+- uid: vigocfg.IAppUser.UserName
+  commentId: P:vigocfg.IAppUser.UserName
+  id: UserName
+  parent: vigocfg.IAppUser
+  langs:
+  - csharp
+  - vb
+  name: UserName
+  nameWithType: IAppUser.UserName
+  fullName: vigocfg.IAppUser.UserName
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IAppUser.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: UserName
+    path: ../src/vigocfg/IAppUser.cs
+    startLine: 4
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: string UserName { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: ReadOnly Property UserName As String
+  overload: vigocfg.IAppUser.UserName*
+- uid: vigocfg.IAppUser.SourceFolder
+  commentId: P:vigocfg.IAppUser.SourceFolder
+  id: SourceFolder
+  parent: vigocfg.IAppUser
+  langs:
+  - csharp
+  - vb
+  name: SourceFolder
+  nameWithType: IAppUser.SourceFolder
+  fullName: vigocfg.IAppUser.SourceFolder
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IAppUser.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: SourceFolder
+    path: ../src/vigocfg/IAppUser.cs
+    startLine: 5
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: DirectoryInfo SourceFolder { get; }
+    parameters: []
+    return:
+      type: System.IO.DirectoryInfo
+    content.vb: ReadOnly Property SourceFolder As DirectoryInfo
+  overload: vigocfg.IAppUser.SourceFolder*
+- uid: vigocfg.IAppUser.TargetFolder
+  commentId: P:vigocfg.IAppUser.TargetFolder
+  id: TargetFolder
+  parent: vigocfg.IAppUser
+  langs:
+  - csharp
+  - vb
+  name: TargetFolder
+  nameWithType: IAppUser.TargetFolder
+  fullName: vigocfg.IAppUser.TargetFolder
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IAppUser.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TargetFolder
+    path: ../src/vigocfg/IAppUser.cs
+    startLine: 6
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: DirectoryInfo? TargetFolder { get; }
+    parameters: []
+    return:
+      type: System.IO.DirectoryInfo
+    content.vb: ReadOnly Property TargetFolder As DirectoryInfo
+  overload: vigocfg.IAppUser.TargetFolder*
+- uid: vigocfg.IAppUser.CleanTargetFolder
+  commentId: P:vigocfg.IAppUser.CleanTargetFolder
+  id: CleanTargetFolder
+  parent: vigocfg.IAppUser
+  langs:
+  - csharp
+  - vb
+  name: CleanTargetFolder
+  nameWithType: IAppUser.CleanTargetFolder
+  fullName: vigocfg.IAppUser.CleanTargetFolder
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IAppUser.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: CleanTargetFolder
+    path: ../src/vigocfg/IAppUser.cs
+    startLine: 7
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: bool CleanTargetFolder { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property CleanTargetFolder As Boolean
+  overload: vigocfg.IAppUser.CleanTargetFolder*
+- uid: vigocfg.IAppUser.ActiveTags
+  commentId: P:vigocfg.IAppUser.ActiveTags
+  id: ActiveTags
+  parent: vigocfg.IAppUser
+  langs:
+  - csharp
+  - vb
+  name: ActiveTags
+  nameWithType: IAppUser.ActiveTags
+  fullName: vigocfg.IAppUser.ActiveTags
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IAppUser.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: ActiveTags
+    path: ../src/vigocfg/IAppUser.cs
+    startLine: 8
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: IEnumerable<string> ActiveTags { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.IEnumerable{System.String}
+    content.vb: ReadOnly Property ActiveTags As IEnumerable(Of String)
+  overload: vigocfg.IAppUser.ActiveTags*
+- uid: vigocfg.IAppUser.FileStores
+  commentId: P:vigocfg.IAppUser.FileStores
+  id: FileStores
+  parent: vigocfg.IAppUser
+  langs:
+  - csharp
+  - vb
+  name: FileStores
+  nameWithType: IAppUser.FileStores
+  fullName: vigocfg.IAppUser.FileStores
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IAppUser.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: FileStores
+    path: ../src/vigocfg/IAppUser.cs
+    startLine: 9
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: IEnumerable<IAppUserFileStore> FileStores { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.IEnumerable{vigocfg.IAppUserFileStore}
+    content.vb: ReadOnly Property FileStores As IEnumerable(Of IAppUserFileStore)
+  overload: vigocfg.IAppUser.FileStores*
+references:
+- uid: vigocfg
+  commentId: N:vigocfg
+  href: vigocfg.html
+  name: vigocfg
+  nameWithType: vigocfg
+  fullName: vigocfg
+- uid: vigocfg.IAppUser.UserName*
+  commentId: Overload:vigocfg.IAppUser.UserName
+  href: vigocfg.IAppUser.html#vigocfg_IAppUser_UserName
+  name: UserName
+  nameWithType: IAppUser.UserName
+  fullName: vigocfg.IAppUser.UserName
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: vigocfg.IAppUser.SourceFolder*
+  commentId: Overload:vigocfg.IAppUser.SourceFolder
+  href: vigocfg.IAppUser.html#vigocfg_IAppUser_SourceFolder
+  name: SourceFolder
+  nameWithType: IAppUser.SourceFolder
+  fullName: vigocfg.IAppUser.SourceFolder
+- uid: System.IO.DirectoryInfo
+  commentId: T:System.IO.DirectoryInfo
+  parent: System.IO
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.io.directoryinfo
+  name: DirectoryInfo
+  nameWithType: DirectoryInfo
+  fullName: System.IO.DirectoryInfo
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.io
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.io
+- uid: vigocfg.IAppUser.TargetFolder*
+  commentId: Overload:vigocfg.IAppUser.TargetFolder
+  href: vigocfg.IAppUser.html#vigocfg_IAppUser_TargetFolder
+  name: TargetFolder
+  nameWithType: IAppUser.TargetFolder
+  fullName: vigocfg.IAppUser.TargetFolder
+- uid: vigocfg.IAppUser.CleanTargetFolder*
+  commentId: Overload:vigocfg.IAppUser.CleanTargetFolder
+  href: vigocfg.IAppUser.html#vigocfg_IAppUser_CleanTargetFolder
+  name: CleanTargetFolder
+  nameWithType: IAppUser.CleanTargetFolder
+  fullName: vigocfg.IAppUser.CleanTargetFolder
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: vigocfg.IAppUser.ActiveTags*
+  commentId: Overload:vigocfg.IAppUser.ActiveTags
+  href: vigocfg.IAppUser.html#vigocfg_IAppUser_ActiveTags
+  name: ActiveTags
+  nameWithType: IAppUser.ActiveTags
+  fullName: vigocfg.IAppUser.ActiveTags
+- uid: System.Collections.Generic.IEnumerable{System.String}
+  commentId: T:System.Collections.Generic.IEnumerable{System.String}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<string>
+  nameWithType: IEnumerable<string>
+  fullName: System.Collections.Generic.IEnumerable<string>
+  nameWithType.vb: IEnumerable(Of String)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of String)
+  name.vb: IEnumerable(Of String)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: vigocfg.IAppUser.FileStores*
+  commentId: Overload:vigocfg.IAppUser.FileStores
+  href: vigocfg.IAppUser.html#vigocfg_IAppUser_FileStores
+  name: FileStores
+  nameWithType: IAppUser.FileStores
+  fullName: vigocfg.IAppUser.FileStores
+- uid: System.Collections.Generic.IEnumerable{vigocfg.IAppUserFileStore}
+  commentId: T:System.Collections.Generic.IEnumerable{vigocfg.IAppUserFileStore}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<IAppUserFileStore>
+  nameWithType: IEnumerable<IAppUserFileStore>
+  fullName: System.Collections.Generic.IEnumerable<vigocfg.IAppUserFileStore>
+  nameWithType.vb: IEnumerable(Of IAppUserFileStore)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of vigocfg.IAppUserFileStore)
+  name.vb: IEnumerable(Of IAppUserFileStore)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: vigocfg.IAppUserFileStore
+    name: IAppUserFileStore
+    href: vigocfg.IAppUserFileStore.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: vigocfg.IAppUserFileStore
+    name: IAppUserFileStore
+    href: vigocfg.IAppUserFileStore.html
+  - name: )

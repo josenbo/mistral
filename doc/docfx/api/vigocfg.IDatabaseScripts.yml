@@ -1,0 +1,440 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.IDatabaseScripts
+  commentId: T:vigocfg.IDatabaseScripts
+  id: IDatabaseScripts
+  parent: vigocfg
+  children:
+  - vigocfg.IDatabaseScripts.CleanTargetFolder
+  - vigocfg.IDatabaseScripts.SourceEncoding
+  - vigocfg.IDatabaseScripts.SourceFileType
+  - vigocfg.IDatabaseScripts.SourceFolder
+  - vigocfg.IDatabaseScripts.TargetAppendFinalNewline
+  - vigocfg.IDatabaseScripts.TargetEncoding
+  - vigocfg.IDatabaseScripts.TargetFilePermission
+  - vigocfg.IDatabaseScripts.TargetFolder
+  - vigocfg.IDatabaseScripts.TargetLineEnding
+  langs:
+  - csharp
+  - vb
+  name: IDatabaseScripts
+  nameWithType: IDatabaseScripts
+  fullName: vigocfg.IDatabaseScripts
+  type: Interface
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: IDatabaseScripts
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 2
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: public interface IDatabaseScripts
+    content.vb: Public Interface IDatabaseScripts
+- uid: vigocfg.IDatabaseScripts.SourceFolder
+  commentId: P:vigocfg.IDatabaseScripts.SourceFolder
+  id: SourceFolder
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: SourceFolder
+  nameWithType: IDatabaseScripts.SourceFolder
+  fullName: vigocfg.IDatabaseScripts.SourceFolder
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: SourceFolder
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 4
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: DirectoryInfo SourceFolder { get; }
+    parameters: []
+    return:
+      type: System.IO.DirectoryInfo
+    content.vb: ReadOnly Property SourceFolder As DirectoryInfo
+  overload: vigocfg.IDatabaseScripts.SourceFolder*
+- uid: vigocfg.IDatabaseScripts.TargetFolder
+  commentId: P:vigocfg.IDatabaseScripts.TargetFolder
+  id: TargetFolder
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: TargetFolder
+  nameWithType: IDatabaseScripts.TargetFolder
+  fullName: vigocfg.IDatabaseScripts.TargetFolder
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TargetFolder
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 5
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: DirectoryInfo? TargetFolder { get; }
+    parameters: []
+    return:
+      type: System.IO.DirectoryInfo
+    content.vb: ReadOnly Property TargetFolder As DirectoryInfo
+  overload: vigocfg.IDatabaseScripts.TargetFolder*
+- uid: vigocfg.IDatabaseScripts.CleanTargetFolder
+  commentId: P:vigocfg.IDatabaseScripts.CleanTargetFolder
+  id: CleanTargetFolder
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: CleanTargetFolder
+  nameWithType: IDatabaseScripts.CleanTargetFolder
+  fullName: vigocfg.IDatabaseScripts.CleanTargetFolder
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: CleanTargetFolder
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 6
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: bool CleanTargetFolder { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property CleanTargetFolder As Boolean
+  overload: vigocfg.IDatabaseScripts.CleanTargetFolder*
+- uid: vigocfg.IDatabaseScripts.SourceFileType
+  commentId: P:vigocfg.IDatabaseScripts.SourceFileType
+  id: SourceFileType
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: SourceFileType
+  nameWithType: IDatabaseScripts.SourceFileType
+  fullName: vigocfg.IDatabaseScripts.SourceFileType
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: SourceFileType
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 7
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: FileTypeEnum SourceFileType { get; }
+    parameters: []
+    return:
+      type: vigocfg.FileTypeEnum
+    content.vb: ReadOnly Property SourceFileType As FileTypeEnum
+  overload: vigocfg.IDatabaseScripts.SourceFileType*
+- uid: vigocfg.IDatabaseScripts.SourceEncoding
+  commentId: P:vigocfg.IDatabaseScripts.SourceEncoding
+  id: SourceEncoding
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: SourceEncoding
+  nameWithType: IDatabaseScripts.SourceEncoding
+  fullName: vigocfg.IDatabaseScripts.SourceEncoding
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: SourceEncoding
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 8
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: FileEncodingEnum SourceEncoding { get; }
+    parameters: []
+    return:
+      type: vigocfg.FileEncodingEnum
+    content.vb: ReadOnly Property SourceEncoding As FileEncodingEnum
+  overload: vigocfg.IDatabaseScripts.SourceEncoding*
+- uid: vigocfg.IDatabaseScripts.TargetFilePermission
+  commentId: P:vigocfg.IDatabaseScripts.TargetFilePermission
+  id: TargetFilePermission
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: TargetFilePermission
+  nameWithType: IDatabaseScripts.TargetFilePermission
+  fullName: vigocfg.IDatabaseScripts.TargetFilePermission
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TargetFilePermission
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 9
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: FilePermissionValue TargetFilePermission { get; }
+    parameters: []
+    return:
+      type: vigocfg.FilePermissionValue
+    content.vb: ReadOnly Property TargetFilePermission As FilePermissionValue
+  overload: vigocfg.IDatabaseScripts.TargetFilePermission*
+- uid: vigocfg.IDatabaseScripts.TargetEncoding
+  commentId: P:vigocfg.IDatabaseScripts.TargetEncoding
+  id: TargetEncoding
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: TargetEncoding
+  nameWithType: IDatabaseScripts.TargetEncoding
+  fullName: vigocfg.IDatabaseScripts.TargetEncoding
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TargetEncoding
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 10
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: FileEncodingEnum TargetEncoding { get; }
+    parameters: []
+    return:
+      type: vigocfg.FileEncodingEnum
+    content.vb: ReadOnly Property TargetEncoding As FileEncodingEnum
+  overload: vigocfg.IDatabaseScripts.TargetEncoding*
+- uid: vigocfg.IDatabaseScripts.TargetLineEnding
+  commentId: P:vigocfg.IDatabaseScripts.TargetLineEnding
+  id: TargetLineEnding
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: TargetLineEnding
+  nameWithType: IDatabaseScripts.TargetLineEnding
+  fullName: vigocfg.IDatabaseScripts.TargetLineEnding
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TargetLineEnding
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 11
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: LineEndingEnum TargetLineEnding { get; }
+    parameters: []
+    return:
+      type: vigocfg.LineEndingEnum
+    content.vb: ReadOnly Property TargetLineEnding As LineEndingEnum
+  overload: vigocfg.IDatabaseScripts.TargetLineEnding*
+- uid: vigocfg.IDatabaseScripts.TargetAppendFinalNewline
+  commentId: P:vigocfg.IDatabaseScripts.TargetAppendFinalNewline
+  id: TargetAppendFinalNewline
+  parent: vigocfg.IDatabaseScripts
+  langs:
+  - csharp
+  - vb
+  name: TargetAppendFinalNewline
+  nameWithType: IDatabaseScripts.TargetAppendFinalNewline
+  fullName: vigocfg.IDatabaseScripts.TargetAppendFinalNewline
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IDatabaseScripts.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TargetAppendFinalNewline
+    path: ../src/vigocfg/IDatabaseScripts.cs
+    startLine: 12
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: bool TargetAppendFinalNewline { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property TargetAppendFinalNewline As Boolean
+  overload: vigocfg.IDatabaseScripts.TargetAppendFinalNewline*
+references:
+- uid: vigocfg
+  commentId: N:vigocfg
+  href: vigocfg.html
+  name: vigocfg
+  nameWithType: vigocfg
+  fullName: vigocfg
+- uid: vigocfg.IDatabaseScripts.SourceFolder*
+  commentId: Overload:vigocfg.IDatabaseScripts.SourceFolder
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_SourceFolder
+  name: SourceFolder
+  nameWithType: IDatabaseScripts.SourceFolder
+  fullName: vigocfg.IDatabaseScripts.SourceFolder
+- uid: System.IO.DirectoryInfo
+  commentId: T:System.IO.DirectoryInfo
+  parent: System.IO
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.io.directoryinfo
+  name: DirectoryInfo
+  nameWithType: DirectoryInfo
+  fullName: System.IO.DirectoryInfo
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.io
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.io
+- uid: vigocfg.IDatabaseScripts.TargetFolder*
+  commentId: Overload:vigocfg.IDatabaseScripts.TargetFolder
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_TargetFolder
+  name: TargetFolder
+  nameWithType: IDatabaseScripts.TargetFolder
+  fullName: vigocfg.IDatabaseScripts.TargetFolder
+- uid: vigocfg.IDatabaseScripts.CleanTargetFolder*
+  commentId: Overload:vigocfg.IDatabaseScripts.CleanTargetFolder
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_CleanTargetFolder
+  name: CleanTargetFolder
+  nameWithType: IDatabaseScripts.CleanTargetFolder
+  fullName: vigocfg.IDatabaseScripts.CleanTargetFolder
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: vigocfg.IDatabaseScripts.SourceFileType*
+  commentId: Overload:vigocfg.IDatabaseScripts.SourceFileType
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_SourceFileType
+  name: SourceFileType
+  nameWithType: IDatabaseScripts.SourceFileType
+  fullName: vigocfg.IDatabaseScripts.SourceFileType
+- uid: vigocfg.FileTypeEnum
+  commentId: T:vigocfg.FileTypeEnum
+  parent: vigocfg
+  href: vigocfg.FileTypeEnum.html
+  name: FileTypeEnum
+  nameWithType: FileTypeEnum
+  fullName: vigocfg.FileTypeEnum
+- uid: vigocfg.IDatabaseScripts.SourceEncoding*
+  commentId: Overload:vigocfg.IDatabaseScripts.SourceEncoding
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_SourceEncoding
+  name: SourceEncoding
+  nameWithType: IDatabaseScripts.SourceEncoding
+  fullName: vigocfg.IDatabaseScripts.SourceEncoding
+- uid: vigocfg.FileEncodingEnum
+  commentId: T:vigocfg.FileEncodingEnum
+  parent: vigocfg
+  href: vigocfg.FileEncodingEnum.html
+  name: FileEncodingEnum
+  nameWithType: FileEncodingEnum
+  fullName: vigocfg.FileEncodingEnum
+- uid: vigocfg.IDatabaseScripts.TargetFilePermission*
+  commentId: Overload:vigocfg.IDatabaseScripts.TargetFilePermission
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_TargetFilePermission
+  name: TargetFilePermission
+  nameWithType: IDatabaseScripts.TargetFilePermission
+  fullName: vigocfg.IDatabaseScripts.TargetFilePermission
+- uid: vigocfg.FilePermissionValue
+  commentId: T:vigocfg.FilePermissionValue
+  parent: vigocfg
+  href: vigocfg.FilePermissionValue.html
+  name: FilePermissionValue
+  nameWithType: FilePermissionValue
+  fullName: vigocfg.FilePermissionValue
+- uid: vigocfg.IDatabaseScripts.TargetEncoding*
+  commentId: Overload:vigocfg.IDatabaseScripts.TargetEncoding
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_TargetEncoding
+  name: TargetEncoding
+  nameWithType: IDatabaseScripts.TargetEncoding
+  fullName: vigocfg.IDatabaseScripts.TargetEncoding
+- uid: vigocfg.IDatabaseScripts.TargetLineEnding*
+  commentId: Overload:vigocfg.IDatabaseScripts.TargetLineEnding
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_TargetLineEnding
+  name: TargetLineEnding
+  nameWithType: IDatabaseScripts.TargetLineEnding
+  fullName: vigocfg.IDatabaseScripts.TargetLineEnding
+- uid: vigocfg.LineEndingEnum
+  commentId: T:vigocfg.LineEndingEnum
+  parent: vigocfg
+  href: vigocfg.LineEndingEnum.html
+  name: LineEndingEnum
+  nameWithType: LineEndingEnum
+  fullName: vigocfg.LineEndingEnum
+- uid: vigocfg.IDatabaseScripts.TargetAppendFinalNewline*
+  commentId: Overload:vigocfg.IDatabaseScripts.TargetAppendFinalNewline
+  href: vigocfg.IDatabaseScripts.html#vigocfg_IDatabaseScripts_TargetAppendFinalNewline
+  name: TargetAppendFinalNewline
+  nameWithType: IDatabaseScripts.TargetAppendFinalNewline
+  fullName: vigocfg.IDatabaseScripts.TargetAppendFinalNewline

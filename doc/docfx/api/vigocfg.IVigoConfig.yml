@@ -1,0 +1,341 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.IVigoConfig
+  commentId: T:vigocfg.IVigoConfig
+  id: IVigoConfig
+  parent: vigocfg
+  children:
+  - vigocfg.IVigoConfig.AppUsers
+  - vigocfg.IVigoConfig.DatabaseScripts
+  - vigocfg.IVigoConfig.FileSystemEnv
+  - vigocfg.IVigoConfig.NameParserConfig
+  - vigocfg.IVigoConfig.StagingEnvironment
+  langs:
+  - csharp
+  - vb
+  name: IVigoConfig
+  nameWithType: IVigoConfig
+  fullName: vigocfg.IVigoConfig
+  type: Interface
+  source:
+    remote:
+      path: src/vigocfg/IVigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: IVigoConfig
+    path: ../src/vigocfg/IVigoConfig.cs
+    startLine: 2
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: public interface IVigoConfig
+    content.vb: Public Interface IVigoConfig
+- uid: vigocfg.IVigoConfig.FileSystemEnv
+  commentId: P:vigocfg.IVigoConfig.FileSystemEnv
+  id: FileSystemEnv
+  parent: vigocfg.IVigoConfig
+  langs:
+  - csharp
+  - vb
+  name: FileSystemEnv
+  nameWithType: IVigoConfig.FileSystemEnv
+  fullName: vigocfg.IVigoConfig.FileSystemEnv
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IVigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: FileSystemEnv
+    path: ../src/vigocfg/IVigoConfig.cs
+    startLine: 4
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: IFileSystemEnvironment FileSystemEnv { get; }
+    parameters: []
+    return:
+      type: vigocfg.IFileSystemEnvironment
+    content.vb: ReadOnly Property FileSystemEnv As IFileSystemEnvironment
+  overload: vigocfg.IVigoConfig.FileSystemEnv*
+- uid: vigocfg.IVigoConfig.NameParserConfig
+  commentId: P:vigocfg.IVigoConfig.NameParserConfig
+  id: NameParserConfig
+  parent: vigocfg.IVigoConfig
+  langs:
+  - csharp
+  - vb
+  name: NameParserConfig
+  nameWithType: IVigoConfig.NameParserConfig
+  fullName: vigocfg.IVigoConfig.NameParserConfig
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IVigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: NameParserConfig
+    path: ../src/vigocfg/IVigoConfig.cs
+    startLine: 5
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: INameParserConfig NameParserConfig { get; }
+    parameters: []
+    return:
+      type: vigocfg.INameParserConfig
+    content.vb: ReadOnly Property NameParserConfig As INameParserConfig
+  overload: vigocfg.IVigoConfig.NameParserConfig*
+- uid: vigocfg.IVigoConfig.AppUsers
+  commentId: P:vigocfg.IVigoConfig.AppUsers
+  id: AppUsers
+  parent: vigocfg.IVigoConfig
+  langs:
+  - csharp
+  - vb
+  name: AppUsers
+  nameWithType: IVigoConfig.AppUsers
+  fullName: vigocfg.IVigoConfig.AppUsers
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IVigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: AppUsers
+    path: ../src/vigocfg/IVigoConfig.cs
+    startLine: 6
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: IEnumerable<IAppUser> AppUsers { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.IEnumerable{vigocfg.IAppUser}
+    content.vb: ReadOnly Property AppUsers As IEnumerable(Of IAppUser)
+  overload: vigocfg.IVigoConfig.AppUsers*
+- uid: vigocfg.IVigoConfig.DatabaseScripts
+  commentId: P:vigocfg.IVigoConfig.DatabaseScripts
+  id: DatabaseScripts
+  parent: vigocfg.IVigoConfig
+  langs:
+  - csharp
+  - vb
+  name: DatabaseScripts
+  nameWithType: IVigoConfig.DatabaseScripts
+  fullName: vigocfg.IVigoConfig.DatabaseScripts
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IVigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: DatabaseScripts
+    path: ../src/vigocfg/IVigoConfig.cs
+    startLine: 7
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: IDatabaseScripts DatabaseScripts { get; }
+    parameters: []
+    return:
+      type: vigocfg.IDatabaseScripts
+    content.vb: ReadOnly Property DatabaseScripts As IDatabaseScripts
+  overload: vigocfg.IVigoConfig.DatabaseScripts*
+- uid: vigocfg.IVigoConfig.StagingEnvironment
+  commentId: P:vigocfg.IVigoConfig.StagingEnvironment
+  id: StagingEnvironment
+  parent: vigocfg.IVigoConfig
+  langs:
+  - csharp
+  - vb
+  name: StagingEnvironment
+  nameWithType: IVigoConfig.StagingEnvironment
+  fullName: vigocfg.IVigoConfig.StagingEnvironment
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/IVigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: StagingEnvironment
+    path: ../src/vigocfg/IVigoConfig.cs
+    startLine: 8
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: IStagingEnvironment StagingEnvironment { get; }
+    parameters: []
+    return:
+      type: vigocfg.IStagingEnvironment
+    content.vb: ReadOnly Property StagingEnvironment As IStagingEnvironment
+  overload: vigocfg.IVigoConfig.StagingEnvironment*
+references:
+- uid: vigocfg
+  commentId: N:vigocfg
+  href: vigocfg.html
+  name: vigocfg
+  nameWithType: vigocfg
+  fullName: vigocfg
+- uid: vigocfg.IVigoConfig.FileSystemEnv*
+  commentId: Overload:vigocfg.IVigoConfig.FileSystemEnv
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_FileSystemEnv
+  name: FileSystemEnv
+  nameWithType: IVigoConfig.FileSystemEnv
+  fullName: vigocfg.IVigoConfig.FileSystemEnv
+- uid: vigocfg.IFileSystemEnvironment
+  commentId: T:vigocfg.IFileSystemEnvironment
+  parent: vigocfg
+  href: vigocfg.IFileSystemEnvironment.html
+  name: IFileSystemEnvironment
+  nameWithType: IFileSystemEnvironment
+  fullName: vigocfg.IFileSystemEnvironment
+- uid: vigocfg.IVigoConfig.NameParserConfig*
+  commentId: Overload:vigocfg.IVigoConfig.NameParserConfig
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_NameParserConfig
+  name: NameParserConfig
+  nameWithType: IVigoConfig.NameParserConfig
+  fullName: vigocfg.IVigoConfig.NameParserConfig
+- uid: vigocfg.INameParserConfig
+  commentId: T:vigocfg.INameParserConfig
+  parent: vigocfg
+  href: vigocfg.INameParserConfig.html
+  name: INameParserConfig
+  nameWithType: INameParserConfig
+  fullName: vigocfg.INameParserConfig
+- uid: vigocfg.IVigoConfig.AppUsers*
+  commentId: Overload:vigocfg.IVigoConfig.AppUsers
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_AppUsers
+  name: AppUsers
+  nameWithType: IVigoConfig.AppUsers
+  fullName: vigocfg.IVigoConfig.AppUsers
+- uid: System.Collections.Generic.IEnumerable{vigocfg.IAppUser}
+  commentId: T:System.Collections.Generic.IEnumerable{vigocfg.IAppUser}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<IAppUser>
+  nameWithType: IEnumerable<IAppUser>
+  fullName: System.Collections.Generic.IEnumerable<vigocfg.IAppUser>
+  nameWithType.vb: IEnumerable(Of IAppUser)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of vigocfg.IAppUser)
+  name.vb: IEnumerable(Of IAppUser)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: vigocfg.IAppUser
+    name: IAppUser
+    href: vigocfg.IAppUser.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: vigocfg.IAppUser
+    name: IAppUser
+    href: vigocfg.IAppUser.html
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: vigocfg.IVigoConfig.DatabaseScripts*
+  commentId: Overload:vigocfg.IVigoConfig.DatabaseScripts
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_DatabaseScripts
+  name: DatabaseScripts
+  nameWithType: IVigoConfig.DatabaseScripts
+  fullName: vigocfg.IVigoConfig.DatabaseScripts
+- uid: vigocfg.IDatabaseScripts
+  commentId: T:vigocfg.IDatabaseScripts
+  parent: vigocfg
+  href: vigocfg.IDatabaseScripts.html
+  name: IDatabaseScripts
+  nameWithType: IDatabaseScripts
+  fullName: vigocfg.IDatabaseScripts
+- uid: vigocfg.IVigoConfig.StagingEnvironment*
+  commentId: Overload:vigocfg.IVigoConfig.StagingEnvironment
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_StagingEnvironment
+  name: StagingEnvironment
+  nameWithType: IVigoConfig.StagingEnvironment
+  fullName: vigocfg.IVigoConfig.StagingEnvironment
+- uid: vigocfg.IStagingEnvironment
+  commentId: T:vigocfg.IStagingEnvironment
+  parent: vigocfg
+  href: vigocfg.IStagingEnvironment.html
+  name: IStagingEnvironment
+  nameWithType: IStagingEnvironment
+  fullName: vigocfg.IStagingEnvironment

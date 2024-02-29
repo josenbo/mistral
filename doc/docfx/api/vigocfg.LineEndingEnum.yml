@@ -1,0 +1,294 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.LineEndingEnum
+  commentId: T:vigocfg.LineEndingEnum
+  id: LineEndingEnum
+  parent: vigocfg
+  children:
+  - vigocfg.LineEndingEnum.CR_LF
+  - vigocfg.LineEndingEnum.LF
+  - vigocfg.LineEndingEnum.Undefined
+  langs:
+  - csharp
+  - vb
+  name: LineEndingEnum
+  nameWithType: LineEndingEnum
+  fullName: vigocfg.LineEndingEnum
+  type: Enum
+  source:
+    remote:
+      path: src/vigocfg/LineEndingEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: LineEndingEnum
+    path: ../src/vigocfg/LineEndingEnum.cs
+    startLine: 4
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: >-
+      [PublicAPI]
+
+      public enum LineEndingEnum
+    content.vb: >-
+      <PublicAPI>
+
+      Public Enum LineEndingEnum
+  extensionMethods:
+  - vigocfg.LineEndingEnum.vigocfg.LineEndingEnumHelper.IsDefined
+  - vigocfg.LineEndingEnum.vigocfg.LineEndingEnumHelper.IsDefinedAndValid
+  - vigocfg.LineEndingEnum.vigocfg.LineEndingEnumHelper.ToNewlineSequence
+  attributes:
+  - type: JetBrains.Annotations.PublicAPIAttribute
+    ctor: JetBrains.Annotations.PublicAPIAttribute.#ctor
+    arguments: []
+- uid: vigocfg.LineEndingEnum.Undefined
+  commentId: F:vigocfg.LineEndingEnum.Undefined
+  id: Undefined
+  parent: vigocfg.LineEndingEnum
+  langs:
+  - csharp
+  - vb
+  name: Undefined
+  nameWithType: LineEndingEnum.Undefined
+  fullName: vigocfg.LineEndingEnum.Undefined
+  type: Field
+  source:
+    remote:
+      path: src/vigocfg/LineEndingEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: Undefined
+    path: ../src/vigocfg/LineEndingEnum.cs
+    startLine: 7
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: Undefined = 0
+    return:
+      type: vigocfg.LineEndingEnum
+- uid: vigocfg.LineEndingEnum.LF
+  commentId: F:vigocfg.LineEndingEnum.LF
+  id: LF
+  parent: vigocfg.LineEndingEnum
+  langs:
+  - csharp
+  - vb
+  name: LF
+  nameWithType: LineEndingEnum.LF
+  fullName: vigocfg.LineEndingEnum.LF
+  type: Field
+  source:
+    remote:
+      path: src/vigocfg/LineEndingEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: LF
+    path: ../src/vigocfg/LineEndingEnum.cs
+    startLine: 10
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: LF = 113001
+    return:
+      type: vigocfg.LineEndingEnum
+- uid: vigocfg.LineEndingEnum.CR_LF
+  commentId: F:vigocfg.LineEndingEnum.CR_LF
+  id: CR_LF
+  parent: vigocfg.LineEndingEnum
+  langs:
+  - csharp
+  - vb
+  name: CR_LF
+  nameWithType: LineEndingEnum.CR_LF
+  fullName: vigocfg.LineEndingEnum.CR_LF
+  type: Field
+  source:
+    remote:
+      path: src/vigocfg/LineEndingEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: CR_LF
+    path: ../src/vigocfg/LineEndingEnum.cs
+    startLine: 12
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: CR_LF = 113003
+    return:
+      type: vigocfg.LineEndingEnum
+references:
+- uid: vigocfg
+  commentId: N:vigocfg
+  href: vigocfg.html
+  name: vigocfg
+  nameWithType: vigocfg
+  fullName: vigocfg
+- uid: vigocfg.LineEndingEnum.vigocfg.LineEndingEnumHelper.IsDefined
+  commentId: M:vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+  parent: vigocfg.LineEndingEnumHelper
+  definition: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+  href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefined_vigocfg_LineEndingEnum_
+  name: IsDefined(LineEndingEnum)
+  nameWithType: LineEndingEnumHelper.IsDefined(LineEndingEnum)
+  fullName: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+  spec.csharp:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+    name: IsDefined
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefined_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+    name: IsDefined
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefined_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+- uid: vigocfg.LineEndingEnum.vigocfg.LineEndingEnumHelper.IsDefinedAndValid
+  commentId: M:vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+  parent: vigocfg.LineEndingEnumHelper
+  definition: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+  href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefinedAndValid_vigocfg_LineEndingEnum_
+  name: IsDefinedAndValid(LineEndingEnum)
+  nameWithType: LineEndingEnumHelper.IsDefinedAndValid(LineEndingEnum)
+  fullName: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+  spec.csharp:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefinedAndValid_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefinedAndValid_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+- uid: vigocfg.LineEndingEnum.vigocfg.LineEndingEnumHelper.ToNewlineSequence
+  commentId: M:vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+  parent: vigocfg.LineEndingEnumHelper
+  definition: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+  href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_ToNewlineSequence_vigocfg_LineEndingEnum_
+  name: ToNewlineSequence(LineEndingEnum)
+  nameWithType: LineEndingEnumHelper.ToNewlineSequence(LineEndingEnum)
+  fullName: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+  spec.csharp:
+  - uid: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+    name: ToNewlineSequence
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_ToNewlineSequence_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+    name: ToNewlineSequence
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_ToNewlineSequence_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+- uid: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+  commentId: M:vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+  href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefined_vigocfg_LineEndingEnum_
+  name: IsDefined(LineEndingEnum)
+  nameWithType: LineEndingEnumHelper.IsDefined(LineEndingEnum)
+  fullName: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+  spec.csharp:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+    name: IsDefined
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefined_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefined(vigocfg.LineEndingEnum)
+    name: IsDefined
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefined_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+- uid: vigocfg.LineEndingEnumHelper
+  commentId: T:vigocfg.LineEndingEnumHelper
+  parent: vigocfg
+  href: vigocfg.LineEndingEnumHelper.html
+  name: LineEndingEnumHelper
+  nameWithType: LineEndingEnumHelper
+  fullName: vigocfg.LineEndingEnumHelper
+- uid: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+  commentId: M:vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+  href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefinedAndValid_vigocfg_LineEndingEnum_
+  name: IsDefinedAndValid(LineEndingEnum)
+  nameWithType: LineEndingEnumHelper.IsDefinedAndValid(LineEndingEnum)
+  fullName: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+  spec.csharp:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefinedAndValid_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.LineEndingEnumHelper.IsDefinedAndValid(vigocfg.LineEndingEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_IsDefinedAndValid_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+- uid: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+  commentId: M:vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+  href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_ToNewlineSequence_vigocfg_LineEndingEnum_
+  name: ToNewlineSequence(LineEndingEnum)
+  nameWithType: LineEndingEnumHelper.ToNewlineSequence(LineEndingEnum)
+  fullName: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+  spec.csharp:
+  - uid: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+    name: ToNewlineSequence
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_ToNewlineSequence_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.LineEndingEnumHelper.ToNewlineSequence(vigocfg.LineEndingEnum)
+    name: ToNewlineSequence
+    href: vigocfg.LineEndingEnumHelper.html#vigocfg_LineEndingEnumHelper_ToNewlineSequence_vigocfg_LineEndingEnum_
+  - name: (
+  - uid: vigocfg.LineEndingEnum
+    name: LineEndingEnum
+    href: vigocfg.LineEndingEnum.html
+  - name: )
+- uid: vigocfg.LineEndingEnum
+  commentId: T:vigocfg.LineEndingEnum
+  parent: vigocfg
+  href: vigocfg.LineEndingEnum.html
+  name: LineEndingEnum
+  nameWithType: LineEndingEnum
+  fullName: vigocfg.LineEndingEnum

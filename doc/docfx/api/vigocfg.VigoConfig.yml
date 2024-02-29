@@ -1,0 +1,728 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.VigoConfig
+  commentId: T:vigocfg.VigoConfig
+  id: VigoConfig
+  parent: vigocfg
+  children:
+  - vigocfg.VigoConfig.#ctor(vigocfg.Settings.Configuration)
+  - vigocfg.VigoConfig.AppUsers
+  - vigocfg.VigoConfig.DatabaseScripts
+  - vigocfg.VigoConfig.FileSystemEnv
+  - vigocfg.VigoConfig.NameParserConfig
+  - vigocfg.VigoConfig.StagingEnvironment
+  langs:
+  - csharp
+  - vb
+  name: VigoConfig
+  nameWithType: VigoConfig
+  fullName: vigocfg.VigoConfig
+  type: Class
+  source:
+    remote:
+      path: src/vigocfg/VigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: VigoConfig
+    path: ../src/vigocfg/VigoConfig.cs
+    startLine: 5
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: >-
+      [PublicAPI]
+
+      public class VigoConfig : IVigoConfig
+    content.vb: >-
+      <PublicAPI>
+
+      Public Class VigoConfig Implements IVigoConfig
+  inheritance:
+  - System.Object
+  implements:
+  - vigocfg.IVigoConfig
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  attributes:
+  - type: JetBrains.Annotations.PublicAPIAttribute
+    ctor: JetBrains.Annotations.PublicAPIAttribute.#ctor
+    arguments: []
+- uid: vigocfg.VigoConfig.FileSystemEnv
+  commentId: P:vigocfg.VigoConfig.FileSystemEnv
+  id: FileSystemEnv
+  parent: vigocfg.VigoConfig
+  langs:
+  - csharp
+  - vb
+  name: FileSystemEnv
+  nameWithType: VigoConfig.FileSystemEnv
+  fullName: vigocfg.VigoConfig.FileSystemEnv
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/VigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: FileSystemEnv
+    path: ../src/vigocfg/VigoConfig.cs
+    startLine: 8
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  example: []
+  syntax:
+    content: public IFileSystemEnvironment FileSystemEnv { get; }
+    parameters: []
+    return:
+      type: vigocfg.IFileSystemEnvironment
+    content.vb: Public ReadOnly Property FileSystemEnv As IFileSystemEnvironment
+  overload: vigocfg.VigoConfig.FileSystemEnv*
+  implements:
+  - vigocfg.IVigoConfig.FileSystemEnv
+- uid: vigocfg.VigoConfig.NameParserConfig
+  commentId: P:vigocfg.VigoConfig.NameParserConfig
+  id: NameParserConfig
+  parent: vigocfg.VigoConfig
+  langs:
+  - csharp
+  - vb
+  name: NameParserConfig
+  nameWithType: VigoConfig.NameParserConfig
+  fullName: vigocfg.VigoConfig.NameParserConfig
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/VigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: NameParserConfig
+    path: ../src/vigocfg/VigoConfig.cs
+    startLine: 9
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  example: []
+  syntax:
+    content: public INameParserConfig NameParserConfig { get; }
+    parameters: []
+    return:
+      type: vigocfg.INameParserConfig
+    content.vb: Public ReadOnly Property NameParserConfig As INameParserConfig
+  overload: vigocfg.VigoConfig.NameParserConfig*
+  implements:
+  - vigocfg.IVigoConfig.NameParserConfig
+- uid: vigocfg.VigoConfig.AppUsers
+  commentId: P:vigocfg.VigoConfig.AppUsers
+  id: AppUsers
+  parent: vigocfg.VigoConfig
+  langs:
+  - csharp
+  - vb
+  name: AppUsers
+  nameWithType: VigoConfig.AppUsers
+  fullName: vigocfg.VigoConfig.AppUsers
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/VigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: AppUsers
+    path: ../src/vigocfg/VigoConfig.cs
+    startLine: 10
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  example: []
+  syntax:
+    content: public IEnumerable<IAppUser> AppUsers { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.IEnumerable{vigocfg.IAppUser}
+    content.vb: Public ReadOnly Property AppUsers As IEnumerable(Of IAppUser)
+  overload: vigocfg.VigoConfig.AppUsers*
+  implements:
+  - vigocfg.IVigoConfig.AppUsers
+- uid: vigocfg.VigoConfig.DatabaseScripts
+  commentId: P:vigocfg.VigoConfig.DatabaseScripts
+  id: DatabaseScripts
+  parent: vigocfg.VigoConfig
+  langs:
+  - csharp
+  - vb
+  name: DatabaseScripts
+  nameWithType: VigoConfig.DatabaseScripts
+  fullName: vigocfg.VigoConfig.DatabaseScripts
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/VigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: DatabaseScripts
+    path: ../src/vigocfg/VigoConfig.cs
+    startLine: 11
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  example: []
+  syntax:
+    content: public IDatabaseScripts DatabaseScripts { get; }
+    parameters: []
+    return:
+      type: vigocfg.IDatabaseScripts
+    content.vb: Public ReadOnly Property DatabaseScripts As IDatabaseScripts
+  overload: vigocfg.VigoConfig.DatabaseScripts*
+  implements:
+  - vigocfg.IVigoConfig.DatabaseScripts
+- uid: vigocfg.VigoConfig.StagingEnvironment
+  commentId: P:vigocfg.VigoConfig.StagingEnvironment
+  id: StagingEnvironment
+  parent: vigocfg.VigoConfig
+  langs:
+  - csharp
+  - vb
+  name: StagingEnvironment
+  nameWithType: VigoConfig.StagingEnvironment
+  fullName: vigocfg.VigoConfig.StagingEnvironment
+  type: Property
+  source:
+    remote:
+      path: src/vigocfg/VigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: StagingEnvironment
+    path: ../src/vigocfg/VigoConfig.cs
+    startLine: 12
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  example: []
+  syntax:
+    content: public IStagingEnvironment StagingEnvironment { get; }
+    parameters: []
+    return:
+      type: vigocfg.IStagingEnvironment
+    content.vb: Public ReadOnly Property StagingEnvironment As IStagingEnvironment
+  overload: vigocfg.VigoConfig.StagingEnvironment*
+  implements:
+  - vigocfg.IVigoConfig.StagingEnvironment
+- uid: vigocfg.VigoConfig.#ctor(vigocfg.Settings.Configuration)
+  commentId: M:vigocfg.VigoConfig.#ctor(vigocfg.Settings.Configuration)
+  id: '#ctor(vigocfg.Settings.Configuration)'
+  parent: vigocfg.VigoConfig
+  langs:
+  - csharp
+  - vb
+  name: VigoConfig(Configuration?)
+  nameWithType: VigoConfig.VigoConfig(Configuration?)
+  fullName: vigocfg.VigoConfig.VigoConfig(vigocfg.Settings.Configuration?)
+  type: Constructor
+  source:
+    remote:
+      path: src/vigocfg/VigoConfig.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: .ctor
+    path: ../src/vigocfg/VigoConfig.cs
+    startLine: 14
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: public VigoConfig(Configuration? environmentSettings)
+    parameters:
+    - id: environmentSettings
+      type: vigocfg.Settings.Configuration
+    content.vb: Public Sub New(environmentSettings As Configuration)
+  overload: vigocfg.VigoConfig.#ctor*
+  nameWithType.vb: VigoConfig.New(Configuration)
+  fullName.vb: vigocfg.VigoConfig.New(vigocfg.Settings.Configuration)
+  name.vb: New(Configuration)
+references:
+- uid: vigocfg
+  commentId: N:vigocfg
+  href: vigocfg.html
+  name: vigocfg
+  nameWithType: vigocfg
+  fullName: vigocfg
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: vigocfg.IVigoConfig
+  commentId: T:vigocfg.IVigoConfig
+  parent: vigocfg
+  href: vigocfg.IVigoConfig.html
+  name: IVigoConfig
+  nameWithType: IVigoConfig
+  fullName: vigocfg.IVigoConfig
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: vigocfg.VigoConfig.FileSystemEnv*
+  commentId: Overload:vigocfg.VigoConfig.FileSystemEnv
+  href: vigocfg.VigoConfig.html#vigocfg_VigoConfig_FileSystemEnv
+  name: FileSystemEnv
+  nameWithType: VigoConfig.FileSystemEnv
+  fullName: vigocfg.VigoConfig.FileSystemEnv
+- uid: vigocfg.IVigoConfig.FileSystemEnv
+  commentId: P:vigocfg.IVigoConfig.FileSystemEnv
+  parent: vigocfg.IVigoConfig
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_FileSystemEnv
+  name: FileSystemEnv
+  nameWithType: IVigoConfig.FileSystemEnv
+  fullName: vigocfg.IVigoConfig.FileSystemEnv
+- uid: vigocfg.IFileSystemEnvironment
+  commentId: T:vigocfg.IFileSystemEnvironment
+  parent: vigocfg
+  href: vigocfg.IFileSystemEnvironment.html
+  name: IFileSystemEnvironment
+  nameWithType: IFileSystemEnvironment
+  fullName: vigocfg.IFileSystemEnvironment
+- uid: vigocfg.VigoConfig.NameParserConfig*
+  commentId: Overload:vigocfg.VigoConfig.NameParserConfig
+  href: vigocfg.VigoConfig.html#vigocfg_VigoConfig_NameParserConfig
+  name: NameParserConfig
+  nameWithType: VigoConfig.NameParserConfig
+  fullName: vigocfg.VigoConfig.NameParserConfig
+- uid: vigocfg.IVigoConfig.NameParserConfig
+  commentId: P:vigocfg.IVigoConfig.NameParserConfig
+  parent: vigocfg.IVigoConfig
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_NameParserConfig
+  name: NameParserConfig
+  nameWithType: IVigoConfig.NameParserConfig
+  fullName: vigocfg.IVigoConfig.NameParserConfig
+- uid: vigocfg.INameParserConfig
+  commentId: T:vigocfg.INameParserConfig
+  parent: vigocfg
+  href: vigocfg.INameParserConfig.html
+  name: INameParserConfig
+  nameWithType: INameParserConfig
+  fullName: vigocfg.INameParserConfig
+- uid: vigocfg.VigoConfig.AppUsers*
+  commentId: Overload:vigocfg.VigoConfig.AppUsers
+  href: vigocfg.VigoConfig.html#vigocfg_VigoConfig_AppUsers
+  name: AppUsers
+  nameWithType: VigoConfig.AppUsers
+  fullName: vigocfg.VigoConfig.AppUsers
+- uid: vigocfg.IVigoConfig.AppUsers
+  commentId: P:vigocfg.IVigoConfig.AppUsers
+  parent: vigocfg.IVigoConfig
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_AppUsers
+  name: AppUsers
+  nameWithType: IVigoConfig.AppUsers
+  fullName: vigocfg.IVigoConfig.AppUsers
+- uid: System.Collections.Generic.IEnumerable{vigocfg.IAppUser}
+  commentId: T:System.Collections.Generic.IEnumerable{vigocfg.IAppUser}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<IAppUser>
+  nameWithType: IEnumerable<IAppUser>
+  fullName: System.Collections.Generic.IEnumerable<vigocfg.IAppUser>
+  nameWithType.vb: IEnumerable(Of IAppUser)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of vigocfg.IAppUser)
+  name.vb: IEnumerable(Of IAppUser)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: vigocfg.IAppUser
+    name: IAppUser
+    href: vigocfg.IAppUser.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: vigocfg.IAppUser
+    name: IAppUser
+    href: vigocfg.IAppUser.html
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: vigocfg.VigoConfig.DatabaseScripts*
+  commentId: Overload:vigocfg.VigoConfig.DatabaseScripts
+  href: vigocfg.VigoConfig.html#vigocfg_VigoConfig_DatabaseScripts
+  name: DatabaseScripts
+  nameWithType: VigoConfig.DatabaseScripts
+  fullName: vigocfg.VigoConfig.DatabaseScripts
+- uid: vigocfg.IVigoConfig.DatabaseScripts
+  commentId: P:vigocfg.IVigoConfig.DatabaseScripts
+  parent: vigocfg.IVigoConfig
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_DatabaseScripts
+  name: DatabaseScripts
+  nameWithType: IVigoConfig.DatabaseScripts
+  fullName: vigocfg.IVigoConfig.DatabaseScripts
+- uid: vigocfg.IDatabaseScripts
+  commentId: T:vigocfg.IDatabaseScripts
+  parent: vigocfg
+  href: vigocfg.IDatabaseScripts.html
+  name: IDatabaseScripts
+  nameWithType: IDatabaseScripts
+  fullName: vigocfg.IDatabaseScripts
+- uid: vigocfg.VigoConfig.StagingEnvironment*
+  commentId: Overload:vigocfg.VigoConfig.StagingEnvironment
+  href: vigocfg.VigoConfig.html#vigocfg_VigoConfig_StagingEnvironment
+  name: StagingEnvironment
+  nameWithType: VigoConfig.StagingEnvironment
+  fullName: vigocfg.VigoConfig.StagingEnvironment
+- uid: vigocfg.IVigoConfig.StagingEnvironment
+  commentId: P:vigocfg.IVigoConfig.StagingEnvironment
+  parent: vigocfg.IVigoConfig
+  href: vigocfg.IVigoConfig.html#vigocfg_IVigoConfig_StagingEnvironment
+  name: StagingEnvironment
+  nameWithType: IVigoConfig.StagingEnvironment
+  fullName: vigocfg.IVigoConfig.StagingEnvironment
+- uid: vigocfg.IStagingEnvironment
+  commentId: T:vigocfg.IStagingEnvironment
+  parent: vigocfg
+  href: vigocfg.IStagingEnvironment.html
+  name: IStagingEnvironment
+  nameWithType: IStagingEnvironment
+  fullName: vigocfg.IStagingEnvironment
+- uid: vigocfg.VigoConfig.#ctor*
+  commentId: Overload:vigocfg.VigoConfig.#ctor
+  href: vigocfg.VigoConfig.html#vigocfg_VigoConfig__ctor_vigocfg_Settings_Configuration_
+  name: VigoConfig
+  nameWithType: VigoConfig.VigoConfig
+  fullName: vigocfg.VigoConfig.VigoConfig
+  nameWithType.vb: VigoConfig.New
+  fullName.vb: vigocfg.VigoConfig.New
+  name.vb: New
+- uid: vigocfg.Settings.Configuration
+  commentId: T:vigocfg.Settings.Configuration
+  parent: vigocfg.Settings
+  href: vigocfg.Settings.Configuration.html
+  name: Configuration
+  nameWithType: Configuration
+  fullName: vigocfg.Settings.Configuration
+- uid: vigocfg.Settings
+  commentId: N:vigocfg.Settings
+  href: vigocfg.html
+  name: vigocfg.Settings
+  nameWithType: vigocfg.Settings
+  fullName: vigocfg.Settings
+  spec.csharp:
+  - uid: vigocfg
+    name: vigocfg
+    href: vigocfg.html
+  - name: .
+  - uid: vigocfg.Settings
+    name: Settings
+    href: vigocfg.Settings.html
+  spec.vb:
+  - uid: vigocfg
+    name: vigocfg
+    href: vigocfg.html
+  - name: .
+  - uid: vigocfg.Settings
+    name: Settings
+    href: vigocfg.Settings.html

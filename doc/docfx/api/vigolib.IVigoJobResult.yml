@@ -1,0 +1,89 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigolib.IVigoJobResult
+  commentId: T:vigolib.IVigoJobResult
+  id: IVigoJobResult
+  parent: vigolib
+  children:
+  - vigolib.IVigoJobResult.Success
+  langs:
+  - csharp
+  - vb
+  name: IVigoJobResult
+  nameWithType: IVigoJobResult
+  fullName: vigolib.IVigoJobResult
+  type: Interface
+  source:
+    remote:
+      path: src/vigolib/IVigoJobResult.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: IVigoJobResult
+    path: ../src/vigolib/IVigoJobResult.cs
+    startLine: 2
+  assemblies:
+  - vigolib
+  namespace: vigolib
+  syntax:
+    content: public interface IVigoJobResult
+    content.vb: Public Interface IVigoJobResult
+- uid: vigolib.IVigoJobResult.Success
+  commentId: P:vigolib.IVigoJobResult.Success
+  id: Success
+  parent: vigolib.IVigoJobResult
+  langs:
+  - csharp
+  - vb
+  name: Success
+  nameWithType: IVigoJobResult.Success
+  fullName: vigolib.IVigoJobResult.Success
+  type: Property
+  source:
+    remote:
+      path: src/vigolib/IVigoJobResult.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: Success
+    path: ../src/vigolib/IVigoJobResult.cs
+    startLine: 5
+  assemblies:
+  - vigolib
+  namespace: vigolib
+  syntax:
+    content: bool Success { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property Success As Boolean
+  overload: vigolib.IVigoJobResult.Success*
+references:
+- uid: vigolib
+  commentId: N:vigolib
+  href: vigolib.html
+  name: vigolib
+  nameWithType: vigolib
+  fullName: vigolib
+- uid: vigolib.IVigoJobResult.Success*
+  commentId: Overload:vigolib.IVigoJobResult.Success
+  href: vigolib.IVigoJobResult.html#vigolib_IVigoJobResult_Success
+  name: Success
+  nameWithType: IVigoJobResult.Success
+  fullName: vigolib.IVigoJobResult.Success
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System

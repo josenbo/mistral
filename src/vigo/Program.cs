@@ -1,64 +1,110 @@
-﻿using Serilog;
+﻿using System.Diagnostics;
+using Serilog;
 using Serilog.Events;
-using vigocfg;
-using vigoftg;
-using vigolib;
+using vigo;
+using vigobase;
 
-var ok = ConfigureLogging(LogEventLevel.Information);
+var stopwatch = new Stopwatch();
+stopwatch.Start();
 
-if (ok)
+try
 {
+    ConfigureLogging();
+
+    var settings = AppConfigBuilder.Build();
+
+    Log.Information("Running the action {TheCommand} with the configuration {TheConfig}",
+        settings.Command,
+        settings);
+
+    IJobRunner jobRunner = settings switch
+    {
+        AppConfigRepoDeploy appConfigRepoDeploy => new JobRunnerRepoDeploy(appConfigRepoDeploy),
+        AppConfigRepoCheck appConfigRepoCheck => new JobRunnerRepoCheck(appConfigRepoCheck),
+        AppConfigFolderExplain appConfigFolderExplain => new JobRunnerFolderExplain(appConfigFolderExplain),
+        AppConfigInfoHelp appConfigInfoHelp => new JobRunnerInfoHelp(appConfigInfoHelp),
+        AppConfigInfoVersion appConfigInfoVersion => new JobRunnerInfoVersion(appConfigInfoVersion),
+        null => throw new VigoFatalException(AppEnv.Faults.Fatal("Failed to set up the job")),
+        _ => throw new VigoFatalException(AppEnv.Faults.Fatal("Failed to set up the job"))
+    };
+
+    // jobRunner = new JobRunnerDoNothing(settings);
+
     try
     {
-        var config = (IVigoConfig)new VigoConfig(null);
-        var nameParser = ConfigureNameParser(new NameParser(), config); 
-        var job = (IVigoJob)new VigoJob(config, nameParser);
-
-        var jobResult = job.Run();
-        
-        ok = jobResult.Success;
+        if (jobRunner.Prepare())
+            jobRunner.Run();
     }
-    catch (Exception e)
+    finally
     {
-        Log.Error(e, "program aborted");
-        ok = false;
+        jobRunner.CleanUp();
     }
+
+    Log.Information("Process terminated {TheResult} after {TheTimeSpan}",
+        (jobRunner.Success ? "successfully" : "with errors"),
+        stopwatch.Elapsed);
+
+    Environment.ExitCode = jobRunner.Success ? 0 : 1;
+}
+catch (VigoFatalException)
+{
+    Console.Error.WriteLine("The program terminates prematurely due to the following incidents:");
+    Console.Error.WriteLine();
+    var printHeader = true;
+    foreach (var incident in AppEnv.Faults.Incidents)
+    {
+        if (printHeader)
+        {
+            Console.Error.WriteLine("Log-Entry  Message");
+            printHeader = false;
+        }
+            
+        Console.Error.WriteLine($"{incident.IncidentId}  {incident.Message}");
+    }
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("Check (or enable) the logs and consult help pages");
+    Console.Error.WriteLine();
+    Environment.ExitCode = 1;
+}
+catch (Exception e)
+{
+    Log.Error(e, "program aborted");
+    Console.Error.WriteLine("Fatal: the program terminates prematurely due to an error it could not handle");
+    Environment.ExitCode = 1;
+}
+finally
+{
+    stopwatch.Stop();
 }
 
-Environment.ExitCode = ok ? 0 : 1;
-
+Log.CloseAndFlush();
 return;
 
-INameParser ConfigureNameParser(NameParser nameParser, IVigoConfig config)
-{
-    nameParser.AddCaseSensitiveTags(config.NameParserConfig.CaseSensitiveFilterTags);
-    nameParser.AddCaseInsensitiveTags(config.NameParserConfig.CaseInsensitiveFilterTags);
-    return nameParser;
-}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-bool ConfigureLogging(LogEventLevel? consoleLogEventLevel)
+void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 {
-    try
+    var hasSingleRunLogConfiguration = ConfigSourceReaderEnvironmentVariables.TryGetSingleRunLogConfiguration(out var logLevelFile, out var logfile);
+
+    if (!hasSingleRunLogConfiguration && !logLevelConsole.HasValue)
+        return;
+    
+    var loggerConfiguration = new LoggerConfiguration()
+        .MinimumLevel.Debug();
+
+    if (logLevelConsole.HasValue)
     {
-        var loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console(restrictedToMinimumLevel: consoleLogEventLevel ?? LogEventLevel.Information);
-
-        var envLogFolder = Environment.GetEnvironmentVariable("VIGO_LOG_FOLDER");
-
-        if (!string.IsNullOrWhiteSpace(envLogFolder) && Directory.Exists(envLogFolder))
-        {
-            var logFile = new FileInfo(Path.Combine(envLogFolder, "vigo.log"));
-            loggerConfiguration.WriteTo.File(logFile.FullName, restrictedToMinimumLevel: LogEventLevel.Debug, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2);
-        }
-        
-        Log.Logger = loggerConfiguration.CreateLogger();
-
-        return true;
+        loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: logLevelConsole.Value);
     }
-    catch (Exception e)
+
+    if (hasSingleRunLogConfiguration && logfile is not null)
     {
-        Console.WriteLine($"Could not configure logging: {e.Message}");
-        return false;
-    }    
+        // loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 4);
+        loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile);
+    }
+
+    Log.Logger = loggerConfiguration.CreateLogger();
 }
+

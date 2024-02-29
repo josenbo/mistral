@@ -1,0 +1,243 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigocfg.FileTypeEnum
+  commentId: T:vigocfg.FileTypeEnum
+  id: FileTypeEnum
+  parent: vigocfg
+  children:
+  - vigocfg.FileTypeEnum.BinaryFile
+  - vigocfg.FileTypeEnum.TextFile
+  - vigocfg.FileTypeEnum.Undefined
+  langs:
+  - csharp
+  - vb
+  name: FileTypeEnum
+  nameWithType: FileTypeEnum
+  fullName: vigocfg.FileTypeEnum
+  type: Enum
+  source:
+    remote:
+      path: src/vigocfg/FileTypeEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: FileTypeEnum
+    path: ../src/vigocfg/FileTypeEnum.cs
+    startLine: 4
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: >-
+      [PublicAPI]
+
+      public enum FileTypeEnum
+    content.vb: >-
+      <PublicAPI>
+
+      Public Enum FileTypeEnum
+  extensionMethods:
+  - vigocfg.FileTypeEnum.vigocfg.FileTypeEnumHelper.IsDefined
+  - vigocfg.FileTypeEnum.vigocfg.FileTypeEnumHelper.IsDefinedAndValid
+  attributes:
+  - type: JetBrains.Annotations.PublicAPIAttribute
+    ctor: JetBrains.Annotations.PublicAPIAttribute.#ctor
+    arguments: []
+- uid: vigocfg.FileTypeEnum.Undefined
+  commentId: F:vigocfg.FileTypeEnum.Undefined
+  id: Undefined
+  parent: vigocfg.FileTypeEnum
+  langs:
+  - csharp
+  - vb
+  name: Undefined
+  nameWithType: FileTypeEnum.Undefined
+  fullName: vigocfg.FileTypeEnum.Undefined
+  type: Field
+  source:
+    remote:
+      path: src/vigocfg/FileTypeEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: Undefined
+    path: ../src/vigocfg/FileTypeEnum.cs
+    startLine: 7
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: Undefined = 0
+    return:
+      type: vigocfg.FileTypeEnum
+- uid: vigocfg.FileTypeEnum.TextFile
+  commentId: F:vigocfg.FileTypeEnum.TextFile
+  id: TextFile
+  parent: vigocfg.FileTypeEnum
+  langs:
+  - csharp
+  - vb
+  name: TextFile
+  nameWithType: FileTypeEnum.TextFile
+  fullName: vigocfg.FileTypeEnum.TextFile
+  type: Field
+  source:
+    remote:
+      path: src/vigocfg/FileTypeEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: TextFile
+    path: ../src/vigocfg/FileTypeEnum.cs
+    startLine: 8
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: TextFile = 111001
+    return:
+      type: vigocfg.FileTypeEnum
+- uid: vigocfg.FileTypeEnum.BinaryFile
+  commentId: F:vigocfg.FileTypeEnum.BinaryFile
+  id: BinaryFile
+  parent: vigocfg.FileTypeEnum
+  langs:
+  - csharp
+  - vb
+  name: BinaryFile
+  nameWithType: FileTypeEnum.BinaryFile
+  fullName: vigocfg.FileTypeEnum.BinaryFile
+  type: Field
+  source:
+    remote:
+      path: src/vigocfg/FileTypeEnum.cs
+      branch: main
+      repo: https://git.dhl.com/b7o1tue0137/vigo.git
+    id: BinaryFile
+    path: ../src/vigocfg/FileTypeEnum.cs
+    startLine: 9
+  assemblies:
+  - vigocfg
+  namespace: vigocfg
+  syntax:
+    content: BinaryFile = 111002
+    return:
+      type: vigocfg.FileTypeEnum
+references:
+- uid: vigocfg
+  commentId: N:vigocfg
+  href: vigocfg.html
+  name: vigocfg
+  nameWithType: vigocfg
+  fullName: vigocfg
+- uid: vigocfg.FileTypeEnum.vigocfg.FileTypeEnumHelper.IsDefined
+  commentId: M:vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+  parent: vigocfg.FileTypeEnumHelper
+  definition: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+  href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefined_vigocfg_FileTypeEnum_
+  name: IsDefined(FileTypeEnum)
+  nameWithType: FileTypeEnumHelper.IsDefined(FileTypeEnum)
+  fullName: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+  spec.csharp:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+    name: IsDefined
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefined_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+    name: IsDefined
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefined_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+- uid: vigocfg.FileTypeEnum.vigocfg.FileTypeEnumHelper.IsDefinedAndValid
+  commentId: M:vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+  parent: vigocfg.FileTypeEnumHelper
+  definition: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+  href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefinedAndValid_vigocfg_FileTypeEnum_
+  name: IsDefinedAndValid(FileTypeEnum)
+  nameWithType: FileTypeEnumHelper.IsDefinedAndValid(FileTypeEnum)
+  fullName: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+  spec.csharp:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefinedAndValid_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefinedAndValid_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+- uid: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+  commentId: M:vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+  href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefined_vigocfg_FileTypeEnum_
+  name: IsDefined(FileTypeEnum)
+  nameWithType: FileTypeEnumHelper.IsDefined(FileTypeEnum)
+  fullName: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+  spec.csharp:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+    name: IsDefined
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefined_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefined(vigocfg.FileTypeEnum)
+    name: IsDefined
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefined_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+- uid: vigocfg.FileTypeEnumHelper
+  commentId: T:vigocfg.FileTypeEnumHelper
+  parent: vigocfg
+  href: vigocfg.FileTypeEnumHelper.html
+  name: FileTypeEnumHelper
+  nameWithType: FileTypeEnumHelper
+  fullName: vigocfg.FileTypeEnumHelper
+- uid: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+  commentId: M:vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+  href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefinedAndValid_vigocfg_FileTypeEnum_
+  name: IsDefinedAndValid(FileTypeEnum)
+  nameWithType: FileTypeEnumHelper.IsDefinedAndValid(FileTypeEnum)
+  fullName: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+  spec.csharp:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefinedAndValid_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+  spec.vb:
+  - uid: vigocfg.FileTypeEnumHelper.IsDefinedAndValid(vigocfg.FileTypeEnum)
+    name: IsDefinedAndValid
+    href: vigocfg.FileTypeEnumHelper.html#vigocfg_FileTypeEnumHelper_IsDefinedAndValid_vigocfg_FileTypeEnum_
+  - name: (
+  - uid: vigocfg.FileTypeEnum
+    name: FileTypeEnum
+    href: vigocfg.FileTypeEnum.html
+  - name: )
+- uid: vigocfg.FileTypeEnum
+  commentId: T:vigocfg.FileTypeEnum
+  parent: vigocfg
+  href: vigocfg.FileTypeEnum.html
+  name: FileTypeEnum
+  nameWithType: FileTypeEnum
+  fullName: vigocfg.FileTypeEnum

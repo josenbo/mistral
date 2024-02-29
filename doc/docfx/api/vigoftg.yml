@@ -1,0 +1,45 @@
+### YamlMime:ManagedReference
+items:
+- uid: vigoftg
+  commentId: N:vigoftg
+  id: vigoftg
+  children:
+  - vigoftg.INameParseResult
+  - vigoftg.INameParser
+  - vigoftg.NameParser
+  langs:
+  - csharp
+  - vb
+  name: vigoftg
+  nameWithType: vigoftg
+  fullName: vigoftg
+  type: Namespace
+  assemblies:
+  - vigoftg
+references:
+- uid: vigoftg.INameParser
+  commentId: T:vigoftg.INameParser
+  parent: vigoftg
+  href: vigoftg.INameParser.html
+  name: INameParser
+  nameWithType: INameParser
+  fullName: vigoftg.INameParser
+- uid: vigoftg.INameParseResult
+  commentId: T:vigoftg.INameParseResult
+  parent: vigoftg
+  href: vigoftg.INameParseResult.html
+  name: INameParseResult
+  nameWithType: INameParseResult
+  fullName: vigoftg.INameParseResult
+- uid: vigoftg.NameParser
+  commentId: T:vigoftg.NameParser
+  href: vigoftg.NameParser.html
+  name: NameParser
+  nameWithType: NameParser
+  fullName: vigoftg.NameParser
+- uid: vigoftg
+  commentId: N:vigoftg
+  href: vigoftg.html
+  name: vigoftg
+  nameWithType: vigoftg
+  fullName: vigoftg
