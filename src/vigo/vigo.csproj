@@ -17,6 +17,17 @@
   <ItemGroup>
     <InternalsVisibleTo Include="vigo-tests" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="HelpScreens\HelpGeneral.txt" />
+    <EmbeddedResource Include="HelpScreens\HelpGeneral.txt" />
+    <None Remove="HelpScreens\HelpDeploy.txt" />
+    <EmbeddedResource Include="HelpScreens\HelpDeploy.txt" />
+    <None Remove="HelpScreens\HelpCheck.txt" />
+    <EmbeddedResource Include="HelpScreens\HelpCheck.txt" />
+    <None Remove="HelpScreens\HelpExplain.txt" />
+    <EmbeddedResource Include="HelpScreens\HelpExplain.txt" />
+  </ItemGroup>
   
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -24,6 +35,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
+    <AssemblyVersion>0.9.271</AssemblyVersion>
   </PropertyGroup>
 
 </Project>

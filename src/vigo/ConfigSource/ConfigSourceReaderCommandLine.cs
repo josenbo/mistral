@@ -271,6 +271,14 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             }
             else
             {
+                if (AppEnv.IsApplicationModulePath(current))
+                {
+                    Log.Debug("Ignoring a command line parameter that points to a module of the current process. Skipped module path is {TheModulePath}", 
+                        current);
+                    
+                    continue;
+                }
+                
                 Log.Debug("Registered a command line argument for handling in the next step {TheArg}", current);
 
                 cmdArgsWithoutOptions.Add(current);

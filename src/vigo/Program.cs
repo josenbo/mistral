@@ -28,7 +28,7 @@ try
         _ => throw new VigoFatalException(AppEnv.Faults.Fatal("Failed to set up the job"))
     };
 
-    jobRunner = new JobRunnerDoNothing(settings);
+    // jobRunner = new JobRunnerDoNothing(settings);
 
     try
     {

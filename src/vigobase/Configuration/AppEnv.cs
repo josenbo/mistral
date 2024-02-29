@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using JetBrains.Annotations;
+using Serilog;
 
 namespace vigobase;
 
@@ -116,9 +118,30 @@ public static class AppEnv
         
         return directoryInfo;
     }
+
+    public static bool IsApplicationModulePath(string path)
+    {
+        if (ProcessDirectoryPath is null)
+            return false;
+
+        if (!path.StartsWith(ProcessDirectoryPath))
+            return false;
+        
+        var matchedModule = Process
+            .GetCurrentProcess()
+            .Modules
+            .OfType<ProcessModule>()
+            .SingleOrDefault(m => m.FileName == path);
+
+        return (matchedModule is not null);
+    }
     
     private const string EnvVarVigoTempDir = "VIGO_TEMP";
     
     private static DirectoryInfo? _topLevelDirectory;
     private static int _tempFileSequence = Random.Shared.Next(100000000, 999999999);
+    private static readonly string? ProcessDirectoryPath =
+        Environment.ProcessPath is not null && File.Exists(Environment.ProcessPath)
+            ? new FileInfo(Environment.ProcessPath).DirectoryName
+            : null;
 }
