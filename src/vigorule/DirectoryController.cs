@@ -34,7 +34,7 @@ public class DirectoryController : IFolderConfiguration
     {
         LocalFileHandlingParams = ParentFileHandlingParams = parentFileHandlingParams;
         Location = location;
-        FolderConfigurator.Configure(this);
+        // FolderConfigurator.Configure(this);
     }
 
     private readonly List<FileRule> _rules = [];

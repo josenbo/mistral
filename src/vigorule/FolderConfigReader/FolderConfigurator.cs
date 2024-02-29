@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Serilog;
-using Tomlyn;
 using vigobase;
 
 namespace vigorule;
 
+/*
 internal static class FolderConfigurator
 {
     public static void Configure(IFolderConfiguration config)
@@ -164,3 +164,5 @@ internal static class FolderConfigurator
             );
     }
 }
+*/
+

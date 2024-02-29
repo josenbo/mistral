@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigorule", "vigorule\vigoru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigorule-tests", "vigorule-tests\vigorule-tests.csproj", "{2A62603C-5060-4F90-A7D2-D6A48E818539}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vigo-tests", "vigo-tests\vigo-tests.csproj", "{77E3EDDA-A8C6-4FAC-A674-07490A55C909}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,5 +68,9 @@ Global
 		{2A62603C-5060-4F90-A7D2-D6A48E818539}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A62603C-5060-4F90-A7D2-D6A48E818539}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A62603C-5060-4F90-A7D2-D6A48E818539}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77E3EDDA-A8C6-4FAC-A674-07490A55C909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77E3EDDA-A8C6-4FAC-A674-07490A55C909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77E3EDDA-A8C6-4FAC-A674-07490A55C909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77E3EDDA-A8C6-4FAC-A674-07490A55C909}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
