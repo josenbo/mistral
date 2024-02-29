@@ -7,11 +7,17 @@ namespace vigo;
 
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-internal class JobRunnerRepoDeploy(AppConfigRepoDeploy appConfigRepoDeploy) : IJobRunner
+internal class JobRunnerRepoDeploy : IJobRunner
 {
     public IRepositoryReader RepositoryReader => _reader;
-    private AppConfigRepoDeploy AppConfig { get; } = appConfigRepoDeploy;
     public bool Success { get; private set; }
+
+    public JobRunnerRepoDeploy(AppConfigRepoDeploy appConfigRepoDeploy)
+    {
+        AppConfig = appConfigRepoDeploy;
+        AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot; 
+        _reader = new RepositoryReader(appConfigRepoDeploy);
+    }
     
     public bool Prepare()
     {
@@ -43,8 +49,10 @@ internal class JobRunnerRepoDeploy(AppConfigRepoDeploy appConfigRepoDeploy) : IJ
         }
     }
 
-    private readonly RepositoryReader _reader = new RepositoryReader(appConfigRepoDeploy);
-    
+    private AppConfigRepoDeploy AppConfig { get; }
+
+    private readonly RepositoryReader _reader;
+
     private static bool BuildTarball(IRepositoryReader reader, AppConfigRepoDeploy appConfig)
     {
         try

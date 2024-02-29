@@ -24,8 +24,8 @@ try
         AppConfigFolderExplain appConfigFolderExplain => new JobRunnerFolderExplain(appConfigFolderExplain),
         AppConfigInfoHelp appConfigInfoHelp => new JobRunnerInfoHelp(appConfigInfoHelp),
         AppConfigInfoVersion appConfigInfoVersion => new JobRunnerInfoVersion(appConfigInfoVersion),
-        null => throw new VigoFatalException(AppEnv.Faults.Fatal("Failed to set up the job")),
-        _ => throw new VigoFatalException(AppEnv.Faults.Fatal("Failed to set up the job"))
+        null => throw new VigoFatalException(AppEnv.Faults.Fatal("FX252", "Failed to set up the job")),
+        _ => throw new VigoFatalException(AppEnv.Faults.Fatal("FX259","Failed to set up the job"))
     };
 
     // jobRunner = new JobRunnerDoNothing(settings);
@@ -46,8 +46,10 @@ try
 
     Environment.ExitCode = jobRunner.Success ? 0 : 1;
 }
-catch (VigoFatalException)
+catch (VigoFatalException e)
 {
+    Log.Fatal(e, "Immediate termination of the program was requested and we will exit after dumping the incidents");
+    
     Console.Error.WriteLine("The program terminates prematurely due to the following incidents:");
     Console.Error.WriteLine();
     var printHeader = true;

@@ -69,12 +69,12 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
         }
         
         if (cmdArgsWithoutOptions.Count == 0)
-            throw new VigoFatalException(AppEnv.Faults.Fatal("No command specified"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX322","No command specified"));
 
         if (command == CommandEnum.Undefined)
         {
             if (string.IsNullOrWhiteSpace(firstCmdArg) || !File.Exists(firstCmdArg))
-                throw new VigoFatalException(AppEnv.Faults.Fatal("No command specified"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX329","No command specified"));
 
             Log.Debug("This might be the command line that you get from the shell, when you run the configuration file as a script CONFIGURATION-FILE [Name 1] .. [Name n]. Will translate this to the corresponding EXPLAIN action.");
             
@@ -82,7 +82,7 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             
             if (!configurationFile.Exists || configurationFile.Directory is null || !configurationFile.Directory.Exists)
                 throw new VigoFatalException(
-                    AppEnv.Faults.Fatal("An invalid configuration file was passed on the command line"));
+                    AppEnv.Faults.Fatal("FX336","An invalid configuration file was passed on the command line"));
 
             var names = new List<string>();
 
@@ -120,7 +120,7 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
         {
             var unexpected = cmdArgsWithoutOptions[1..];
             Log.Error("Unexpected command line arguments {TheUnexpectedArguments}", unexpected);
-            throw new VigoFatalException(AppEnv.Faults.Fatal("Encountered unexpected command line arguments"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX343","Encountered unexpected command line arguments"));
         }
         else
         {
@@ -169,10 +169,10 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
                     continue;
                 
                 if (string.IsNullOrEmpty(next))
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -r or --repository-root is missing"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX350",$"The value for -r or --repository-root is missing"));
 
                 if (string.IsNullOrEmpty(next) || !Directory.Exists(next))
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -r or --repository-root must be an existing directory"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX357",$"The value for -r or --repository-root must be an existing directory"));
 
                 var repositoryRoot = new DirectoryInfo(Path.GetFullPath(next));
                 
@@ -188,12 +188,12 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
                     continue;
                 
                 if (string.IsNullOrEmpty(next))
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -o or --output-file is missing"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX364",$"The value for -o or --output-file is missing"));
 
                 var deploymentBundle = new FileInfo(Path.GetFullPath(next));
                 
                 if (deploymentBundle.Directory is null || !deploymentBundle.Directory.Exists)
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -o or --output-file must be file in an existing directory"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX371",$"The value for -o or --output-file must be file in an existing directory"));
 
                 retval = retval with { OutputFile = deploymentBundle };
             }
@@ -207,18 +207,18 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
                     continue;
                 
                 if (string.IsNullOrEmpty(next))
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -t or --targets is missing"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX378",$"The value for -t or --targets is missing"));
 
                 var targets = next.Split(ListSeparators,
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 if (0 == targets.Count)
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -t or --targets must be a list of target names"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX385",$"The value for -t or --targets must be a list of target names"));
 
                 var invalidTargets = targets.Where(t => !DeploymentTargetHelper.IsValidName(t)).ToList();
                 
                 if (0 < invalidTargets.Count)
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The option -t or --targets has invalid target names {string.Join(", ", invalidTargets)}"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX392",$"The option -t or --targets has invalid target names {string.Join(", ", invalidTargets)}"));
 
                 retval = retval with { Targets = targets };
             }
@@ -232,12 +232,12 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
                     continue;
                 
                 if (string.IsNullOrEmpty(next))
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -c or --configuration-file is missing"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX399",$"The value for -c or --configuration-file is missing"));
 
                 var configurationFile = new FileInfo(Path.GetFullPath(next));
                 
                 if (!configurationFile.Exists || configurationFile.Directory is null || !configurationFile.Directory.Exists)
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -c or --configuration-file must be an existing file"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX406",$"The value for -c or --configuration-file must be an existing file"));
 
                 retval = retval with { ConfigurationFile = configurationFile };
             }
@@ -251,7 +251,7 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
                     continue;
                 
                 if (string.IsNullOrEmpty(next))
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -n or --names is missing"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX413",$"The value for -n or --names is missing"));
 
                 var names = next.Split(ListSeparators, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                     .Select(Path.GetFileName)
@@ -259,7 +259,7 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
                     .ToList();
 
                 if (0 == names.Count)
-                    throw new VigoFatalException(AppEnv.Faults.Fatal($"The value for -n or --names must be a list of filenames"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX420",$"The value for -n or --names must be a list of filenames"));
 
                 retval = retval with { Names = names };
             }
@@ -267,7 +267,7 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             {
                 Log.Debug("Saw an unknown command line option {TheOption}", current);
 
-                throw new VigoFatalException(AppEnv.Faults.Fatal($"Unknown command line option {current}"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX427",$"Unknown command line option {current}"));
             }
             else
             {
@@ -297,7 +297,7 @@ internal class ConfigSourceReaderCommandLine : IConfigSourceReader
             return true;
         
         Log.Error("The command line options {Options} can appear only once", opts);
-        throw new VigoFatalException(AppEnv.Faults.Fatal($"A command line option appears twice"));
+        throw new VigoFatalException(AppEnv.Faults.Fatal("FX434",$"A command line option appears twice"));
     }
     
     private readonly List<string> _cmdArgs = [];

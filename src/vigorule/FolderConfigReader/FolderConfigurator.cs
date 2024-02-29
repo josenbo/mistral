@@ -36,7 +36,7 @@ internal static class FolderConfigurator
                     theConfigfile);
                     //appSettings.DeploymentConfigFileName);
 
-                throw new VigoFatalException("Could not read the folder configuration");
+                throw new VigoFatalException(AppEnv.Faults.Fatal("Could not read the folder configuration"));
             }
 
             config.HasKeepFolderFlag = tomlConfigurationData.KeepEmptyFolder is true;
@@ -50,7 +50,7 @@ internal static class FolderConfigurator
         {
             Log.Fatal(e,"Could not read the configuration in the directory {TheDir}",
                 AppEnv.GetTopLevelRelativePath(config.Location.FullName));
-            throw new VigoFatalException("Failed to read the deployment configuration in the repository folder");
+            throw new VigoFatalException(AppEnv.Faults.Fatal("Failed to read the deployment configuration in the repository folder"));
         }
     }
 

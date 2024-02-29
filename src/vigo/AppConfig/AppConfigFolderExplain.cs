@@ -6,7 +6,7 @@ namespace vigo;
 internal record AppConfigFolderExplain(
     FileInfo ConfigurationFile, 
     IReadOnlyList<string> Names
-) : AppConfigFolder(ConfigurationFile.Directory ?? throw new VigoFatalException($"No parent directory for the folder configuration {ConfigurationFile.FullName}"))
+) : AppConfigFolder(ConfigurationFile.Directory ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX511",$"No parent directory for the folder configuration {ConfigurationFile.FullName}")))
 {
     public override CommandEnum Command => CommandEnum.Explain;
 }

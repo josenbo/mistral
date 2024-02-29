@@ -13,7 +13,7 @@ public static class AppEnv
     public static StandardFileHandling FinalCatchAllRule { get; set; }
     public static DirectoryInfo TopLevelDirectory
     {
-        get => _topLevelDirectory ?? throw new VigoFatalException($"{nameof(vigobase)}.{nameof(AppEnv)}.{nameof(TopLevelDirectory)} was not set");
+        get => _topLevelDirectory ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX266",$"{nameof(vigobase)}.{nameof(AppEnv)}.{nameof(TopLevelDirectory)} was not set"));
         set => _topLevelDirectory = value;
     }
     public static DirectoryInfo TemporaryDirectory { get; set; }
@@ -87,11 +87,7 @@ public static class AppEnv
             path = path[..4096];
 
         if (!Directory.Exists(path))
-        {
-            const string message = "Could not locate the directory for temporary files";
-            Console.Error.WriteLine(message);
-            throw new VigoFatalException(message);
-        }
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX273","Could not locate the directory for temporary files"));
             
         if (!Path.IsPathRooted(path))
             path = Path.GetFullPath(path);
@@ -108,11 +104,7 @@ public static class AppEnv
         var directoryInfo = new DirectoryInfo(path);
 
         if (directoryInfo.Exists)
-        {
-            const string message = "Could not set up the directory for temporary files";
-            Console.Error.WriteLine(message);
-            throw new VigoFatalException(message);
-        }
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX280","Could not set up the directory for temporary files"));
         
         directoryInfo.Create();
         

@@ -27,7 +27,7 @@ public class DirectoryController : IFolderConfiguration
         Log.Fatal("There is no rule matching the file name {TheFileName} in the directory {TheDirectory}",
             file.Name,
             AppEnv.GetTopLevelRelativePath(file.FullName));
-        throw new VigoFatalException("Could not find a file rule");
+        throw new VigoFatalException(AppEnv.Faults.Fatal("FX560","Could not find a file rule"));
     }
     
     public DirectoryController(DirectoryInfo location, FileHandlingParameters parentFileHandlingParams)
@@ -58,11 +58,7 @@ public class DirectoryController : IFolderConfiguration
     void IFolderConfiguration.AddRule(FileRule rule)
     {
         if (rule.Id.Index != _rules.Count)
-        {
-            const string message = "Precondition failed for rule numbering"; 
-            Log.Fatal(message);
-            throw new VigoFatalException(message);
-        }
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX567","Precondition failed for rule numbering"));
         _rules.Add(rule);
     }
    
