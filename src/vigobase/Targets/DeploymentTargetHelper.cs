@@ -31,6 +31,11 @@ public static partial class DeploymentTargetHelper
             yield return knownName;
         }
     }
+    
+    public static bool IsValidName(string targetName)
+    {
+        return RexTargetName.IsMatch(targetName);
+    }
 
     private static string GetOrRegisterKnownName(string name)
     {

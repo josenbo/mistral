@@ -15,6 +15,7 @@ public static class AppEnv
         set => _topLevelDirectory = value;
     }
     public static DirectoryInfo TemporaryDirectory { get; set; }
+    public static FaultRegistry Faults { get; set; }
 
     public static string GetTopLevelRelativePath(string path)
     {
@@ -33,6 +34,8 @@ public static class AppEnv
 
     static AppEnv()
     {
+        Faults = new FaultRegistry();
+        
         var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
     
         DefaultFileHandlingParams = new FileHandlingParameters(
@@ -114,7 +117,7 @@ public static class AppEnv
         return directoryInfo;
     }
     
-    private const string EnvVarVigoTempDir = "VIGO_TEMP_DIR";
+    private const string EnvVarVigoTempDir = "VIGO_TEMP";
     
     private static DirectoryInfo? _topLevelDirectory;
     private static int _tempFileSequence = Random.Shared.Next(100000000, 999999999);

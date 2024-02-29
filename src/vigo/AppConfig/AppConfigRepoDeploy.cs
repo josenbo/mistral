@@ -4,8 +4,9 @@ namespace vigo;
 
 internal record AppConfigRepoDeploy(
     DirectoryInfo RepositoryRoot, 
-    FileInfo Tarball
-) : AppConfigRepo(RepositoryRoot)
+    FileInfo OutputFile,
+    IReadOnlyList<string> Targets
+    ) : AppConfigRepo(RepositoryRoot)
 {
     public override CommandEnum Command => CommandEnum.Deploy;
 }

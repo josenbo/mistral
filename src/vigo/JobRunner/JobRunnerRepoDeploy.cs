@@ -7,45 +7,23 @@ namespace vigo;
 
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-internal class JobRunner(AppConfigRepo configRepo)
+internal class JobRunnerRepoDeploy(AppConfigRepoDeploy appConfigRepoDeploy) : IJobRunner
 {
     public IRepositoryReader RepositoryReader => _reader;
-    private AppConfigRepo ConfigRepo { get; } = configRepo;
+    private AppConfigRepoDeploy AppConfig { get; } = appConfigRepoDeploy;
     public bool Success { get; private set; }
     
     public bool Prepare()
     {
-        try
-        {
-            _reader.ReadRepository();
-            
-            return _reader.FileTransformations.All(ft => ft.CheckedSuccessfully) &&
-                   _reader.DirectoryTransformations.All(dt => dt.CheckedSuccessfully);
-        }
-        catch (Exception e)
-        {
-            Log.Fatal(e, "Scanning and processing the repository failed");
-            return false;
-        }
+        _reader.ReadRepository();
+        
+        return _reader.FileTransformations.All(ft => ft.CheckedSuccessfully) &&
+               _reader.DirectoryTransformations.All(dt => dt.CheckedSuccessfully);
     }
     
     public bool Run()
     {
-        try
-        {
-            Success = ConfigRepo switch
-            {
-                AppConfigRepoDeploy configurationDeployToTarball => BuildTarball(_reader, configurationDeployToTarball),
-                AppConfigRepoCheck configurationCheckCommit => RunCommitChecks(_reader, configurationCheckCommit),
-                _ => false
-            };
-        }
-        catch(Exception e)
-        {
-            // ignored
-            Log.Fatal(e, "Preparing the deployment failed");
-            Success = false;
-        }
+        Success = BuildTarball(_reader, AppConfig);
 
         return Success;
     }
@@ -54,8 +32,8 @@ internal class JobRunner(AppConfigRepo configRepo)
     {
         try
         {
-            if (Success && ConfigRepo is AppConfigRepoDeploy configTarball && File.Exists(AppConfigRepo.TemporaryTarballPath))
-                File.Move(AppConfigRepo.TemporaryTarballPath, configTarball.Tarball.FullName);
+            if (Success && File.Exists(AppConfigRepo.OutputFileTempPath))
+                File.Move(AppConfigRepo.OutputFileTempPath, AppConfig.OutputFile.FullName);
             
             AppEnv.TemporaryDirectory.Delete(true);
         }
@@ -65,14 +43,9 @@ internal class JobRunner(AppConfigRepo configRepo)
         }
     }
 
-    private readonly RepositoryReader _reader = new RepositoryReader(configRepo);
+    private readonly RepositoryReader _reader = new RepositoryReader(appConfigRepoDeploy);
     
-    private static bool RunCommitChecks(RepositoryReader reader, AppConfigRepoCheck configRepo)
-    {
-        return true;
-    }
-
-    private static bool BuildTarball(RepositoryReader reader, AppConfigRepoDeploy configRepo)
+    private static bool BuildTarball(IRepositoryReader reader, AppConfigRepoDeploy appConfig)
     {
         try
         {
@@ -122,7 +95,7 @@ internal class JobRunner(AppConfigRepo configRepo)
                 tarball.AddItem(request);
             }
         
-            tarball.Save(configRepo.Tarball);
+            tarball.Save(appConfig.OutputFile);
             
             return true;
         }
@@ -133,9 +106,9 @@ internal class JobRunner(AppConfigRepo configRepo)
 
             try
             {
-                configRepo.Tarball.Refresh();
-                if (configRepo.Tarball.Exists)
-                    configRepo.Tarball.Delete();
+                appConfig.OutputFile.Refresh();
+                if (appConfig.OutputFile.Exists)
+                    appConfig.OutputFile.Delete();
             }
             catch (Exception)
             {
