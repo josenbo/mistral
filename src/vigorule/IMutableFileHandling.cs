@@ -1,7 +1,9 @@
-﻿using vigobase;
+﻿using JetBrains.Annotations;
+using vigobase;
 
 namespace vigorule;
 
+[PublicAPI]
 public interface IMutableFileHandling : IMutableHandling
 {
     FileInfo SourceFile { get; }

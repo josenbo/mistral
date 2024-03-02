@@ -1,5 +1,8 @@
-﻿namespace vigorule;
+﻿using JetBrains.Annotations;
 
+namespace vigorule;
+
+[PublicAPI]
 public interface IMutableDirectoryHandling : IMutableHandling
 {
     DirectoryInfo SourceDirectory { get; }

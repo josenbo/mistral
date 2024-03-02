@@ -91,6 +91,15 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
 
     public IEnumerable<string> DeploymentTargets => _handling.Targets;
     
+    public void Explain(StringBuilder sb, ExplainSettings settings)
+    {
+        // todo: add implementation
+        sb.Append(nameof(FileHandlingImpl))
+            .Append('.')
+            .Append(nameof(Explain))
+            .AppendLine(" still needs to be implemented");
+    }
+    
     IFinalFileHandling IMutableFileHandling.CheckAndTransform()
     {
         var filename = SourceFile.Name;

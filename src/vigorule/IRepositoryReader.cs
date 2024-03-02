@@ -1,7 +1,9 @@
-﻿using vigobase;
+﻿using JetBrains.Annotations;
+using vigobase;
 
 namespace vigorule;
 
+[PublicAPI]
 public interface IRepositoryReader
 {
     delegate void BeforeApplyFileHandling(IMutableFileHandling transformation);
