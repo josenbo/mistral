@@ -61,6 +61,7 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
             }
         }
 
+        mutableDirectoryHandling.IsEmptyDirectory = deployableFileCount == 0;
         mutableDirectoryHandling.CanDeploy = mutableDirectoryHandling.KeepEmptyDirectory || 0 < deployableFileCount;
         
         var finalDirectoryHandling = mutableDirectoryHandling.CheckAndTransform();

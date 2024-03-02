@@ -14,8 +14,9 @@ internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : IJobR
     {
         _reader.Read();
         
-        return _reader.Files.All(ft => ft.CheckedSuccessfully) &&
-               _reader.Directories.All(dt => dt.CheckedSuccessfully);
+        return _reader
+            .FinalItems<IFinalHandling>(true)
+            .All(ft => ft.CheckedSuccessfully);
     }
 
     public bool Run()

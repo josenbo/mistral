@@ -27,8 +27,9 @@ internal class JobRunnerRepoDeploy : IJobRunner
     {
         _reader.Read();
         
-        return _reader.Files.All(ft => ft.CheckedSuccessfully) &&
-               _reader.Directories.All(dt => dt.CheckedSuccessfully);
+        return _reader
+            .FinalItems<IFinalHandling>(true)
+            .All(ft => ft.CheckedSuccessfully);
     }
     
     public bool Run()
@@ -64,7 +65,7 @@ internal class JobRunnerRepoDeploy : IJobRunner
             var directoryTimestamp = DateTimeOffset.Now;
             
             var targets = reader
-                .Files
+                .FinalItems<IFinalFileHandling>(true)
                 .SelectMany(ft => ft.DeploymentTargets)
                 .Distinct()
                 .ToList();
@@ -75,7 +76,7 @@ internal class JobRunnerRepoDeploy : IJobRunner
             {
                 // ReSharper disable LoopCanBeConvertedToQuery
 
-                foreach (var transformation in reader.Files)
+                foreach (var transformation in reader.FinalItems<IFinalFileHandling>(true))
                 {
                     requests.Add(new TarItemFile(
                         TarRelativePath: Path.Combine(target, AppEnv.GetTopLevelRelativePath(transformation.TargetFile)),
@@ -85,7 +86,7 @@ internal class JobRunnerRepoDeploy : IJobRunner
                         ));
                 }
 
-                foreach (var transformation in reader.Directories)
+                foreach (var transformation in reader.FinalItems<IFinalDirectoryHandling>(true))
                 {
                     requests.Add(new TarItemDirectory(
                         TarRelativePath: Path.Combine(target, AppEnv.GetTopLevelRelativePath(transformation.SourceDirectory)),
