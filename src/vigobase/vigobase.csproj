@@ -16,9 +16,5 @@
       <PackageReference Include="Serilog" Version="3.1.1" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Transform\" />
-    </ItemGroup>
 
 </Project>
