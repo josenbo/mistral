@@ -30,7 +30,7 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
         ProcessDirectory(controller);
     }
     
-    private int ProcessDirectory(DirectoryController controller)
+    private int ProcessDirectory(DirectoryController controller, bool isTopLevel = true)
     {
         var deployableFileCount = 0;
         
@@ -60,12 +60,12 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
             {
                 if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
                     continue;
-                deployableFileCount += ProcessDirectory(new DirectoryController(di, request));
+                deployableFileCount += ProcessDirectory(new DirectoryController(di, request), false);
             }
         }
 
         mutableDirectoryHandling.IsEmptyDirectory = deployableFileCount == 0;
-        mutableDirectoryHandling.CanDeploy = mutableDirectoryHandling.KeepEmptyDirectory || 0 < deployableFileCount;
+        mutableDirectoryHandling.CanDeploy = !isTopLevel && (mutableDirectoryHandling.KeepEmptyDirectory || 0 < deployableFileCount);
         
         var finalDirectoryHandling = mutableDirectoryHandling.CheckAndTransform();
         
