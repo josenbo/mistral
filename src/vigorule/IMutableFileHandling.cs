@@ -14,6 +14,5 @@ public interface IMutableFileHandling : IMutableHandling
     FilePermission FilePermission { get; set; }
     LineEndingEnum LineEnding { get; set; }
     bool FixTrailingNewline { get; set; }
-    bool CanDeploy { get; set; }
     IFinalFileHandling CheckAndTransform();
 }

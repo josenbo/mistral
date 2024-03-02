@@ -15,6 +15,5 @@ public interface IFinalFileHandling : IFinalHandling
     FilePermission FilePermission { get; }
     LineEndingEnum LineEnding { get; }
     IEnumerable<string> DeploymentTargets { get; }
-    bool CanDeploy { get; }
     bool FixTrailingNewline { get; }
 }

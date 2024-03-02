@@ -12,9 +12,7 @@ public interface IRepositoryReader
     event AfterApplyFileHandling? AfterApplyFileHandlingEvent;
     event AfterApplyDirectoryHandling? AfterApplyDirectoryHandlingEvent;
 
-    IEnumerable<IFinalHandling> FilesAndDirectories { get; }
-    IEnumerable<IFinalFileHandling> Files { get; }
-    IEnumerable<IFinalDirectoryHandling> Directories { get; }
+    IEnumerable<T> FinalItems<T>(bool canDeployOnly) where T : IFinalHandling;
 
     void Read();
 }

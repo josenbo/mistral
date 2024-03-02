@@ -7,31 +7,33 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
     public event IRepositoryReader.BeforeApplyDirectoryHandling? BeforeApplyDirectoryHandlingEvent;
     public event IRepositoryReader.AfterApplyDirectoryHandling? AfterApplyDirectoryHandlingEvent;
 
-    public IEnumerable<IFinalHandling> FilesAndDirectories => _transformations; 
-    public IEnumerable<IFinalFileHandling> Files => _transformations.OfType<IFinalFileHandling>();
-    public IEnumerable<IFinalDirectoryHandling> Directories => _transformations.OfType<IFinalDirectoryHandling>();
-    
+    public IEnumerable<IFinalHandling> FilesAndDirectories => _finalItems; 
+    public IEnumerable<IFinalFileHandling> Files => _finalItems.OfType<IFinalFileHandling>();
+    public IEnumerable<IFinalDirectoryHandling> Directories => _finalItems.OfType<IFinalDirectoryHandling>();
+
+    IEnumerable<T> IRepositoryReader.FinalItems<T>(bool canDeployOnly) // where T : IFinalHandling
+    {
+        return canDeployOnly
+            ? _finalItems.OfType<T>().Where(t => t.CanDeploy)
+            : _finalItems.OfType<T>();
+    }
+
     public void Read()
     {
-        _transformations.Clear();
+        _finalItems.Clear();
         
         var controller = new DirectoryController(request.TopLevelDirectory, request);
 
         ProcessDirectory(controller);
     }
     
-    private void ProcessDirectory(DirectoryController controller)
+    private int ProcessDirectory(DirectoryController controller)
     {
+        var deployableFileCount = 0;
+        
         var mutableDirectoryHandling = controller.GetDirectoryTransformation();
         
         BeforeApplyDirectoryHandlingEvent?.Invoke(mutableDirectoryHandling);
-
-        var finalDirectoryHandling = mutableDirectoryHandling.CheckAndTransform();
-        
-        AfterApplyDirectoryHandlingEvent?.Invoke(finalDirectoryHandling);
-        
-        if (finalDirectoryHandling.KeepEmptyDirectory)
-            _transformations.Add(finalDirectoryHandling);
         
         foreach (var fi in controller.Location.EnumerateFiles())
         {
@@ -42,21 +44,33 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
             var finalFileHandling = mutableFileHandling.CheckAndTransform();
             
             AfterApplyFileHandlingEvent?.Invoke(finalFileHandling);
-            
+
             if (finalFileHandling.CanDeploy)
-                _transformations.Add(finalFileHandling);
+                deployableFileCount++;
+
+            _finalItems.Add(finalFileHandling);
         }
 
-        if (!request.WalkFolderTree) 
-            return;
-        
-        foreach (var di in controller.Location.EnumerateDirectories())
+        if (request.WalkFolderTree)
         {
-            if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
-                continue;
-            ProcessDirectory(new DirectoryController(di, request));
+            foreach (var di in controller.Location.EnumerateDirectories())
+            {
+                if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+                deployableFileCount += ProcessDirectory(new DirectoryController(di, request));
+            }
         }
+
+        mutableDirectoryHandling.CanDeploy = mutableDirectoryHandling.KeepEmptyDirectory || 0 < deployableFileCount;
+        
+        var finalDirectoryHandling = mutableDirectoryHandling.CheckAndTransform();
+        
+        AfterApplyDirectoryHandlingEvent?.Invoke(finalDirectoryHandling);
+        
+        _finalItems.Add(finalDirectoryHandling);
+
+        return deployableFileCount;
     }
 
-    private readonly List<IFinalHandling> _transformations = [];
+    private readonly List<IFinalHandling> _finalItems = [];
 }
