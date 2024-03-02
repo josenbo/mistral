@@ -1,4 +1,6 @@
-﻿namespace vigorule;
+﻿using vigobase;
+
+namespace vigorule;
 
 internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryReader
 {
@@ -7,10 +9,11 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
     public event IRepositoryReader.BeforeApplyDirectoryHandling? BeforeApplyDirectoryHandlingEvent;
     public event IRepositoryReader.AfterApplyDirectoryHandling? AfterApplyDirectoryHandlingEvent;
 
-    public IEnumerable<IFinalHandling> FilesAndDirectories => _finalItems; 
-    public IEnumerable<IFinalFileHandling> Files => _finalItems.OfType<IFinalFileHandling>();
-    public IEnumerable<IFinalDirectoryHandling> Directories => _finalItems.OfType<IFinalDirectoryHandling>();
-
+    public DirectoryInfo TopLevelDirectory => request.TopLevelDirectory;
+    public string GetTopLevelRelativePath(string path) => request.GetTopLevelRelativePath(path);
+    public string GetTopLevelRelativePath(FileSystemInfo fileSystemItem) => request.GetTopLevelRelativePath(fileSystemItem);
+    public FileHandlingParameters DefaultHandling => request.DefaultHandling;
+    
     IEnumerable<T> IRepositoryReader.FinalItems<T>(bool canDeployOnly) // where T : IFinalHandling
     {
         return canDeployOnly

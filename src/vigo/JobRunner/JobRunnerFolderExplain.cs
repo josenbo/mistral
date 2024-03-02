@@ -1,16 +1,14 @@
 ﻿namespace vigo;
 
-internal class JobRunnerFolderExplain(AppConfigFolderExplain appConfig) : IJobRunner
+internal class JobRunnerFolderExplain(AppConfigFolderExplain appConfig) : JobRunner
 {
     private AppConfigFolderExplain AppConfig { get; } = appConfig;    
 
-    public bool Success { get; } = true;
-    
-    public bool Prepare() => true;
+    public override bool Prepare() => true;
 
-    public bool Run() => true;
+    public override bool Run() => true;
 
-    public void CleanUp()
+    public override void CleanUp()
     {
     }
 }

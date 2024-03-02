@@ -2,13 +2,11 @@
 
 namespace vigo;
 
-internal class JobRunnerInfoVersion(AppConfigInfoVersion appConfig) : IJobRunner
+internal class JobRunnerInfoVersion(AppConfigInfoVersion appConfig) : JobRunner
 {
-    public bool Success { get; } = true;
-    
-    public bool Prepare() => true;
+    public override bool Prepare() => true;
 
-    public bool Run()
+    public override bool Run()
     {
         Assembly appAssembly;
         
@@ -34,7 +32,7 @@ internal class JobRunnerInfoVersion(AppConfigInfoVersion appConfig) : IJobRunner
         return true;
     }
 
-    public void CleanUp()
+    public override void CleanUp()
     {
     }
 

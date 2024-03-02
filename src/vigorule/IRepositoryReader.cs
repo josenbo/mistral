@@ -1,4 +1,6 @@
-﻿namespace vigorule;
+﻿using vigobase;
+
+namespace vigorule;
 
 public interface IRepositoryReader
 {
@@ -11,6 +13,11 @@ public interface IRepositoryReader
     event BeforeApplyDirectoryHandling? BeforeApplyDirectoryHandlingEvent;
     event AfterApplyFileHandling? AfterApplyFileHandlingEvent;
     event AfterApplyDirectoryHandling? AfterApplyDirectoryHandlingEvent;
+
+    DirectoryInfo TopLevelDirectory { get; }
+    string GetTopLevelRelativePath(string path);
+    string GetTopLevelRelativePath(FileSystemInfo file);
+    FileHandlingParameters DefaultHandling { get; }
 
     IEnumerable<T> FinalItems<T>(bool canDeployOnly) where T : IFinalHandling;
 

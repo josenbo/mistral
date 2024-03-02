@@ -4,13 +4,12 @@ using vigorule;
 
 namespace vigo;
 
-internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : IJobRunner
+internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : JobRunner
 {
     public IRepositoryReader RepositoryReader => _reader;
     private AppConfigRepoCheck AppConfig { get; } = appConfigRepoCheck;
-    public bool Success { get; private set; }
 
-    public bool Prepare()
+    public override bool Prepare()
     {
         _reader.Read();
         
@@ -19,13 +18,13 @@ internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : IJobR
             .All(ft => ft.CheckedSuccessfully);
     }
 
-    public bool Run()
+    public override bool Run()
     {
         Success = RunCommitChecks(_reader, AppConfig);
         return Success;
     }
 
-    public void CleanUp()
+    public override void CleanUp()
     {
         try
         {

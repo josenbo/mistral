@@ -6,11 +6,9 @@ using vigobase;
 
 namespace vigo;
 
-internal class JobRunnerInfoHelp(AppConfigInfoHelp appConfig) : IJobRunner
+internal class JobRunnerInfoHelp(AppConfigInfoHelp appConfig) : JobRunner
 {
-    public bool Success { get; } = true;
-
-    public bool Prepare()
+    public override bool Prepare()
     {
         const string defaultPage = "HelpGeneral.txt";
         
@@ -56,7 +54,7 @@ internal class JobRunnerInfoHelp(AppConfigInfoHelp appConfig) : IJobRunner
         return (resourceName is not null);
     }
 
-    public bool Run()
+    public override bool Run()
     {
         if (string.IsNullOrWhiteSpace(_helpResource))
             return false;
@@ -71,7 +69,7 @@ internal class JobRunnerInfoHelp(AppConfigInfoHelp appConfig) : IJobRunner
         return true;
     }
 
-    public void CleanUp()
+    public override void CleanUp()
     {
     }
     

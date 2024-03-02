@@ -16,9 +16,9 @@ internal record RepositoryReadRequest(
         return Path.GetRelativePath(TopLevelDirectory.FullName, path);
     }
     
-    public string GetTopLevelRelativePath(FileSystemInfo file)
+    public string GetTopLevelRelativePath(FileSystemInfo fileSystemItem)
     {
-        return Path.GetRelativePath(TopLevelDirectory.FullName, file.FullName);
+        return Path.GetRelativePath(TopLevelDirectory.FullName, fileSystemItem.FullName);
     }
 
     public string GetConfigFilesRegexPattern()

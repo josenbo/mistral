@@ -17,7 +17,7 @@ try
         settings.Command,
         settings);
 
-    IJobRunner jobRunner = settings switch
+    JobRunner jobRunner = settings switch
     {
         AppConfigRepoDeploy appConfigRepoDeploy => new JobRunnerRepoDeploy(appConfigRepoDeploy),
         AppConfigRepoCheck appConfigRepoCheck => new JobRunnerRepoCheck(appConfigRepoCheck),
