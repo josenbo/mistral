@@ -1,15 +1,16 @@
 ﻿using Serilog;
 using Serilog.Events;
+using vigobase;
 
 namespace vigoconfig;
 
-internal class PartialFolderConfig
+internal class PartialFolderConfig(ConfigurationFileTypeEnum configurationType)
 {
     public bool? KeepEmptyFolder { get; set; }
     public PartialFolderConfigHandling? LocalDefaults { get; set; }
     public IList<PartialFolderConfigRule> PartialRules { get; } = [];
-    
     public SourceBlockFolder? Block { get; set; }
+    public ConfigurationFileTypeEnum ConfigurationType { get; } = configurationType;
 
     internal void DumpToDebug()
     {

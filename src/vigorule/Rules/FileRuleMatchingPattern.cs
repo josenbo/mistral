@@ -19,7 +19,7 @@ internal record FileRuleMatchingPattern(
 )
 {
     internal override FileRuleConditionEnum Condition => FileRuleConditionEnum.MatchPattern;
-    internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation)
+    internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IMutableFileHandling? transformation)
     {
         if (!Regex.IsMatch(file.Name, NameToMatch))
         {
@@ -31,7 +31,7 @@ internal record FileRuleMatchingPattern(
             ? string.Empty
             : Regex.Replace(file.Name, NameToMatch, NameReplacement);
 
-        transformation = new DeploymentTransformationFile(file, Handling, this)
+        transformation = new FileHandlingImpl(file, Handling, this)
         {
             CanDeploy = Action is FileRuleActionEnum.DeployFile,
             DifferentTargetFileName = newName

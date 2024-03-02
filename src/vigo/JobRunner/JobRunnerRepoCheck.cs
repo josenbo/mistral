@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using vigobase;
+using vigorule;
 
 namespace vigo;
 
@@ -11,10 +12,10 @@ internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : IJobR
 
     public bool Prepare()
     {
-        _reader.ReadRepository();
+        _reader.Read();
         
-        return _reader.FileTransformations.All(ft => ft.CheckedSuccessfully) &&
-               _reader.DirectoryTransformations.All(dt => dt.CheckedSuccessfully);
+        return _reader.Files.All(ft => ft.CheckedSuccessfully) &&
+               _reader.Directories.All(dt => dt.CheckedSuccessfully);
     }
 
     public bool Run()
@@ -35,7 +36,11 @@ internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : IJobR
         }
     }
 
-    private readonly RepositoryReader _reader = new RepositoryReader(appConfigRepoCheck);
+    private readonly IRepositoryReader _reader = RuleBasedHandlingApi.GetReader(
+        topLevelDirectory: appConfigRepoCheck.RepositoryRoot,
+        defaultHandling: AppEnv.DefaultFileHandlingParams,
+        configFiles: AppEnv.DeployConfigRule.Filenames
+        );
 
     private static bool RunCommitChecks(IRepositoryReader reader, AppConfigRepoCheck appConfig)
     {

@@ -49,10 +49,10 @@ internal static class AppConfigBuilder
     private static AppConfigRepoDeploy AssembleDeploy(AppArguments appArgs)
     {
         var repositoryRoot = appArgs.RepositoryRoot
-                             ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX287","The repository root is mandatory for the deploy action"));
+                             ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX287",null,"The repository root is mandatory for the deploy action. Check the command line"));
         
         var deploymentBundle = appArgs.OutputFile
-                               ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX294","The output file is mandatory for the deploy action"));
+                               ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX294",null,"The output file is mandatory for the deploy action. Check the command line"));
         
         var targets = appArgs.Targets ?? Array.Empty<string>();
                       
@@ -68,7 +68,7 @@ internal static class AppConfigBuilder
     private static AppConfigRepoCheck AssembleCheck(AppArguments appArgs)
     {
         var repositoryRoot = appArgs.RepositoryRoot
-                             ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX301","The repository root is mandatory for the check action"));
+                             ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX301",null,"The repository root is mandatory for the check action. Check the command line"));
 
         var appConfig = new AppConfigRepoCheck(
             RepositoryRoot: repositoryRoot);
@@ -80,7 +80,7 @@ internal static class AppConfigBuilder
     private static AppConfigFolderExplain AssembleExplain(AppArguments appArgs)
     {
         var configurationFile = appArgs.ConfigurationFile
-                                ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX308","The configuration file is mandatory for the explain action"));
+                                ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX308", null,"The configuration file is mandatory for the explain action. Check the command line"));
         
         var names = appArgs.Names ?? Array.Empty<string>();
         
@@ -114,6 +114,6 @@ internal static class AppConfigBuilder
     private static AppConfig AssembleFault(AppArguments appArgs)
     {
         Log.Error("Invalid or missing action {TheAppArgs}", appArgs);
-        throw new VigoFatalException(AppEnv.Faults.Fatal("FX315","Invalid or missing action"));
+        throw new VigoFatalException(AppEnv.Faults.Fatal("FX315",null,"Invalid or missing action. Check the command line"));
     }
 }

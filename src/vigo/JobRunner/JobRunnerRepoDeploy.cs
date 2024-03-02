@@ -2,6 +2,7 @@
 using Serilog;
 using vigoarchive;
 using vigobase;
+using vigorule;
 
 namespace vigo;
 
@@ -16,15 +17,18 @@ internal class JobRunnerRepoDeploy : IJobRunner
     {
         AppConfig = appConfigRepoDeploy;
         AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot; 
-        _reader = new RepositoryReader(appConfigRepoDeploy);
+        _reader = RuleBasedHandlingApi.GetReader(
+            topLevelDirectory: appConfigRepoDeploy.RepositoryRoot,
+            defaultHandling: AppEnv.DefaultFileHandlingParams,
+            configFiles: AppEnv.DeployConfigRule.Filenames);
     }
     
     public bool Prepare()
     {
-        _reader.ReadRepository();
+        _reader.Read();
         
-        return _reader.FileTransformations.All(ft => ft.CheckedSuccessfully) &&
-               _reader.DirectoryTransformations.All(dt => dt.CheckedSuccessfully);
+        return _reader.Files.All(ft => ft.CheckedSuccessfully) &&
+               _reader.Directories.All(dt => dt.CheckedSuccessfully);
     }
     
     public bool Run()
@@ -51,7 +55,7 @@ internal class JobRunnerRepoDeploy : IJobRunner
 
     private AppConfigRepoDeploy AppConfig { get; }
 
-    private readonly RepositoryReader _reader;
+    private readonly IRepositoryReader _reader;
 
     private static bool BuildTarball(IRepositoryReader reader, AppConfigRepoDeploy appConfig)
     {
@@ -60,7 +64,7 @@ internal class JobRunnerRepoDeploy : IJobRunner
             var directoryTimestamp = DateTimeOffset.Now;
             
             var targets = reader
-                .FileTransformations
+                .Files
                 .SelectMany(ft => ft.DeploymentTargets)
                 .Distinct()
                 .ToList();
@@ -71,7 +75,7 @@ internal class JobRunnerRepoDeploy : IJobRunner
             {
                 // ReSharper disable LoopCanBeConvertedToQuery
 
-                foreach (var transformation in reader.FileTransformations)
+                foreach (var transformation in reader.Files)
                 {
                     requests.Add(new TarItemFile(
                         TarRelativePath: Path.Combine(target, AppEnv.GetTopLevelRelativePath(transformation.TargetFile)),
@@ -81,7 +85,7 @@ internal class JobRunnerRepoDeploy : IJobRunner
                         ));
                 }
 
-                foreach (var transformation in reader.DirectoryTransformations)
+                foreach (var transformation in reader.Directories)
                 {
                     requests.Add(new TarItemDirectory(
                         TarRelativePath: Path.Combine(target, AppEnv.GetTopLevelRelativePath(transformation.SourceDirectory)),

@@ -24,11 +24,15 @@ try
         AppConfigFolderExplain appConfigFolderExplain => new JobRunnerFolderExplain(appConfigFolderExplain),
         AppConfigInfoHelp appConfigInfoHelp => new JobRunnerInfoHelp(appConfigInfoHelp),
         AppConfigInfoVersion appConfigInfoVersion => new JobRunnerInfoVersion(appConfigInfoVersion),
-        null => throw new VigoFatalException(AppEnv.Faults.Fatal("FX252", "Failed to set up the job")),
-        _ => throw new VigoFatalException(AppEnv.Faults.Fatal("FX259","Failed to set up the job"))
+        null => throw new VigoFatalException(AppEnv.Faults.Fatal(
+            "FX252", 
+            $"Configuration should be valid or throw a fatal exception. Check why {nameof(settings)} could be null", 
+            string.Empty)),
+        _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
+            "FX259",
+            "Are we missing a new app action that needs to be implemented?", 
+            string.Empty))
     };
-
-    // jobRunner = new JobRunnerDoNothing(settings);
 
     try
     {
@@ -77,9 +81,9 @@ catch (Exception e)
 finally
 {
     stopwatch.Stop();
+    Log.CloseAndFlush();
 }
 
-Log.CloseAndFlush();
 return;
 
 ////////////////////////////////////////////////////////////////////////////////

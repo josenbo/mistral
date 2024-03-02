@@ -75,7 +75,7 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
                 path = path[..4096];
 
             if (!Directory.Exists(path))
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX441",$"Invalid repository root path in the environment variable {EnvVarVigoRepositoryRoot}"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX441",null,$"Invalid repository root path in the environment variable {EnvVarVigoRepositoryRoot}"));
 
             if (!Path.IsPathRooted(path))
                 path = Path.GetFullPath(path);
@@ -84,8 +84,7 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Log.Error(e, "Caught exception");
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX448","Startup configuration failed"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX448","Check what kind of exception was thrown and add proper handling for this situation", string.Empty), e);
         }
     }
     
@@ -111,13 +110,13 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
             if (fileInfo.Directory is null || !fileInfo.Directory.Exists) 
             {
                 Log.Error("Expected the tarball file path to be located in an existing directory (Tarball file path: {ThePath})", path);
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX455","The directory for the output file must exist"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX455",null,$"The directory for the output file must exist. Check the environment variable {EnvVarVigoOutputFile}"));
             }
 
             if (!fileInfo.Name.EndsWith(".tar.gz") || fileInfo.Name.Length < 8) 
             {
                 Log.Error("Expected the tarball file name to have a .tar.gz suffix and a non-empty base name (Tarball file name: {TheName})", fileInfo.Name);
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX462","The output file name must have a .tar.gz suffix"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX462",null, $"The output file name must have a .tar.gz suffix. Check the environment variable {EnvVarVigoOutputFile}"));
             }
             
             if (fileInfo.Exists)
@@ -127,8 +126,7 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Log.Error(e, "Caught exception");
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX469","Startup configuration failed"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX469","Check what kind of exception was thrown and add proper handling for this situation", string.Empty), e);
         }
     }
 
@@ -154,22 +152,21 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
             Log.Debug("Environment variable {TheName} was split into {TheSplitValues}", EnvVarVigoTargets, targetsList);
             
             if (0 == targetsList.Count)
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX476",$"{EnvVarVigoTargets} must have at least one target"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX476",null,$"The list of targets cannot be empty, but you can delete the environment variable to handle all targets. Check the environment variable {EnvVarVigoTargets}"));
 
             var invalidTargets = targetsList.Where(t => !DeploymentTargetHelper.IsValidName(t)).ToList();
                 
             if (0 < invalidTargets.Count)
             {
                 Log.Error("{TheEnvVar} has invalid target names {TheInvalidNames}", EnvVarVigoTargets, invalidTargets);
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX483",$"{EnvVarVigoTargets} has invalid target names"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX483",null, $"There are invalid target names {string.Join(", ", invalidTargets)} has invalid target names. Check the environment variable {EnvVarVigoTargets}"));
             }
 
             return targetsList;
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Log.Error(e, "Caught exception");
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX490","Startup configuration failed"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX490","Check what kind of exception was thrown and add proper handling for this situation", string.Empty), e);
         }
     }
     
@@ -203,8 +200,7 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Log.Error(e, "Caught exception");
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX497","Startup configuration failed"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX497","Check what kind of exception was thrown and add proper handling for this situation", string.Empty), e);
         }
     }
 
@@ -233,8 +229,7 @@ internal class ConfigSourceReaderEnvironmentVariables : IConfigSourceReader
         }
         catch (Exception e) when (e is not VigoException)
         {
-            Log.Error(e, "Caught exception");
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX504","Startup configuration failed"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX504","Check what kind of exception was thrown and add proper handling for this situation", string.Empty), e);
         }
     }
     

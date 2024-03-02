@@ -38,6 +38,14 @@ public interface IFolderConfiguration
     IConfigurationScriptExtract? BasedOn { get; }
 
     /// <summary>
+    /// The format of the configuration source.
+    /// Currently this may be Markdown or Native.
+    /// This is probed in the source and may differ
+    /// from the requested format. 
+    /// </summary>
+    ConfigurationFileTypeEnum ConfigurationType { get; }
+    
+    /// <summary>
     /// The configuration of rules should only
     /// specify the noteworthy and rely on defaults
     /// for the rest. To this end the global default

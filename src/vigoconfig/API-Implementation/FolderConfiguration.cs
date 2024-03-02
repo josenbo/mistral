@@ -5,7 +5,7 @@ namespace vigoconfig;
 internal class FolderConfiguration : IFolderConfiguration
 {
     bool IFolderConfiguration.KeepEmptyFolder => _partialPartialFolderConfig.KeepEmptyFolder ?? false;
-
+    ConfigurationFileTypeEnum IFolderConfiguration.ConfigurationType => _partialPartialFolderConfig.ConfigurationType;
     IConfigurationScriptExtract? IFolderConfiguration.BasedOn => _partialPartialFolderConfig.Block;
     
     IEnumerable<IFileRuleConfiguration> IFolderConfiguration.RuleConfigurations => _rules;

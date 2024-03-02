@@ -20,7 +20,7 @@ public static partial class DeploymentTargetHelper
             if (!RexTargetName.IsMatch(name))
             {
                 Log.Fatal("Invalid target name {TheTargetName}", name);
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX518","Invalid target name"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX518",null,"Invalid target name. Check the configuration"));
             }
 
             var knownName = GetOrRegisterKnownName(name);

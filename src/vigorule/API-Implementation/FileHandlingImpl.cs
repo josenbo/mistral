@@ -5,13 +5,14 @@ using vigobase;
 
 namespace vigorule;
 
-internal class DeploymentTransformationFile : IDeploymentTransformationReadWriteFile, IDeploymentTransformationReadOnlyFile
+internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
 {
     public bool CanDeploy { get; set; }
     public FileInfo SourceFile { get; }
-    public FileInfo CheckedAndTransformedTemporaryFile => _checkedAndTransformedTemporaryFile ??
-                                                          throw new VigoFatalException(AppEnv.Faults.Fatal("FX574",
-                                                              $"The checked and transformed file is not (yet) available ({AppEnv.GetTopLevelRelativePath(SourceFile)})"));
+    public FileInfo CheckedAndTransformedTemporaryFile => _checkedAndTransformedTemporaryFile ?? throw new VigoFatalException(AppEnv.Faults.Fatal(
+        "FX574",
+        $"The checked and transformed file is not (yet) available ({AppEnv.GetTopLevelRelativePath(SourceFile)})",
+        string.Empty));
     public bool CheckedSuccessfully { get; private set; }
     public string RelativePathSourceFile => AppEnv.GetTopLevelRelativePath(SourceFile.FullName);
     public string? DifferentTargetFileName
@@ -36,17 +37,17 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
                     Log.Error("Setting the new name {NewName} for the repository file {TheSourceFile} failed, because the repository file has no parent directory",
                         _differentTargetFileName,
                         AppEnv.GetTopLevelRelativePath(SourceFile.FullName));                    
-                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX581","The DirectoryName of a repository file should never be null"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX581","The DirectoryName of a repository file should never be null", string.Empty));
                 }
         
                 TargetFile = new FileInfo(Path.Combine(SourceFile.DirectoryName, _differentTargetFileName));
             }
             catch (Exception e) when (e is not VigoException)
             {
-                Log.Error(e,"Setting the new name {NewName} for the repository file {TheSourceFile} failed with an Exception",
+                Log.Error("Setting the new name {NewName} for the repository file {TheSourceFile} failed with an Exception",
                     _differentTargetFileName,
                     AppEnv.GetTopLevelRelativePath(SourceFile.FullName));                    
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX588","Failed to set a new name for a repository file"), e);
+                throw new VigoFatalException(AppEnv.Faults.Fatal("FX588","Failed to set a new name for a repository file", string.Empty), e);
             }
         }
     }
@@ -90,7 +91,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
 
     public IEnumerable<string> DeploymentTargets => _handling.Targets;
     
-    IDeploymentTransformationReadOnlyFile IDeploymentTransformationReadWriteFile.CheckAndTransform()
+    IFinalFileHandling IMutableFileHandling.CheckAndTransform()
     {
         var filename = SourceFile.Name;
         var filepath = AppEnv.GetTopLevelRelativePath(SourceFile.DirectoryName ?? string.Empty);
@@ -186,7 +187,7 @@ internal class DeploymentTransformationFile : IDeploymentTransformationReadWrite
         }
     }
     
-    internal DeploymentTransformationFile(FileInfo sourceFile, FileHandlingParameters defaults, FileRule appliedRule)
+    internal FileHandlingImpl(FileInfo sourceFile, FileHandlingParameters defaults, FileRule appliedRule)
     {
         _handling = defaults;
         TargetFile = SourceFile = sourceFile;

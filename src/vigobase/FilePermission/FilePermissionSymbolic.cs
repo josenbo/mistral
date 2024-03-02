@@ -58,7 +58,7 @@ public partial record FilePermissionSymbolic(string TextRepresentation) : FilePe
                     Log.Error("Encountered the invalid expression {InvalidExpression} in the symbolic permission {TheSymbolicPermissionSpec}",
                         expr,
                         TextRepresentation);
-                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX525",$"The symbolic permission contains an invalid expression"));
+                    throw new VigoFatalException(AppEnv.Faults.Fatal("FX525",null, $"The symbolic permission contains an invalid expression. Check the folder configuration file"));
                 }
             
                 // If the who group is empty or has
@@ -156,7 +156,7 @@ public partial record FilePermissionSymbolic(string TextRepresentation) : FilePe
             Log.Error(e, "Could not calculate the unix file mode for the symbolic permission {TheSymbolicPermissionSpec} and the default file mode {DefaultFileMode}",
                 TextRepresentation,
                 defaultUnixFileMode);
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX532",$"Could not calculate the unix file mode for the symbolic permission"), e);
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX532","Check what happened and add proper handling for this case", string.Empty), e);
         }
     }
 

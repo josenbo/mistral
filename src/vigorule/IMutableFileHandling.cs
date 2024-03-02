@@ -1,6 +1,8 @@
-﻿namespace vigobase;
+﻿using vigobase;
 
-public interface IDeploymentTransformationReadWriteFile : IDeploymentTransformationReadWrite
+namespace vigorule;
+
+public interface IMutableFileHandling : IMutableHandling
 {
     FileInfo SourceFile { get; }
     string RelativePathSourceFile { get; }
@@ -13,5 +15,5 @@ public interface IDeploymentTransformationReadWriteFile : IDeploymentTransformat
     LineEndingEnum LineEnding { get; set; }
     bool FixTrailingNewline { get; set; }
     bool CanDeploy { get; set; }
-    IDeploymentTransformationReadOnlyFile CheckAndTransform();
+    IFinalFileHandling CheckAndTransform();
 }

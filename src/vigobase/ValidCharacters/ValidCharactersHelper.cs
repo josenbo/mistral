@@ -12,7 +12,7 @@ public static partial class ValidCharactersHelper
         if (string.IsNullOrWhiteSpace(configText))
         {
             Log.Fatal("The allowed characters setting can be omitted, but when used, the value must not be empty");
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX539","Invalid empty value for the allowed characters setting"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX539",null, "Invalid empty value for the allowed characters setting. Check the folder configuration file"));
         }
         
         if (string.IsNullOrWhiteSpace(configText) || configText.Trim().Equals("all", StringComparison.InvariantCultureIgnoreCase))
@@ -23,7 +23,7 @@ public static partial class ValidCharactersHelper
         if (!match.Success)
         {
             Log.Fatal("The allowed characters value could not be parsed. Expecting All|Ascii( + others)|AsciiGerman( + others). Value was: {TheValue}", configText);
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX546","Invalid value for the allowed characters setting"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX546",null, "Invalid value for the allowed characters setting. Check the folder configuration file"));
         }
         
         var key = match.Groups["key"].Value.ToLowerInvariant();
@@ -43,7 +43,10 @@ public static partial class ValidCharactersHelper
             // ReSharper restore StringLiteralTypo
             default:
                 Log.Fatal("Invalid key value for the allowed characters setting. Value was: {TheValue}", key);
-                throw new VigoFatalException(AppEnv.Faults.Fatal("FX553","Invalid key value for the allowed characters setting"));
+                throw new VigoFatalException(AppEnv.Faults.Fatal(
+                    "FX553",
+                    null, 
+                    "Invalid base character set name for the allowed characters setting. Check the folder configuration file"));
         }
     }
 

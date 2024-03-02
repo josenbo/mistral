@@ -10,6 +10,5 @@ internal abstract record FileRule(
 ) 
 {
     internal abstract FileRuleConditionEnum Condition { get; }
-    internal abstract bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IDeploymentTransformationReadWriteFile? transformation);
+    internal abstract bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IMutableFileHandling? transformation);
 }
-

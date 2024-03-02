@@ -27,7 +27,7 @@ internal static partial class PartialFolderConfigReader
             
         var (folderBlock, ruleBlocks) = ReadSourceBlocks(lines, configurationFile, configurationType.Value);
 
-        var folderConfig = new PartialFolderConfig();
+        var folderConfig = new PartialFolderConfig(configurationType.Value);
         
         if (folderBlock is not null)
         {

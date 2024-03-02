@@ -13,7 +13,7 @@ public static class AppEnv
     public static StandardFileHandling FinalCatchAllRule { get; set; }
     public static DirectoryInfo TopLevelDirectory
     {
-        get => _topLevelDirectory ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX266",$"{nameof(vigobase)}.{nameof(AppEnv)}.{nameof(TopLevelDirectory)} was not set"));
+        get => _topLevelDirectory ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX266","Forgot to set this from the AppConfig in the JobRunner?", string.Empty));
         set => _topLevelDirectory = value;
     }
     public static DirectoryInfo TemporaryDirectory { get; set; }
@@ -81,13 +81,15 @@ public static class AppEnv
     public static DirectoryInfo GetTemporaryDirectory()
     {
         var envValue = Environment.GetEnvironmentVariable(EnvVarVigoTempDir);
+        Log.Debug("{TheProperty} = {TheValue}", nameof(envValue), envValue);
         var path = envValue ?? Path.GetTempPath();
+        Log.Debug("{TheProperty} = {TheValue}", nameof(path), path);
 
         if (4096 < path.Length)
             path = path[..4096];
 
         if (!Directory.Exists(path))
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX273","Could not locate the directory for temporary files"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal("FX273","Check if the path came from system or settings and see how to handle this case properly", string.Empty));
             
         if (!Path.IsPathRooted(path))
             path = Path.GetFullPath(path);
@@ -104,7 +106,10 @@ public static class AppEnv
         var directoryInfo = new DirectoryInfo(path);
 
         if (directoryInfo.Exists)
-            throw new VigoFatalException(AppEnv.Faults.Fatal("FX280","Could not set up the directory for temporary files"));
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX280",
+                "Collisions are possible but improbable. Check what happened and consider adding collision detection or better cleanup", 
+                string.Empty));
         
         directoryInfo.Create();
         

@@ -1,6 +1,8 @@
-﻿namespace vigobase;
+﻿using vigobase;
 
-public interface IDeploymentTransformationReadOnlyFile : IDeploymentTransformationReadOnly
+namespace vigorule;
+
+public interface IFinalFileHandling : IFinalHandling
 {
     FileInfo SourceFile { get; }
     FileInfo CheckedAndTransformedTemporaryFile { get; }

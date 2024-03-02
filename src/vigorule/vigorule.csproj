@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\vigobase\vigobase.csproj" />
+      <ProjectReference Include="..\vigoconfig\vigoconfig.csproj" />
     </ItemGroup>
 
 </Project>
