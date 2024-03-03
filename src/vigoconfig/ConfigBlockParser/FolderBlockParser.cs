@@ -69,9 +69,11 @@ internal class FolderBlockParser(PartialFolderConfig partialFolderConfig, Source
                 codeBlock.Description,
                 _lastErrorSourceLine,
                 _lastErrorMessage);
-            
-            throw new VigoParseFolderConfigException(
-                "Failed to parse the folder configuration. Encountered syntax errors or illegal values in the folder configuration");
+
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX147",
+                null,
+                "Failed to parse a folder configuration script. See log for details"));
         }    
     }
 

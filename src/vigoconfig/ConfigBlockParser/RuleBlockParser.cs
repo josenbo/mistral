@@ -69,9 +69,11 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                 codeBlock.Description,
                 _lastErrorSourceLine,
                 _lastErrorMessage);
-            
-            throw new VigoParseFolderConfigException(
-                "Failed to parse the file rule. Encountered syntax errors or illegal values in the folder configuration");
+
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX154",
+                null,
+                "Failed to parse a folder configuration script. See log for details"));
         }    
     }
 
@@ -192,7 +194,10 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                 "IGNORE" => FileRuleActionEnum.IgnoreFile,
                 "DEPLOY" => FileRuleActionEnum.DeployFile,
                 "CHECK" => FileRuleActionEnum.CheckFile,
-                _ => throw new VigoParseFolderConfigException($"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}")
+                _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
+                    "FX189",
+                    $"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}",
+                    "Failed to parse a folder configuration script. See log for details"))
             };
 
             if (!string.IsNullOrWhiteSpace(fileType))
@@ -203,8 +208,10 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                 {
                     "TEXT" => FileTypeEnum.TextFile,
                     "BINARY" => FileTypeEnum.BinaryFile,
-                    _ => throw new VigoParseFolderConfigException(
-                        $"Expected the file type of the rule to be in [TEST, BINARY] but found the value {fileType}")
+                    _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
+                        "FX196",
+                        $"Expected the file type of the rule to be in [TEST, BINARY] but found the value {fileType}",
+                        "Failed to parse a folder configuration script. See log for details"))
                 };
             }
 
@@ -216,8 +223,10 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                     {
                         "EQUALS" => FileRuleConditionEnum.MatchName,
                         "MATCHES" => FileRuleConditionEnum.MatchPattern,
-                        _ => throw new VigoParseFolderConfigException(
-                            $"Expected the condition clause of the rule to be either 'IF NAME EQUALS <name>' or 'IF NAME MATCHES <pattern>', but found '{string.Join(", ", tokenizer.MatchedTokens.Skip(4))}'")
+                        _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
+                            "FX203",
+                            $"Expected the condition clause of the rule to be either 'IF NAME EQUALS <name>' or 'IF NAME MATCHES <pattern>', but found '{string.Join(", ", tokenizer.MatchedTokens.Skip(4))}'",
+                            "Failed to parse a folder configuration script. See log for details"))
                     };
 
                     rule.CompareWith = tokenizer.MatchedTokens[^1];

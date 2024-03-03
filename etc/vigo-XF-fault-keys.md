@@ -17,21 +17,14 @@ for (int i = 0; i < 1000; i+=7)
 
 Invariant violated. Notify support and provide logs
 
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX112", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX119", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX126", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX133", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX140", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX147", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX154", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX161", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX168", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX175", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX182", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX189", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX196", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX203", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX210", null, "todo"))
+
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX000",
+                null,
+                "Failed to parse a folder configuration script. See log for details"));
+
+
+
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX217", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX224", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX231", null, "todo"))

@@ -57,7 +57,7 @@ public class CoreRequirements
                                
                                """;
         
-        Assert.Throws<VigoParseFolderConfigException>(() => PartialFolderConfigReader.Parse(content));
+        Assert.Throws<VigoFatalException>(() => PartialFolderConfigReader.Parse(content));
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class CoreRequirements
 
                                """;
         
-        Assert.Throws<VigoParseFolderConfigException>(() => PartialFolderConfigReader.Parse(content));
+        Assert.Throws<VigoFatalException>(() => PartialFolderConfigReader.Parse(content));
     }
     
     [Fact]

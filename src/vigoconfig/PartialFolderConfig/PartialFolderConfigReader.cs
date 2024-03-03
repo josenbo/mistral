@@ -14,15 +14,34 @@ internal static partial class PartialFolderConfigReader
         ConfigurationFileTypeEnum? configurationType = null)
     {
         var lines = content.Split(LineSeparators, StringSplitOptions.None).ToList();
-
+        
         configurationFile ??= "anonymous text block";
+        
+        var vigoMarkerLine = lines.FirstOrDefault(l => l.Contains("vîgô"));
 
-        configurationType ??= GuessConfigurationTypeFromContent(lines);
+        if (vigoMarkerLine is null)
+        {
+            Log.Fatal("The content of the folder configuration script '{TheConfigurationFile}' does not contain the vîgô marker",
+                configurationFile);
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX133",
+                "Configuration files must have the term vîgô appear at least once somewhere in the content",
+                $"A folder configuration script is missing the vîgô marker. See log for details"));
+        }
+        
+        if (configurationType.HasValue && !configurationType.Value.IsDefinedAndValid())
+            configurationType = null;
+            
+        configurationType ??= GuessConfigurationType(configurationFile, lines);
 
         if (!configurationType.Value.IsDefinedAndValid())
         {
-            Log.Error("The content of the folder configuration script '{TheConfigurationFile}' was not recognized as markdown, nor as native format", configurationFile);
-            throw new VigoParseFolderConfigException($"The format of the folder configuration script '{configurationFile}' was not recognized");
+            Log.Fatal("The content of the folder configuration script '{TheConfigurationFile}' was not recognized as markdown, nor as native format", configurationFile);
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX140",
+                null,
+                "Unrecognized format of a folder configuration script. See log for details"));
+            // throw new VigoParseFolderConfigException($"The format of the folder configuration script '{configurationFile}' was not recognized");
         }
             
         var (folderBlock, ruleBlocks) = ReadSourceBlocks(lines, configurationFile, configurationType.Value);
@@ -49,14 +68,19 @@ internal static partial class PartialFolderConfigReader
         return folderConfig;
     }
 
-    private static ConfigurationFileTypeEnum GuessConfigurationTypeFromContent(IReadOnlyCollection<string> lines)
+    private static ConfigurationFileTypeEnum GuessConfigurationType(string configurationFile, IEnumerable<string> lines)
     {
-        if (ProbeMarkdown(lines))
-            return ConfigurationFileTypeEnum.MarkdownFormat;
-
-        return ProbeNative(lines) 
-            ? ConfigurationFileTypeEnum.NativeFormat 
-            : ConfigurationFileTypeEnum.Undefined;
+        switch (Path.GetExtension(configurationFile).ToLowerInvariant())
+        {
+            case ".md":
+                return ConfigurationFileTypeEnum.MarkdownFormat;
+            case ".vigo":
+                return ConfigurationFileTypeEnum.NativeFormat;
+        } 
+        
+        return ProbeMarkdown(lines) 
+            ? ConfigurationFileTypeEnum.MarkdownFormat 
+            : ConfigurationFileTypeEnum.NativeFormat;
     }
 
     private static (SourceBlockFolder? folderConfig,  IReadOnlyList<SourceBlockRule> rulesConfig) ReadSourceBlocks(
@@ -95,7 +119,10 @@ internal static partial class PartialFolderConfigReader
         if (1 < blocks.OfType<SourceBlockFolder>().Count())
         {
             Log.Error("There is more than one folder configuration block");
-            throw new VigoParseFolderConfigException("There can be no more than a single folder configuration block");
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX161",
+                null,
+                "Failed to parse a folder configuration script. See log for details"));
         }
 
         var folderBlock = blocks.OfType<SourceBlockFolder>().SingleOrDefault();
@@ -114,8 +141,11 @@ internal static partial class PartialFolderConfigReader
                 lastRuleBlock.ToLineNumber <= lastRuleBlock.FromLineNumber ||
                 currentRuleBlock.ToLineNumber <= currentRuleBlock.FromLineNumber)
             {
-                Log.Error("The order of configuration sections and source lines is not sequential");
-                throw new VigoParseFolderConfigException("Could not establish the order of configuration sections");
+                Log.Fatal("The order of configuration sections and source lines is not sequential");
+                throw new VigoFatalException(AppEnv.Faults.Fatal(
+                    "FX168",
+                    "Blocks are numbered sequentially and do not overlap",
+                    string.Empty));
             }
 
             lastRuleBlock = currentRuleBlock;
@@ -171,9 +201,12 @@ internal static partial class PartialFolderConfigReader
                 }
                 else
                 {
-                    Log.Error("Unexpected token in line {TheLine}", sourceLine);
-                    throw new VigoParseFolderConfigException(
-                        $"Syntax error in the folder configuration at line {sourceLine.LineNumber}. Expecting DO or CONFIGURE.");
+                    Log.Fatal("Expecting DO or CONFIGURE, but found unmatched token in line {TheLine}", sourceLine);
+                    throw new VigoFatalException(AppEnv.Faults.Fatal(
+                        "FX175",
+                        null,
+                        "Failed to parse a folder configuration script. See log for details"));
+                    
                 }
                 tempLines.Clear();
                 tempLines.Add(sourceLine);
@@ -186,9 +219,13 @@ internal static partial class PartialFolderConfigReader
             return retval;
         
         
-        Log.Error("The last block was not closed properly");
-        throw new VigoParseFolderConfigException(
-            $"Syntax error in the folder configuration. The block beginning at line {tempLines[0].LineNumber} was not closed. Expecting DONE.");
+        Log.Fatal("Syntax error in the folder configuration '{TheConfigFile}'. The block beginning at line {TheFirstLine} was not closed. Expecting DONE.",
+            configurationFile,
+            tempLines[0].LineNumber);
+        throw new VigoFatalException(AppEnv.Faults.Fatal(
+            "FX182",
+            null,
+            "Failed to parse a folder configuration script. See log for details"));
     }
 
     private static bool ProbeMarkdown(IEnumerable<string> lines)
@@ -230,31 +267,6 @@ internal static partial class PartialFolderConfigReader
         return retval;
     }
     
-    private static bool ProbeNative(IEnumerable<string> lines)
-    {
-        var first = true;
-        foreach (var line in lines)
-        {
-            if (first)
-            {
-                if (!RexShebangPattern.IsMatch(line))
-                    return false;
-                else
-                    Log.Debug("Shebang found");
-                
-                first = false;
-            }
-            else
-            {
-                if (!RexNativePattern.IsMatch(line)) continue;
-                
-                Log.Debug("Recognized native format");
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private static IReadOnlyList<SourceLine> GetSourceLinesFromNative(IEnumerable<string> lines)
     {
@@ -274,8 +286,6 @@ internal static partial class PartialFolderConfigReader
     }
     
     private static readonly Regex RexMarkdownPattern = RexMarkdownPatternCompiled();
-    private static readonly Regex RexNativePattern = RexNativePatternCompiled();
-    private static readonly Regex RexShebangPattern = RexShebangPatternCompiled();
     private static readonly Regex RexBeginMarkdownCodeBlock = RexBeginMarkdownCodeBlockCompiled();
     private static readonly Regex RexEndMarkdownCodeBlock = RexEndMarkdownCodeBlockCompiled();
     private static readonly Regex RexEmptyOrComment = RexEmptyOrCommentCompiled();
@@ -287,12 +297,6 @@ internal static partial class PartialFolderConfigReader
     
     [GeneratedRegex(@"^[ \t]*#.*vîgô.*$")]
     private static partial Regex RexMarkdownPatternCompiled();
-
-    [GeneratedRegex(@"^[ \t]*#[ \t]*vîgô.*$")]
-    private static partial Regex RexNativePatternCompiled();
-    
-    [GeneratedRegex(@"^#!/usr/bin/env[ \t]{1,8}vigo[ \t]*$")]
-    private static partial Regex RexShebangPatternCompiled();
     
     [GeneratedRegex(@"^[ \t]{0,8}```[ \t]{0,4}vigo\b")]
     private static partial Regex RexBeginMarkdownCodeBlockCompiled();

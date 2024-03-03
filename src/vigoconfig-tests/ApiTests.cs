@@ -20,6 +20,7 @@ public class ApiTests
                                      VALID CHARACTERS Ascii
                                      SOURCE ENCODING Ascii
                                  DONE
+                                 #vîgô
                                  """,
             configurationFile: $"{nameof(ApiTests)}.{nameof(FolderAndOneRule)}",
             configurationType: ConfigurationFileTypeEnum.NativeFormat,

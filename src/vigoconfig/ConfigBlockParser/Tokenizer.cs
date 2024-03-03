@@ -98,11 +98,14 @@ internal class Tokenizer(SourceBlock sourceBlock)
         if (_matchedTokens.Count == compareWith.Length) 
             return true;
         
-        Log.Error("The matched tokens must be the same number as in the syntax definition, but there were {TheObservedNumber} instead of the expected {TheExpectedNumber}",
+        Log.Fatal("The matched tokens must be the same number as in the syntax definition, but there were {TheObservedNumber} instead of the expected {TheExpectedNumber}",
             _matchedTokens.Count,
             compareWith.Length);
 
-        throw new VigoParseFolderConfigException("The matched tokens do not comply with the syntax tree");
+        throw new VigoFatalException(AppEnv.Faults.Fatal(
+            "FX210",
+            null,
+            "Failed to parse a folder configuration script. See log for details"));
     }
     
     // public bool Check(params string[] compareWith)
