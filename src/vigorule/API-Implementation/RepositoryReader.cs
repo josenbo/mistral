@@ -21,16 +21,37 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
             : _finalItems.OfType<T>();
     }
 
+    IEnumerable<T> IRepositoryReader.FinalItems<T>(string target) // where T : IFinalHandling
+    {
+        return _finalItems.OfType<T>().Where(t => t.CanDeploy && t.HasDeploymentTarget(target));
+    }
+
+    public IEnumerable<string> Targets()
+    {
+        if (0 < _targets.Count || _finalItems.Count == 0)
+            return _targets;
+
+        _targets.AddRange(
+            _finalItems
+                .Where(t => t.CanDeploy)
+                .SelectMany(i => i.DeploymentTargets)
+                .Distinct()
+            );
+        
+        return _targets;
+    }
+
     public void Read()
     {
         _finalItems.Clear();
+        _targets.Clear();
         
-        var controller = new DirectoryController(request.TopLevelDirectory, request);
+        var controller = new DirectoryController(request.TopLevelDirectory, request, true);
 
         ProcessDirectory(controller);
     }
     
-    private int ProcessDirectory(DirectoryController controller, bool isTopLevel = true)
+    private int ProcessDirectory(DirectoryController controller)
     {
         var deployableFileCount = 0;
         
@@ -49,7 +70,10 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
             AfterApplyFileHandlingEvent?.Invoke(finalFileHandling);
 
             if (finalFileHandling.CanDeploy)
+            {
                 deployableFileCount++;
+                controller.CollectDeploymentTargets(finalFileHandling.DeploymentTargets);                
+            }
 
             _finalItems.Add(finalFileHandling);
         }
@@ -60,12 +84,14 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
             {
                 if (di.Name.Equals(".git", StringComparison.InvariantCultureIgnoreCase))
                     continue;
-                deployableFileCount += ProcessDirectory(new DirectoryController(di, request), false);
+
+                var subDirController = new DirectoryController(di, request, false);
+                deployableFileCount += ProcessDirectory(subDirController);
+                controller.CollectDeploymentTargets(subDirController.GetTargets());
             }
         }
 
-        mutableDirectoryHandling.IsEmptyDirectory = deployableFileCount == 0;
-        mutableDirectoryHandling.CanDeploy = !isTopLevel && (mutableDirectoryHandling.KeepEmptyDirectory || 0 < deployableFileCount);
+        mutableDirectoryHandling.CanDeploy = !controller.IsTopLevelDirectory && (mutableDirectoryHandling.KeepEmptyDirectory || 0 < deployableFileCount);
         
         var finalDirectoryHandling = mutableDirectoryHandling.CheckAndTransform();
         
@@ -77,4 +103,5 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
     }
 
     private readonly List<IFinalHandling> _finalItems = [];
+    private readonly List<string> _targets = [];
 }

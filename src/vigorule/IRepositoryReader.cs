@@ -21,8 +21,11 @@ public interface IRepositoryReader
     string GetTopLevelRelativePath(FileSystemInfo file);
     FileHandlingParameters DefaultHandling { get; }
 
+    
     IEnumerable<T> FinalItems<T>(bool canDeployOnly) where T : IFinalHandling;
-
+    IEnumerable<T> FinalItems<T>(string target) where T : IFinalHandling;
+    IEnumerable<string> Targets();
+    
     void Read();
 }
 

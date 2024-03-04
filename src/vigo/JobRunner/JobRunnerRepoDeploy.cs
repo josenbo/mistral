@@ -13,7 +13,8 @@ internal class JobRunnerRepoDeploy : JobRunner
     public JobRunnerRepoDeploy(AppConfigRepoDeploy appConfigRepoDeploy)
     {
         AppConfig = appConfigRepoDeploy;
-        AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot; 
+        AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot;
+        Success = false;
         _reader = RuleBasedHandlingApi.GetReader(
             topLevelDirectory: appConfigRepoDeploy.RepositoryRoot,
             defaultHandling: AppEnv.DefaultFileHandlingParams,
@@ -23,10 +24,12 @@ internal class JobRunnerRepoDeploy : JobRunner
     public override bool Prepare()
     {
         _reader.Read();
-        
-        return _reader
+
+        Success = _reader
             .FinalItems<IFinalHandling>(true)
             .All(ft => ft.CheckedSuccessfully);
+
+        return Success;
     }
     
     public override bool Run()

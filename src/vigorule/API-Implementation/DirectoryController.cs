@@ -4,13 +4,15 @@ using vigoconfig;
 
 namespace vigorule;
 
-internal class DirectoryController(DirectoryInfo location, RepositoryReadRequest request)
+internal class DirectoryController(DirectoryInfo location, RepositoryReadRequest request, bool isTopLevelDirectory)
 {
     public DirectoryInfo Location { get; } = location;
 
+    public bool IsTopLevelDirectory { get; } = isTopLevelDirectory;
+
     public IMutableDirectoryHandling GetDirectoryTransformation()
     {
-        return new DirectoryHandlingImpl(Location, _folderConfiguration?.KeepEmptyFolder ?? false);
+        return new DirectoryHandlingImpl(Location, _folderConfiguration?.KeepEmptyFolder ?? false, IsTopLevelDirectory, GetTargets);
     }
     
     public IMutableFileHandling GetFileTransformation(FileInfo file)
@@ -125,4 +127,20 @@ internal class DirectoryController(DirectoryInfo location, RepositoryReadRequest
             Action: FileRuleActionEnum.IgnoreFile,
             Handling: request.IgnoredFileHandling));
     }
+
+    internal IEnumerable<string> GetTargets()
+    {
+        return _deploymentTargetDictionary.Keys;
+    }
+
+    internal void CollectDeploymentTargets(IEnumerable<string> targets)
+    {
+        foreach (var target in targets)
+        {
+            _deploymentTargetDictionary.TryAdd(target, target);
+        }
+    }
+    
+    private readonly Dictionary<string, string> _deploymentTargetDictionary =
+        new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 }

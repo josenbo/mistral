@@ -16,6 +16,5 @@ public interface IFinalFileHandling : IFinalHandling
     FileEncodingEnum TargetFileEncoding { get; }
     FilePermission FilePermission { get; }
     LineEndingEnum LineEnding { get; }
-    IEnumerable<string> DeploymentTargets { get; }
     bool FixTrailingNewline { get; }
 }

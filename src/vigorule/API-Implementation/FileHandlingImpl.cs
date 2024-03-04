@@ -91,6 +91,16 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
 
     public IEnumerable<string> DeploymentTargets => _handling.Targets;
     
+    public bool HasDeploymentTarget(string target)
+    {
+        return _handling.Targets.Contains(target, StringComparer.InvariantCultureIgnoreCase);
+    }
+
+    public bool CanDeployForTarget(string target)
+    {
+        return CanDeploy && HasDeploymentTarget(target);
+    }
+
     public void Explain(StringBuilder sb, ExplainSettings settings)
     {
         // todo: add implementation
