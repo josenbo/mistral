@@ -34,7 +34,7 @@ internal class JobRunnerRepoDeploy : JobRunner
     
     public override bool Run()
     {
-        Success = BuildTarball(_reader, AppConfig.OutputFile);
+        Success = BuildTarball(_reader, new FileInfo(AppConfigRepo.OutputFileTempPath), AppConfig.Targets);
 
         return Success;
     }
@@ -44,7 +44,11 @@ internal class JobRunnerRepoDeploy : JobRunner
         try
         {
             if (Success && File.Exists(AppConfigRepo.OutputFileTempPath))
+            {
+                Log.Debug("Moving the archive file from the temporary folder to the target destination {TheTarget}", 
+                    AppConfig.OutputFile);
                 File.Move(AppConfigRepo.OutputFileTempPath, AppConfig.OutputFile.FullName);
+            }
             
             AppEnv.TemporaryDirectory.Delete(true);
         }

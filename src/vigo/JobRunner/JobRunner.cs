@@ -13,17 +13,21 @@ internal abstract class JobRunner
     public abstract bool Run();
     public abstract void CleanUp();
     
-    protected static bool BuildTarball(IRepositoryReader reader, FileInfo outputFile)
+    protected static bool BuildTarball(IRepositoryReader reader, FileInfo outputFile, IReadOnlyList<string> filterByTargets)
     {
         try
         {
             var directoryTimestamp = DateTimeOffset.Now;
-            
-            var targets = reader
-                .FinalItems<IFinalFileHandling>(true)
-                .SelectMany(ft => ft.DeploymentTargets)
-                .Distinct()
-                .ToList();
+
+
+            var targets = 0 < filterByTargets.Count
+                ? reader
+                    .Targets()
+                    .Where(t => filterByTargets.Contains(t, StringComparer.InvariantCultureIgnoreCase))
+                    .ToList()
+                : reader
+                    .Targets()
+                    .ToList();
 
             var requests = new List<TarItem>();
             
@@ -31,7 +35,7 @@ internal abstract class JobRunner
             {
                 // ReSharper disable LoopCanBeConvertedToQuery
 
-                foreach (var transformation in reader.FinalItems<IFinalFileHandling>(true))
+                foreach (var transformation in reader.FinalItems<IFinalFileHandling>(target))
                 {
                     requests.Add(new TarItemFile(
                         TarRelativePath: Path.Combine(target, reader.GetTopLevelRelativePath(transformation.TargetFile)),
@@ -41,7 +45,7 @@ internal abstract class JobRunner
                         ));
                 }
 
-                foreach (var transformation in reader.FinalItems<IFinalDirectoryHandling>(true))
+                foreach (var transformation in reader.FinalItems<IFinalDirectoryHandling>(target))
                 {
                     requests.Add(new TarItemDirectory(
                         TarRelativePath: Path.Combine(target, reader.GetTopLevelRelativePath(transformation.SourceDirectory)),
