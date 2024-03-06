@@ -33,7 +33,7 @@ internal record FileRuleMatchingPattern(
 
         transformation = new FileHandlingImpl(file, Handling, this)
         {
-            CanDeploy = Action is FileRuleActionEnum.DeployFile,
+            CanDeploy = Action is FileRuleActionEnum.DeployFile or FileRuleActionEnum.CheckFile,
             DifferentTargetFileName = newName
         };
         return true;

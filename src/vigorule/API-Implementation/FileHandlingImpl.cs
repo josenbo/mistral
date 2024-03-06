@@ -22,6 +22,13 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
         {
             if (_differentTargetFileName == value) return;
 
+            if (_appliedRule.Action == FileRuleActionEnum.CheckFile)
+            {
+                _differentTargetFileName = null;
+                TargetFile = SourceFile;
+                return;
+            }
+            
             try
             {
                 _differentTargetFileName = string.IsNullOrEmpty(value) ? null : value;
@@ -89,11 +96,13 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
         set => _handling = _handling with { FixTrailingNewline = value };
     }
 
-    public IEnumerable<string> DeploymentTargets => _handling.Targets;
+    public IEnumerable<string> DeploymentTargets => _appliedRule.Action == FileRuleActionEnum.CheckFile
+        ? CheckTargets
+        : _handling.Targets;
     
     public bool HasDeploymentTarget(string target)
     {
-        return _handling.Targets.Contains(target, StringComparer.InvariantCultureIgnoreCase);
+        return DeploymentTargets.Contains(target, StringComparer.InvariantCultureIgnoreCase);
     }
 
     public bool CanDeployForTarget(string target)
@@ -124,7 +133,7 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
         Log.Information("The file {FileName} in {FilePath} was selected for the targets {TheTargets} by the rule {TheRule}",
             filename,
             filepath,
-            _handling.Targets,
+            DeploymentTargets,
             _appliedRule.Id.RuleDescription
         );
 
@@ -149,7 +158,7 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
             return this;
         }
 
-        if (!_handling.Targets.Any())
+        if (!DeploymentTargets.Any())
         {
             Log.Fatal("Check failed for {FileName} in {FilePath} because no targets were specified",
                 SourceFile.Name,
@@ -217,4 +226,5 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
     private string? _differentTargetFileName;
     private FileInfo? _checkedAndTransformedTemporaryFile;
     private readonly FileRule _appliedRule;
+    private static readonly List<string> CheckTargets = ["_check_target_"];
 }

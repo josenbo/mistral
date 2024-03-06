@@ -13,7 +13,7 @@ internal abstract class JobRunner
     public abstract bool Run();
     public abstract void CleanUp();
     
-    protected static bool BuildTarball(IRepositoryReader reader, FileInfo outputFile, IReadOnlyList<string> filterByTargets)
+    protected static bool BuildTarball(IRepositoryReader reader, FileInfo outputFile, IReadOnlyList<string> filterByTargets, bool writeCheckTarget)
     {
         try
         {
@@ -33,6 +33,9 @@ internal abstract class JobRunner
             
             foreach (var target in targets)
             {
+                if (target == "_check_target_" && !writeCheckTarget)
+                    continue;
+                
                 // ReSharper disable LoopCanBeConvertedToQuery
 
                 foreach (var transformation in reader.FinalItems<IFinalFileHandling>(target))

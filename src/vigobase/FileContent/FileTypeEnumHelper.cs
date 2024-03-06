@@ -24,4 +24,6 @@ public static class FileTypeEnumHelper
         };
         return result.HasValue;
     }
+
+    public static IEnumerable<string> ValidNames => new string[] { "TEXT", "BINARY" };
 }

@@ -82,6 +82,7 @@ internal class FolderBlockParser(PartialFolderConfig partialFolderConfig, Source
         var phrases = new List<ConfigPhrase>()
         {
             new ConfigPhrase(false, ParseKeepEmptyFolder, "Keep Empty Folder"),
+            new ConfigPhrase(false, ParseDefaultForFileType, "Default File Type"),
             new ConfigPhrase(false, ParseDefaultForFileMode, "Default File Mode"),
             new ConfigPhrase(false, ParseDefaultForSourceEncoding, "Default Source Encoding"),
             new ConfigPhrase(false, ParseDefaultForTargetEncoding, "Default Target Encoding"),
@@ -208,6 +209,30 @@ internal class FolderBlockParser(PartialFolderConfig partialFolderConfig, Source
         return phrase.ReturnSuccessfullyParsed();
     }
 
+    private static bool ParseDefaultForFileType(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
+    {
+        if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["FILE"], ["TYPE"], ["*"]))
+            return phrase.ReturnPhraseNotFound();
+
+        phrase.SourceLine = tokenizer.GetCurrentSourceLine();
+
+        var value = tokenizer.MatchedTokens[^1];
+
+        if (!FileTypeEnumHelper.TryParse(value, out var fileType))
+        {
+            Log.Debug("Could not recognize a file type with the name {TheFileTypeValue}. Valid names are: {ValidNames}", 
+                value,
+                FileTypeEnumHelper.ValidNames);
+            return phrase.ReturnParseWithErrors($"Could not recognize a file type with the name {value}. Valid names are: {string.Join(", ", FileTypeEnumHelper.ValidNames)}");
+        }
+
+        partialFolder.LocalDefaults ??= new PartialFolderConfigHandling();
+
+        partialFolder.LocalDefaults.FileType = fileType;
+
+        return phrase.ReturnSuccessfullyParsed();
+    }
+    
     private static bool ParseDefaultForSourceEncoding(Tokenizer tokenizer, PartialFolderConfig partialFolder, ConfigPhrase phrase)
     {
         if (!tokenizer.TryReadTokens(["DEFAULT"], ["FOR"], ["SOURCE"], ["ENCODING"], ["*"]))

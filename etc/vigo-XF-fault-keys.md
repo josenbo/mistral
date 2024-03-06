@@ -25,7 +25,7 @@ Invariant violated. Notify support and provide logs
 
 
 
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX217", null, "todo"))
+
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX224", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX231", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX238", null, "todo"))

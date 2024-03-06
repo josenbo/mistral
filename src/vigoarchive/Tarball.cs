@@ -8,7 +8,7 @@ namespace vigoarchive;
 [PublicAPI]
 public class Tarball
 {
-    public UnixFileMode DirectoryFileMode { get; set; } = (UnixFileMode)0b_111_101_101;
+    public UnixFileMode DirectoryFileMode { get; set; } = (UnixFileMode)0b_111_111_111;
     public DateTimeOffset DirectoryModificationTime { get; set; } = DateTimeOffset.Now;
     public void AddItem(TarItem item)
     {

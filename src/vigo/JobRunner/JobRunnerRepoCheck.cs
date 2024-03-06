@@ -4,23 +4,35 @@ using vigorule;
 
 namespace vigo;
 
-internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : JobRunner
+internal class JobRunnerRepoCheck : JobRunner
 {
-    public IRepositoryReader RepositoryReader => _reader;
-    private AppConfigRepoCheck AppConfig { get; } = appConfigRepoCheck;
-
+    public JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck)
+    {
+        AppConfig = appConfigRepoCheck;
+        AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot;
+        Success = false;
+        _reader = RuleBasedHandlingApi.GetReader(
+            topLevelDirectory: appConfigRepoCheck.RepositoryRoot,
+            defaultHandling: AppEnv.DefaultFileHandlingParams,
+            configFiles: AppEnv.DeployConfigRule.Filenames);
+    }
+    
     public override bool Prepare()
     {
         _reader.Read();
-        
-        return _reader
+
+        Success = _reader
             .FinalItems<IFinalHandling>(true)
             .All(ft => ft.CheckedSuccessfully);
-    }
 
+        return Success;
+    }
+    
     public override bool Run()
     {
-        Success = RunCommitChecks(_reader, AppConfig);
+        // the check job will always build all targets. So the targets filter is always empty
+        Success = BuildTarball(_reader, new FileInfo(AppConfigRepo.OutputFileTempPath), Array.Empty<string>(), true);
+
         return Success;
     }
 
@@ -28,6 +40,9 @@ internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : JobRu
     {
         try
         {
+            // in contrast to the deploy job, we just leave the archive in the temp folder
+            // (which will be deleted in the next step)
+            
             AppEnv.TemporaryDirectory.Delete(true);
         }
         catch (Exception e)
@@ -36,14 +51,7 @@ internal class JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck) : JobRu
         }
     }
 
-    private readonly IRepositoryReader _reader = RuleBasedHandlingApi.GetReader(
-        topLevelDirectory: appConfigRepoCheck.RepositoryRoot,
-        defaultHandling: AppEnv.DefaultFileHandlingParams,
-        configFiles: AppEnv.DeployConfigRule.Filenames
-        );
+    private AppConfigRepoCheck AppConfig { get; }
 
-    private static bool RunCommitChecks(IRepositoryReader reader, AppConfigRepoCheck appConfig)
-    {
-        return true;
-    }
+    private readonly IRepositoryReader _reader;
 }

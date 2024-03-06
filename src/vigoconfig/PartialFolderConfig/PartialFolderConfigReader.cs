@@ -17,7 +17,7 @@ internal static partial class PartialFolderConfigReader
         
         configurationFile ??= "anonymous text block";
         
-        var vigoMarkerLine = lines.FirstOrDefault(l => l.Contains("vîgô"));
+        var vigoMarkerLine = lines.FirstOrDefault(l => l.TrimStart().StartsWith("vîgô"));
 
         if (vigoMarkerLine is null)
         {
@@ -25,7 +25,7 @@ internal static partial class PartialFolderConfigReader
                 configurationFile);
             throw new VigoFatalException(AppEnv.Faults.Fatal(
                 "FX133",
-                "Configuration files must have the term vîgô appear at least once somewhere in the content",
+                "Configuration files must have the term vîgô appear as the first configuration statement",
                 $"A folder configuration script is missing the vîgô marker. See log for details"));
         }
         
@@ -165,11 +165,30 @@ internal static partial class PartialFolderConfigReader
         var sb = new StringBuilder();
         var inBlock = false;
         var isRuleBlock = false;
+        var isFirstStatement = true;
 
         foreach (var sourceLine in sourceLines)
         {
             if (string.IsNullOrWhiteSpace(sourceLine.Content))
                 continue;
+
+            if (isFirstStatement)
+            {
+                if (!sourceLine.Content.TrimStart().StartsWith("vîgô"))
+                {
+                    Log.Fatal("The configuration does not start with the vîgô marker. {TheFile} {TheLine}",
+                        configurationFile,
+                        sourceLine);
+                    
+                    throw new VigoFatalException(AppEnv.Faults.Fatal(
+                        "FX217",
+                        "The first configuration statement must be a line starting with the term vîgô",
+                        "Could not read the folder configuration. See log for details."));
+                }
+
+                isFirstStatement = false;
+                continue;
+            }
             
             if (inBlock)
             {
@@ -219,7 +238,7 @@ internal static partial class PartialFolderConfigReader
             return retval;
         
         
-        Log.Fatal("Syntax error in the folder configuration '{TheConfigFile}'. The block beginning at line {TheFirstLine} was not closed. Expecting DONE.",
+        Log.Fatal("Syntax error in the folder configuration '{TheConfigFile}'. The block beginning at line {TheFirstLine} was not closed. Expecting DONE",
             configurationFile,
             tempLines[0].LineNumber);
         throw new VigoFatalException(AppEnv.Faults.Fatal(

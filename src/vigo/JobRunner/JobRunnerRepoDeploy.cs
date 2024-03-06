@@ -1,13 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Serilog;
-using vigoarchive;
+﻿using Serilog;
 using vigobase;
 using vigorule;
 
 namespace vigo;
 
-[SuppressMessage("Performance", "CA1822:Mark members as static")]
-[SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
 internal class JobRunnerRepoDeploy : JobRunner
 {
     public JobRunnerRepoDeploy(AppConfigRepoDeploy appConfigRepoDeploy)
@@ -34,7 +30,7 @@ internal class JobRunnerRepoDeploy : JobRunner
     
     public override bool Run()
     {
-        Success = BuildTarball(_reader, new FileInfo(AppConfigRepo.OutputFileTempPath), AppConfig.Targets);
+        Success = BuildTarball(_reader, new FileInfo(AppConfigRepo.OutputFileTempPath), AppConfig.Targets, false);
 
         return Success;
     }
