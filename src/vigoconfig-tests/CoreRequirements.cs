@@ -11,10 +11,14 @@ public class CoreRequirements
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
 
-                               #  [vîgô] Some title
+                               #  Some title
 
                                hash followed by key phrase on the first 
                                non-empty line = markdown format
+                               
+                               ```vigo
+                               vîgô
+                               ```
                                
                                """;
         
@@ -28,12 +32,7 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
-                               
-                                #  vîgô some other text
-                                
-                               # shebang on the first line plus hash followed 
-                               # by key phrase anywhere at least once = native format
+                               vîgô some other text
 
                                """;
         
@@ -49,11 +48,9 @@ public class CoreRequirements
         const string content = """
                                
                                other content
-                               # vîgô
+                               vîgô
                                
-                               Has hash followed by key phrase alright, but it
-                               is neither on the first non-empty line, nor is 
-                               the shebang present
+                               Not first in the first vigo code block
                                
                                """;
         
@@ -65,8 +62,13 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #vîgô
 
+                               Some text here
+
+                               ```vigo
+                               vîgô
+                               ```
+                               
                                this is no vigo block and will be ignored
                                
                                ```
@@ -101,8 +103,7 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
-                               #vîgô
+                               vîgô
 
                                # comments and empty lines will be ignored
                                # comment lines begin with a hash as the
@@ -134,8 +135,9 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
-                                                   # vîgô.
+                                
+                                
+                                       vîgô.
                                 
                                configure folder
                                done
@@ -153,13 +155,13 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                configure folder
                                    default for file mode 600
                                done
 
-                               # vîgô
+                               
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -186,13 +188,12 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                configure folder
                                    DEFAULT for SoUrCe encoding win_1252
                                done
 
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -219,7 +220,8 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
+                                
                                 
                                configure folder
                                    DEFAULT for tARget encoding       iso-88_5.9 1
@@ -254,13 +256,14 @@ public class CoreRequirements
         const string content = """
                                #!/usr/bin/env vigo
                                 
+                               vîgô
+                                
                                configure folder
                                    DEFAULT 
                                      for 
                                        newline  stYle    linux
                                done
 
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -287,7 +290,7 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                configure folder
                                    DEFAULT for add
@@ -295,7 +298,6 @@ public class CoreRequirements
                                  newline  true
                                done
 
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -322,13 +324,11 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                configure folder
                                  DEFAULT FOR VALID CHARACTERS                   AsciiGerman + îô
                                done
-
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -356,13 +356,11 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                configure folder
                                  DEFAULT FOR VALID CHARACTERS all
                                done
-
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -389,13 +387,11 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                configure folder
                                    DEFAULT BUILD TARGETS one, two; three four five-5
                                done
-
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -428,12 +424,10 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                do ignore all files
                                done
-
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -453,12 +447,10 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                do deploy all binary files
                                done
-
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -494,12 +486,11 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
+                               vîgô
                                 
                                do check all text files
                                done
 
-                               # vîgô
                                """;
 
         var folderConfig = PartialFolderConfigReader.Parse(content);
@@ -557,10 +548,10 @@ public class CoreRequirements
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
         const string content = """
-                               #!/usr/bin/env vigo
-                               
-                                #  vîgô some other text
+
+                               vîgô
                                 
+                               
                                # comments and empty lines will be ignored
                                         # indented comment
 

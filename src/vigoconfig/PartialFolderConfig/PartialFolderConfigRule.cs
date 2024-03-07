@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using vigobase;
 
 namespace vigoconfig;
@@ -12,6 +11,7 @@ internal class PartialFolderConfigRule(SourceBlockRule block)
     public string? ReplaceWith { get; set; }
     public PartialFolderConfigHandling? Handling { get; set; } 
     public SourceBlockRule Block { get; } = block;
+    public INameTestAndReplaceHandler? NameTestAndReplaceHandler { get; set; }
 
     public string Description
     {
@@ -48,6 +48,9 @@ internal class PartialFolderConfigRule(SourceBlockRule block)
                     break;
                 case FileRuleConditionEnum.MatchPattern:
                     sb.Append(" IF NAME MATCHES ").Append(CompareWith ?? "missing value");
+                    break;
+                case FileRuleConditionEnum.MatchHandler:
+                    sb.Append(" IF NAME IN ").Append(NameTestAndReplaceHandler?.Identification ?? "missing value");
                     break;
                 case FileRuleConditionEnum.Undefined:
                 default:

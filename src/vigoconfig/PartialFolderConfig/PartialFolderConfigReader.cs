@@ -44,8 +44,16 @@ internal static partial class PartialFolderConfigReader
             // throw new VigoParseFolderConfigException($"The format of the folder configuration script '{configurationFile}' was not recognized");
         }
             
-        var (folderBlock, ruleBlocks) = ReadSourceBlocks(lines, configurationFile, configurationType.Value);
+        var (folderBlock, ruleBlocks, defineBlocks) = ReadSourceBlocks(lines, configurationFile, configurationType.Value);
 
+        var commonDefinitions = new CommonDefinitions();
+
+        foreach (var defineBlock in defineBlocks)
+        {
+            var parser = new DefineBlockParser(commonDefinitions, defineBlock);
+            parser.Parse();
+        }
+        
         var folderConfig = new PartialFolderConfig(configurationType.Value);
         
         if (folderBlock is not null)
@@ -58,7 +66,7 @@ internal static partial class PartialFolderConfigReader
         foreach (var ruleBlock in ruleBlocks)
         {
             var partialRule = new PartialFolderConfigRule(ruleBlock);
-            var parser = new RuleBlockParser(partialRule, ruleBlock);
+            var parser = new RuleBlockParser(partialRule, ruleBlock, commonDefinitions);
             folderConfig.PartialRules.Add(partialRule);
             parser.Parse();
         }
@@ -68,7 +76,7 @@ internal static partial class PartialFolderConfigReader
         return folderConfig;
     }
 
-    private static ConfigurationFileTypeEnum GuessConfigurationType(string configurationFile, IEnumerable<string> lines)
+    private static ConfigurationFileTypeEnum GuessConfigurationType(string configurationFile, List<string> lines)
     {
         switch (Path.GetExtension(configurationFile).ToLowerInvariant())
         {
@@ -76,14 +84,17 @@ internal static partial class PartialFolderConfigReader
                 return ConfigurationFileTypeEnum.MarkdownFormat;
             case ".vigo":
                 return ConfigurationFileTypeEnum.NativeFormat;
-        } 
-        
-        return ProbeMarkdown(lines) 
-            ? ConfigurationFileTypeEnum.MarkdownFormat 
-            : ConfigurationFileTypeEnum.NativeFormat;
+        }
+
+        if (ProbeMarkdown(lines))
+            return ConfigurationFileTypeEnum.MarkdownFormat;
+
+        return ProbeNative(lines)
+            ? ConfigurationFileTypeEnum.NativeFormat
+            : ConfigurationFileTypeEnum.Undefined;
     }
 
-    private static (SourceBlockFolder? folderConfig,  IReadOnlyList<SourceBlockRule> rulesConfig) ReadSourceBlocks(
+    private static (SourceBlockFolder? folderConfig,  IReadOnlyList<SourceBlockRule> rulesConfig,  IReadOnlyList<SourceBlockDefine> defineConfig) ReadSourceBlocks(
         IEnumerable<string> lines,
         string configurationFile,
         ConfigurationFileTypeEnum configurationType
@@ -127,9 +138,10 @@ internal static partial class PartialFolderConfigReader
 
         var folderBlock = blocks.OfType<SourceBlockFolder>().SingleOrDefault();
         var ruleBlocks = blocks.OfType<SourceBlockRule>().ToList();
+        var defineBlocks = blocks.OfType<SourceBlockDefine>().ToList();
 
         if (ruleBlocks.Count == 0)
-            return (folderBlock, ruleBlocks);
+            return (folderBlock, ruleBlocks, defineBlocks);
 
         var lastRuleBlock = ruleBlocks[0];
         for (var i = 1; i < ruleBlocks.Count; i++)
@@ -151,7 +163,7 @@ internal static partial class PartialFolderConfigReader
             lastRuleBlock = currentRuleBlock;
         }
 
-        return (folderBlock, ruleBlocks);
+        return (folderBlock, ruleBlocks, defineBlocks);
     }
 
     private static IReadOnlyList<SourceBlock> GroupSourceBlocks(
@@ -163,8 +175,9 @@ internal static partial class PartialFolderConfigReader
         var position = 1;
         var ruleIndex = 1;
         var sb = new StringBuilder();
-        var inBlock = false;
-        var isRuleBlock = false;
+        // var inBlock = false;
+        var currentBlockType = CodeBlockTypeEnum.Undefined;
+        // var isRuleBlock = false;
         var isFirstStatement = true;
 
         foreach (var sourceLine in sourceLines)
@@ -190,37 +203,69 @@ internal static partial class PartialFolderConfigReader
                 continue;
             }
             
-            if (inBlock)
+            if (currentBlockType != CodeBlockTypeEnum.Undefined)
             {
                 tempLines.Add(sourceLine);
                 sb.Append(sourceLine.Content).Append(('\n'));
 
                 if (!RexEndBlock.IsMatch(sourceLine.Content)) 
                     continue;
+
+                SourceBlock sourceBlock = currentBlockType switch
+                {
+                    CodeBlockTypeEnum.Undefined => throw new VigoFatalException(AppEnv.Faults.Fatal(
+                        "FX224", 
+                        "We should never get here", 
+                        string.Empty)),
+                    
+                    CodeBlockTypeEnum.FolderBlock => new SourceBlockFolder(
+                        tempLines.ToList(),
+                        sb.ToString(),
+                        configurationFile, 
+                        position++),
+                    
+                    CodeBlockTypeEnum.RuleBlock => new SourceBlockRule(
+                        tempLines.ToList(), 
+                        sb.ToString(),
+                        configurationFile,
+                        position++, 
+                        ruleIndex++),
+                    
+                    CodeBlockTypeEnum.DefineBlock => new SourceBlockDefine(
+                        tempLines.ToList(), 
+                        sb.ToString(), 
+                        configurationFile,
+                        position++),
+                    
+                    _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
+                        "FX231", 
+                        "Is there a new block type which we forgot to implement?", 
+                        string.Empty))
+                };
                 
-                retval.Add(isRuleBlock
-                    ? new SourceBlockRule(tempLines.ToList(), sb.ToString(), configurationFile, position++, ruleIndex++)
-                    : new SourceBlockFolder(tempLines.ToList(), sb.ToString(), configurationFile, position++)
-                );
+                retval.Add( sourceBlock);
+                
                 tempLines.Clear();
                 sb.Clear();
-                inBlock = false;
+                currentBlockType = CodeBlockTypeEnum.Undefined;
             }
             else
             {
                 if (RexBeginRuleBlock.IsMatch(sourceLine.Content))
                 {
-                    inBlock = true;
-                    isRuleBlock = true;
+                    currentBlockType = CodeBlockTypeEnum.RuleBlock;
                 }
                 else if (RexBeginFolderBlock.IsMatch(sourceLine.Content))
                 {
-                    inBlock = true;
-                    isRuleBlock = false;
+                    currentBlockType = CodeBlockTypeEnum.FolderBlock;
+                }
+                else if (RexBeginDefineBlock.IsMatch(sourceLine.Content))
+                {
+                    currentBlockType = CodeBlockTypeEnum.DefineBlock;
                 }
                 else
                 {
-                    Log.Fatal("Expecting DO or CONFIGURE, but found unmatched token in line {TheLine}", sourceLine);
+                    Log.Fatal("Expecting DO, CONFIGURE or DEFINE, but found unmatched token in line {TheLine}", sourceLine);
                     throw new VigoFatalException(AppEnv.Faults.Fatal(
                         "FX175",
                         null,
@@ -234,7 +279,7 @@ internal static partial class PartialFolderConfigReader
             }
         }
 
-        if (!inBlock) 
+        if (currentBlockType == CodeBlockTypeEnum.Undefined) 
             return retval;
         
         
@@ -249,9 +294,27 @@ internal static partial class PartialFolderConfigReader
 
     private static bool ProbeMarkdown(IEnumerable<string> lines)
     {
-        var line = lines.FirstOrDefault(l => !string.IsNullOrWhiteSpace(l));
-        if (line is null || !RexMarkdownPattern.IsMatch(line)) return false;
+        var markdownLines = GetSourceLinesFromMarkdown(lines);
+        if (markdownLines.Count < 1)
+            return false;
+        var firstLine = markdownLines[0].Content.Trim();
+        if (!firstLine.StartsWith("vîgô"))
+            return false;
+        
         Log.Debug("Recognized markdown format");
+        return true;
+    }
+
+    private static bool ProbeNative(IEnumerable<string> lines)
+    {
+        var nativeLines = GetSourceLinesFromNative(lines);
+        if (nativeLines.Count < 1)
+            return false;
+        var firstLine = nativeLines[0].Content.Trim();
+        if (!firstLine.StartsWith("vîgô"))
+            return false;
+        
+        Log.Debug("Recognized native format");
         return true;
     }
 
@@ -310,8 +373,9 @@ internal static partial class PartialFolderConfigReader
     private static readonly Regex RexEmptyOrComment = RexEmptyOrCommentCompiled();
     private static readonly Regex RexBeginRuleBlock = RexBeginRuleBlockCompiled();
     private static readonly Regex RexBeginFolderBlock = RexBeginFolderBlockCompiled();
+    private static readonly Regex RexBeginDefineBlock = RexBeginDefineBlockCompiled();
     private static readonly Regex RexEndBlock = RexEndBlockCompiled();
-
+    
     #region Generated Embedded Regex
     
     [GeneratedRegex(@"^[ \t]*#.*vîgô.*$")]
@@ -332,10 +396,21 @@ internal static partial class PartialFolderConfigReader
     [GeneratedRegex(@"^\s*done\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex RexEndBlockCompiled();
     
+    [GeneratedRegex(@"^\s*define\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    private static partial Regex RexBeginDefineBlockCompiled();
+
     [GeneratedRegex(@"^\s*do\s.*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex RexBeginRuleBlockCompiled();
     
     #endregion
 
+    private enum CodeBlockTypeEnum
+    {
+        Undefined = 0,
+        FolderBlock = 173301,
+        RuleBlock = 629893,
+        DefineBlock = 447373
+    }
+    
     private static readonly string[] LineSeparators = new[] { "\r\n", "\n" };
 }

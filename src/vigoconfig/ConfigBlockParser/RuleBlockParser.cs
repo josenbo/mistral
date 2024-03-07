@@ -4,7 +4,7 @@ using vigobase;
 
 namespace vigoconfig;
 
-internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock codeBlock)
+internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock codeBlock, CommonDefinitions commonDefinitions)
 {
     #region local private class ConfigPhrase
 
@@ -61,20 +61,20 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
     
     public void Parse()
     {
-        if (!ParseValues())
-        {
-            Log.Fatal("Failed to parse {TheBlockDescription}." +
-                      " There is a syntax error or an unrecognized value in the line {TheLine}." +
-                      " The error message was {TheErrorMessage}",
-                codeBlock.Description,
-                _lastErrorSourceLine,
-                _lastErrorMessage);
+        if (ParseValues()) 
+            return;
+        
+        Log.Fatal("Failed to parse {TheBlockDescription}." +
+                  " There is a syntax error or an unrecognized value in the line {TheLine}." +
+                  " The error message was {TheErrorMessage}",
+            codeBlock.Description,
+            _lastErrorSourceLine,
+            _lastErrorMessage);
 
-            throw new VigoFatalException(AppEnv.Faults.Fatal(
-                "FX154",
-                null,
-                "Failed to parse a folder configuration script. See log for details"));
-        }    
+        throw new VigoFatalException(AppEnv.Faults.Fatal(
+            "FX154",
+            null,
+            "Failed to parse a folder configuration script. See log for details"));
     }
 
     private bool ParseValues()
@@ -92,10 +92,10 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
             new ConfigPhrase(false, ParseBuildTargets, "Build Targets")
         };
 
-        if (!ParseRuleHeader(_tokenizer, partialRule))
+        if (!ParseRuleHeader(_tokenizer, partialRule, commonDefinitions))
         {
             _lastErrorSourceLine = _tokenizer.GetCurrentSourceLine();
-            _lastErrorMessage = "A file rule section must start with 'DO [IGNORE|DEPLOY|CHECK] [TEXT|BINARY| ] FILE' optionally followed by 'IF NAME EQUALS = <name>' or 'IF NAME MATCHES = <regex>'";
+            _lastErrorMessage = "A file rule section must start with 'DO [IGNORE|DEPLOY|CHECK] [TEXT|BINARY| ] FILE' optionally followed by 'IF NAME EQUALS <name>', 'IF NAME MATCHES <regex>' or 'IF NAME IN = <listname>'";
             return false;
         }
 
@@ -143,7 +143,7 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                 return false;
             }
             
-            // We are definitely in an error state. To give mor information to the user
+            // We are definitely in an error state. To give more information to the user
             // we check, if an already parsed line appears a second time
 
             _lastErrorSourceLine = _tokenizer.GetCurrentSourceLine();
@@ -173,7 +173,7 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
         return false;
     }
 
-    private static bool ParseRuleHeader(Tokenizer tokenizer, PartialFolderConfigRule rule)
+    private static bool ParseRuleHeader(Tokenizer tokenizer, PartialFolderConfigRule rule, CommonDefinitions commonDefinitions)
     {
         try
         {
@@ -183,7 +183,7 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
             {
                 fileType = tokenizer.MatchedTokens[3];
             }
-            else if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES"], ["*"]))
+            else if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES", "IN"], ["*"]))
             {
                 fileType = tokenizer.MatchedTokens[2];
             }
@@ -223,13 +223,30 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
                     {
                         "EQUALS" => FileRuleConditionEnum.MatchName,
                         "MATCHES" => FileRuleConditionEnum.MatchPattern,
+                        "IN" => FileRuleConditionEnum.MatchHandler,
                         _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
                             "FX203",
                             $"Expected the condition clause of the rule to be either 'IF NAME EQUALS <name>' or 'IF NAME MATCHES <pattern>', but found '{string.Join(", ", tokenizer.MatchedTokens.Skip(4))}'",
                             "Failed to parse a folder configuration script. See log for details"))
                     };
+                    
+                    var conditionArg = tokenizer.MatchedTokens[^1];
 
-                    rule.CompareWith = tokenizer.MatchedTokens[^1];
+                    if (rule.Condition is FileRuleConditionEnum.MatchName or FileRuleConditionEnum.MatchPattern)
+                    {
+                        rule.CompareWith = conditionArg;
+                        break;
+                    }
+
+                    if (!commonDefinitions.NamedFileListDict.TryGetValue(conditionArg, out var namedFileList))
+                        throw new VigoFatalException(AppEnv.Faults.Fatal(
+                            "FX609",
+                            null,
+                            $"The file list {conditionArg} was not found"));
+                    
+                    rule.NameTestAndReplaceHandler = namedFileList;
+                    rule.CompareWith = string.Empty;
+                    
                     break;
                 
                 case 5:

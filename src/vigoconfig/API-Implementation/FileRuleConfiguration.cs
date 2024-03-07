@@ -22,6 +22,8 @@ internal class FileRuleConfiguration : IFileRuleConfiguration
 
     IConfigurationScriptExtract IFileRuleConfiguration.BasedOn => _partialRule.Block;
 
+    public INameTestAndReplaceHandler? NameTestAndReplaceHandler => _partialRule.NameTestAndReplaceHandler;
+
     IEnumerable<FileHandlingParameters> IFileRuleConfiguration.GetHandlingDefaultsChain() => _handlingDefaultsChain;
 
     public FileRuleConfiguration(PartialFolderConfigRule partialRule, FileHandlingParameters folderDefaults, List<FileHandlingParameters> handlingDefaultsChain)

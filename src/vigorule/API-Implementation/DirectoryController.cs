@@ -112,6 +112,15 @@ internal class DirectoryController(DirectoryInfo location, RepositoryReadRequest
                         Action: ruleConfiguration.Action,
                         Handling: ruleConfiguration.Handling),
                     
+                    FileRuleConditionEnum.MatchHandler => new FileRuleMatchingHandler(
+                        Id: new FileRuleId(repoDirectory, rules.Count, ruleConfiguration.RuleDescription),
+                        Action: ruleConfiguration.Action,
+                        NameTestAndReplaceHandler: ruleConfiguration.NameTestAndReplaceHandler ?? throw new VigoFatalException(AppEnv.Faults.Fatal(
+                            "FX616", 
+                            $"Existence of a {nameof(INameTestAndReplaceHandler)} implementation must be checked and ensured during rule compilation",
+                            string.Empty)),
+                        Handling: ruleConfiguration.Handling),
+                    
                     _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
                         "FX133",  
                         "Are we missing a new rule type", 

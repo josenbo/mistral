@@ -10,6 +10,8 @@ public class ApiTests
         
         var success = FolderConfigurationApi.Reader.TryParse(
             configurationScript: """
+                                 vîgô
+                                  
                                  CONFIGURE FOLDER
                                      DEFAULT BUILD TARGETS NONE
                                      DEFAULT FOR SOURCE ENCODING ISO-8859-15

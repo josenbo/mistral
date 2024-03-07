@@ -81,6 +81,12 @@ public interface IFileRuleConfiguration
     IConfigurationScriptExtract? BasedOn { get; }
 
     /// <summary>
+    /// Provides file name matching and replacing
+    /// for rules with a MatchHandler condition
+    /// </summary>
+    INameTestAndReplaceHandler? NameTestAndReplaceHandler { get; }
+    
+    /// <summary>
     /// The configuration of rules should only
     /// specify the noteworthy and rely on defaults
     /// for the rest. To this end the global default
