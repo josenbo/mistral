@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="D9004" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="D9004">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/admin/dist/vigo" local="$PROJECT_DIR$/vigo" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

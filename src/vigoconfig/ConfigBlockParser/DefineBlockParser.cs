@@ -63,7 +63,7 @@ internal partial class DefineBlockParser(CommonDefinitions commonDefinitions, So
 
     #region Generated Embedded Regex
 
-    [GeneratedRegex(@"^\s*DEFINE\s+FILE\s+LIST\s+(?'listName'[a-zA-Z][-_.a-zA-Z]{0,39})\s*$", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.ExplicitCapture | RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"^\s*DEFINE\s+FILE\s+LIST\s+(?'listName'[a-zA-Z][-_.a-zA-Z0-9]{0,79})\s*$", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.ExplicitCapture | RegexOptions.CultureInvariant)]
     private static partial Regex RexHeaderCompiled();
     
     [GeneratedRegex(@"^\s*done\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]

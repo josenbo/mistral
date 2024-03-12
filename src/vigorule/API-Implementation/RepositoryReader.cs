@@ -1,4 +1,5 @@
-﻿using vigobase;
+﻿using Serilog;
+using vigobase;
 
 namespace vigorule;
 
@@ -61,6 +62,9 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
         
         foreach (var fi in controller.Location.EnumerateFiles())
         {
+            // if (fi.Name.Equals("tia_ines_daten.sql"))
+            //     Log.Debug("Arrived at {TheFile}", fi);
+            
             var mutableFileHandling = controller.GetFileTransformation(fi);
 
             BeforeApplyFileHandlingEvent?.Invoke(mutableFileHandling);

@@ -92,6 +92,9 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
             new ConfigPhrase(false, ParseBuildTargets, "Build Targets")
         };
 
+        // if (codeBlock.Content.Contains("DO CHECK TEXT FILE IF FILE NAME IN check_ascii_german_list"))
+        //     Log.Debug("Arrived at rule {TheRule}", codeBlock);
+        
         if (!ParseRuleHeader(_tokenizer, partialRule, commonDefinitions))
         {
             _lastErrorSourceLine = _tokenizer.GetCurrentSourceLine();

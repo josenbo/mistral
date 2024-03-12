@@ -35,7 +35,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
-    <AssemblyVersion>0.9.271</AssemblyVersion>
+    <AssemblyVersion>0.9.341</AssemblyVersion>
   </PropertyGroup>
 
 </Project>

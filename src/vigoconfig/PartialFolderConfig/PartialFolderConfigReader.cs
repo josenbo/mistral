@@ -396,7 +396,7 @@ internal static partial class PartialFolderConfigReader
     [GeneratedRegex(@"^\s*done\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex RexEndBlockCompiled();
     
-    [GeneratedRegex(@"^\s*define\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"^\s*define\s.*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex RexBeginDefineBlockCompiled();
 
     [GeneratedRegex(@"^\s*do\s.*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="88a82ff3-91f6-49b0-8701-299a985de052" name="D9004">
+        <fileTransfer accessType="SFTP" host="INES-D9004.tcb.deutschepost.de" port="22" sshConfigId="5854b21d-ac8c-4544-b510-1c50a2c32b63" sshConfig="D9004" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

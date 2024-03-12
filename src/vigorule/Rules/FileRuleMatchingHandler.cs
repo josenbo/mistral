@@ -20,7 +20,7 @@ internal record FileRuleMatchingHandler(
     internal override FileRuleConditionEnum Condition => FileRuleConditionEnum.MatchHandler;
     internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IMutableFileHandling? transformation)
     {
-        if (NameTestAndReplaceHandler.TestName(file.Name, out var derivedFileName))
+        if (!NameTestAndReplaceHandler.TestName(file.Name, out var derivedFileName))
         {
             transformation = null;
             return false;

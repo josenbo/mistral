@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="OPEN_SSH" host="INES-D9004.tcb.deutschepost.de" id="5854b21d-ac8c-4544-b510-1c50a2c32b63" port="22" customName="D9004" nameFormat="CUSTOM" username="admin" useOpenSSHConfig="true">
+        <option name="customName" value="D9004" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

@@ -47,7 +47,12 @@ public static partial class DeploymentTargetHelper
 
     static DeploymentTargetHelper()
     {
-        GetOrRegisterKnownName("Prod");
+        GetOrRegisterKnownName("PROD");
+        GetOrRegisterKnownName("REF");
+        GetOrRegisterKnownName("UAT");
+        GetOrRegisterKnownName("DEV");
+        GetOrRegisterKnownName("CI");
+        GetOrRegisterKnownName("TST");
         GetOrRegisterKnownName("Production");
         GetOrRegisterKnownName("NonProd");
         GetOrRegisterKnownName("NonProduction");
