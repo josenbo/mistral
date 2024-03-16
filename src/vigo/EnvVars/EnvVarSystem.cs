@@ -15,4 +15,9 @@ internal class EnvVarSystem : EnvVar
         var envValue = Environment.GetEnvironmentVariable(environmentVariableName);
         return string.IsNullOrWhiteSpace(envValue) ? defaultValue : envValue;
     }
+
+    public override IEnumerable<string> GetEnvironmentVariables()
+    {
+        return (IEnumerable<string>)Environment.GetEnvironmentVariables().Keys;
+    }
 }
