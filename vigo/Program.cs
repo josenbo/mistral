@@ -1,15 +1,15 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Serilog;
 using Serilog.Events;
 using vigo;
 using vigobase;
 
-var stopwatch = new Stopwatch();
-stopwatch.Start();
-
 try
 {
+    AppEnv.TimingReportFile = GetFileInfoFromEnvironmentVariable("VIGO_TIMING_REPORT");
+    
+    AppEnv.RecordTiming("Application started");
+
     ConfigureLogging();
 
     var settings = AppConfigBuilder.Build();
@@ -47,10 +47,13 @@ try
 
     Log.Information("Process terminated {TheResult} after {TheTimeSpan}",
         (jobRunner.Success ? "successfully" : "with errors"),
-        stopwatch.Elapsed);
+        AppEnv.GetCurrentRunElapsedTime());
 
     Environment.ExitCode = jobRunner.Success ? 0 : 1;
 }
+
+
+
 catch (VigoFatalException e)
 {
     Log.Fatal(e, "Immediate termination of the program was requested and we will exit after dumping the incidents");
@@ -73,44 +76,99 @@ catch (VigoFatalException e)
     Console.Error.WriteLine();
     Environment.ExitCode = 1;
 }
+
+
+
 catch (Exception e)
 {
     Log.Error(e, "program aborted");
     Console.Error.WriteLine("Fatal: the program terminates prematurely due to an error it could not handle");
     Environment.ExitCode = 1;
 }
+
+
+
 finally
 {
-    stopwatch.Stop();
+    AppEnv.RecordTiming("Application terminates");
     Log.CloseAndFlush();
 }
 
 return;
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+
+#region Setting up logging
 
 void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 {
-    TryGetLogfileFromEnvironmentVariable("VIGO_LOGFILE_DEBUG", out var logfileDebug);
-    TryGetLogfileFromEnvironmentVariable("VIGO_LOGFILE_INFORMATION", out var logfileInformation);
-    TryGetLogfileFromEnvironmentVariable("VIGO_LOGFILE_WARNING", out var logfileWarning);
-    TryGetLogfileFromEnvironmentVariable("VIGO_LOGFILE_ERROR", out var logfileError);
-    TryGetLogfileFromEnvironmentVariable("VIGO_LOGFILE_DEBUG_SHARED", out var logfileDebugShared);
+    if (TryGetLogLevelFromEnvironmentVariable("VIGO_CONSOLE_LOG_LEVEL", out var parsedConsoleLogLevel))
+        logLevelConsole = parsedConsoleLogLevel.Value;
+    
+    TryGetLogfileFromEnvironmentVariable(
+        environmentVariable: "VIGO_LOGFILE_DEBUG",
+        deleteIfExists: true,
+        logfile: out var logfileDebug);
+    
+    TryGetLogfileFromEnvironmentVariable(
+        environmentVariable: "VIGO_LOGFILE_INFORMATION",
+        deleteIfExists: true,
+        logfile: out var logfileInformation);
+    
+    TryGetLogfileFromEnvironmentVariable(
+        environmentVariable: "VIGO_LOGFILE_WARNING",
+        deleteIfExists: true,
+        logfile: out var logfileWarning);
+    
+    TryGetLogfileFromEnvironmentVariable(
+        environmentVariable: "VIGO_LOGFILE_ERROR",
+        deleteIfExists: true,
+        logfile: out var logfileError);
+    
+    TryGetLogfileFromEnvironmentVariable(
+        environmentVariable: "VIGO_SHARED_LOG_FILE",
+        deleteIfExists: false,
+        logfile: out var sharedLogFile);
 
+    var sharedLogLevel = LogEventLevel.Information;
+    var sharedLogRetentionDays = 5;
+    
+    if (sharedLogFile is not null)
+    {
+        if (TryGetLogLevelFromEnvironmentVariable("VIGO_SHARED_LOG_LEVEL", out var parsedLogLevel))
+            sharedLogLevel = parsedLogLevel.Value;
+
+        var parsedRetentionDays = EnvVar.GetSystem().GetEnvironmentVariable("VIGO_SHARED_LOG_RETENTION_DAYS");
+        
+        if (!string.IsNullOrWhiteSpace(parsedRetentionDays))
+            if (int.TryParse(parsedRetentionDays, out var parsedInteger ))
+                sharedLogRetentionDays = Math.Max(Math.Min(parsedInteger, 14), 1);
+    }
+
+    
     var minimumLevelSet = false;
     var loggerConfiguration = new LoggerConfiguration();
 
-    if (logLevelConsole == LogEventLevel.Verbose)
+    // ----------------------------------------------------
+    var configuredLogLevel = LogEventLevel.Verbose;
+    
+    if (logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
         loggerConfiguration.MinimumLevel.Verbose();
         minimumLevelSet = true;
         
-        loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Verbose);
+        if (logLevelConsole == configuredLogLevel)
+            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Verbose);
     }
+
+    // ----------------------------------------------------
+    configuredLogLevel = LogEventLevel.Debug;
     
-    if (logfileDebug is not null || logfileDebugShared is not null || logLevelConsole == LogEventLevel.Debug)
+    if (logfileDebug is not null  || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
         if (!minimumLevelSet)
         {
@@ -118,31 +176,17 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
             minimumLevelSet = true;
         }
         
-        if (logLevelConsole == LogEventLevel.Debug)
-            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug);
+        if (logLevelConsole == configuredLogLevel)
+            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
         if (logfileDebug is not null)
-            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: LogEventLevel.Debug);    
-        
-        // pattern for rolling logs for later use
-        // loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 4);
-        if (logfileDebugShared is not null)
-        {
-            var runId = Random.Shared.Next(1000000000, 1999999999);
-
-            loggerConfiguration.WriteTo.File(
-                logfileDebugShared.FullName,
-                restrictedToMinimumLevel: LogEventLevel.Debug,
-                rollingInterval: RollingInterval.Day,
-                retainedFileCountLimit: 4,
-                shared: true,
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] " + 
-                                runId +
-                                " {Message:lj}{NewLine}{Exception}");
-        }
+            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
     }
         
-    if (logfileInformation is not null || logLevelConsole == LogEventLevel.Information)
+    // ----------------------------------------------------
+    configuredLogLevel = LogEventLevel.Information;
+
+    if (logfileInformation is not null || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
         if (!minimumLevelSet)
         {
@@ -150,14 +194,17 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
             minimumLevelSet = true;
         }
         
-        if (logLevelConsole == LogEventLevel.Information)
-            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information);
+        if (logLevelConsole == configuredLogLevel)
+            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
-        if (logfileInformation is not null)
-            loggerConfiguration.WriteTo.File(logfileInformation.FullName, restrictedToMinimumLevel: LogEventLevel.Information);    
+        if (logfileDebug is not null)
+            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
     }
         
-    if (logfileWarning is not null || logLevelConsole == LogEventLevel.Warning)
+    // ----------------------------------------------------
+    configuredLogLevel = LogEventLevel.Warning;
+
+    if (logfileWarning is not null || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
         if (!minimumLevelSet)
         {
@@ -165,14 +212,17 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
             minimumLevelSet = true;
         }
         
-        if (logLevelConsole == LogEventLevel.Warning)
-            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Warning);
+        if (logLevelConsole == configuredLogLevel)
+            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
-        if (logfileWarning is not null)
-            loggerConfiguration.WriteTo.File(logfileWarning.FullName, restrictedToMinimumLevel: LogEventLevel.Warning);    
+        if (logfileDebug is not null)
+            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
     }
 
-    if (logfileError is not null || logLevelConsole == LogEventLevel.Error)
+    // ----------------------------------------------------
+    configuredLogLevel = LogEventLevel.Error;
+
+    if (logfileError is not null || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
         if (!minimumLevelSet)
         {
@@ -180,14 +230,17 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
             minimumLevelSet = true;
         }
         
-        if (logLevelConsole == LogEventLevel.Error)
-            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Error);
+        if (logLevelConsole == configuredLogLevel)
+            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
-        if (logfileError is not null)
-            loggerConfiguration.WriteTo.File(logfileError.FullName, restrictedToMinimumLevel: LogEventLevel.Error);    
+        if (logfileDebug is not null)
+            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
     }
 
-    if (logLevelConsole == LogEventLevel.Fatal)
+    // ----------------------------------------------------
+    configuredLogLevel = LogEventLevel.Fatal;
+
+    if (logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
         if (!minimumLevelSet)
         {
@@ -195,26 +248,36 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
             minimumLevelSet = true;
         }
         
-        loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Fatal);
+        if (logLevelConsole == configuredLogLevel)
+            loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
     }
 
     if (!minimumLevelSet)
         return;
     
-    // pattern for rolling logs for later use
-    // loggerConfiguration.WriteTo.File(logfile.FullName, restrictedToMinimumLevel: logLevelFile, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 4);
-
-    if (logfileDebugShared is null)
+    if (sharedLogFile is not null)
     {
-        Log.Logger = loggerConfiguration.CreateLogger();
-        return;
+        var runId = Random.Shared.Next(1000000000, 1999999999);
+
+        loggerConfiguration.WriteTo.File(
+            sharedLogFile.FullName,
+            restrictedToMinimumLevel: sharedLogLevel,
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: sharedLogRetentionDays,
+            shared: true,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] #" + 
+                            runId +
+                            " {Message:lj}{NewLine}{Exception}");
     }
     
-    var sharedLogger = new LoggerConfiguration()
-        .MinimumLevel.Debug()
-        .Enrich.
+    Log.Logger = loggerConfiguration.CreateLogger();
 }
 
+#endregion
+
+#region Environment variable helper functions
+
+// ReSharper disable once UnusedLocalFunctionReturnValue
 bool TryGetLogfileFromEnvironmentVariable(string environmentVariable, bool deleteIfExists, [NotNullWhen(true)]out FileInfo? logfile)
 {
     var path = Environment.GetEnvironmentVariable(environmentVariable);
@@ -234,7 +297,7 @@ bool TryGetLogfileFromEnvironmentVariable(string environmentVariable, bool delet
     return true;
 }
 
-bool TryGetConsoleLogLevelFromEnvironmentVariable(string environmentVariable, [NotNullWhen(true)] out LogEventLevel? loglevel)
+bool TryGetLogLevelFromEnvironmentVariable(string environmentVariable, [NotNullWhen(true)] out LogEventLevel? loglevel)
 {
     var value = Environment.GetEnvironmentVariable(environmentVariable);
 
@@ -248,3 +311,14 @@ bool TryGetConsoleLogLevelFromEnvironmentVariable(string environmentVariable, [N
     return true;
 }
 
+FileInfo? GetFileInfoFromEnvironmentVariable(string environmentVariable)
+{
+    var path = Environment.GetEnvironmentVariable(environmentVariable);
+    
+    if (string.IsNullOrWhiteSpace(path) || !Path.IsPathRooted(path) || !Directory.Exists(Path.GetDirectoryName(path)))
+        return null;
+
+    return new FileInfo(Path.GetFullPath(path));
+}
+
+#endregion

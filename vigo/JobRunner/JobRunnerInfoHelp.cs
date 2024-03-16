@@ -51,13 +51,14 @@ internal class JobRunnerInfoHelp(AppConfigInfoHelp appConfig) : JobRunner
         }
 
         _helpResource = resourceName ?? string.Empty;
-        return (resourceName is not null);
+        Success = (resourceName is not null);
+        return Success;
     }
 
     public override bool Run()
     {
         if (string.IsNullOrWhiteSpace(_helpResource))
-            return false;
+            return Success = false;
 
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(_helpResource);
         if (stream is null)
@@ -66,7 +67,7 @@ internal class JobRunnerInfoHelp(AppConfigInfoHelp appConfig) : JobRunner
         var helpText = reader.ReadToEnd();
         Console.Write(helpText);
 
-        return true;
+        return Success = true;
     }
 
     public override void CleanUp()

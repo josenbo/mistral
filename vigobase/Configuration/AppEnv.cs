@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using Serilog;
 
@@ -16,8 +17,10 @@ public static class AppEnv
         get => _topLevelDirectory ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX266","Forgot to set this from the AppConfig in the JobRunner?", string.Empty));
         set => _topLevelDirectory = value;
     }
+
+    public static FileInfo? TimingReportFile { get; set; }
     public static DirectoryInfo TemporaryDirectory { get; set; }
-    public static FaultRegistry Faults { get; set; }
+    public static FaultRegistry Faults { get; private set; }
 
     public static string GetTopLevelRelativePath(string path)
     {
@@ -34,8 +37,28 @@ public static class AppEnv
         return Path.Combine(TemporaryDirectory.FullName, $"tempfile_{_tempFileSequence++}");
     }
 
+    public static void RecordTiming(
+            string? message = null,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+    {
+        if (TimingReportFile is null)
+            return;
+
+        using var sw = TimingReportFile.AppendText();
+        sw.WriteLine($"{_currentRunStopwatch.ElapsedMilliseconds}\t{message}\t{memberName}\t{sourceFilePath}\t{sourceLineNumber}");
+    }
+    
+    public static TimeSpan GetCurrentRunElapsedTime()
+    {
+        return _currentRunStopwatch.Elapsed;
+    }
+    
     static AppEnv()
     {
+        _currentRunStopwatch.Start();
+        
         Faults = new FaultRegistry();
         
         var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
@@ -141,4 +164,6 @@ public static class AppEnv
         Environment.ProcessPath is not null && File.Exists(Environment.ProcessPath)
             ? new FileInfo(Environment.ProcessPath).DirectoryName
             : null;
+
+    private static Stopwatch _currentRunStopwatch = new Stopwatch();
 }

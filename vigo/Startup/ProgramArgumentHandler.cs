@@ -19,6 +19,7 @@ internal static class ProgramArgumentHandler
             commandLineArguments, 
             environmentVariables
             );
+    
     private static AppConfig GetProgramTask(IEnumerable<string> commandLineArguments, EnvVar environmentVariables)
     {
         var cmdline = commandLineArguments.ToArray();
@@ -56,7 +57,7 @@ internal static class ProgramArgumentHandler
         return new AppConfigInfoVersion();
     }
 
-    private static void Get
+    // private static void Get
     private static bool FilterEnvironmentVariablesForLogging(string environmentVariable)
     {
         return environmentVariable.StartsWith("VIGO_");
@@ -68,6 +69,5 @@ internal class CombinedAndSanitizedProgramArguments
     public string? RepositoryRootPath { get; set; }
     public string? DeploymentBundlePath { get; set; }
     public string? TargetNames { get; set; }
-    public bool MinimalWork { get; set; }
-    
+    public bool IncludePrepared { get; set; }
 }

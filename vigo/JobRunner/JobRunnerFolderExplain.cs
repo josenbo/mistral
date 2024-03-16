@@ -4,9 +4,15 @@ internal class JobRunnerFolderExplain(AppConfigFolderExplain appConfig) : JobRun
 {
     private AppConfigFolderExplain AppConfig { get; } = appConfig;    
 
-    public override bool Prepare() => true;
+    public override bool Prepare()
+    {
+        return Success = true;
+    }
 
-    public override bool Run() => true;
+    public override bool Run()
+    {
+        return Success = true;
+    }
 
     public override void CleanUp()
     {

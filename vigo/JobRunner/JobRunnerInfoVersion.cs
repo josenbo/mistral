@@ -4,7 +4,10 @@ namespace vigo;
 
 internal class JobRunnerInfoVersion(AppConfigInfoVersion appConfig) : JobRunner
 {
-    public override bool Prepare() => true;
+    public override bool Prepare()
+    {
+        return Success = true;
+    }
 
     public override bool Run()
     {
@@ -29,7 +32,7 @@ internal class JobRunnerInfoVersion(AppConfigInfoVersion appConfig) : JobRunner
         // Console.WriteLine($"{currentExecutable} v{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}.{appVersion.Revision}");
         Console.WriteLine($"{currentExecutable} v{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}");
 
-        return true;
+        return Success = true;
     }
 
     public override void CleanUp()
