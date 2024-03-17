@@ -6,8 +6,8 @@ namespace vigo;
 
 internal static class AppConfigBuilder
 {
-    public static AppConfig Assemble() 
-        => BuildAppConfig(cmdArgsEnum: Environment.GetCommandLineArgs(), envVarFacade: EnvVar.GetSystem());
+    public static AppConfig Assemble(IEnumerable<string> cmdArgsEnum) 
+        => BuildAppConfig(cmdArgsEnum, envVarFacade: EnvVar.GetSystem());
 
     public static AppConfig Assemble(IEnumerable<string> cmdArgsEnum, EnvVar envVarFacade) 
         => BuildAppConfig(cmdArgsEnum, envVarFacade);

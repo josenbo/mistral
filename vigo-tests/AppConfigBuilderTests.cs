@@ -9,7 +9,7 @@ public class AppConfigBuilderTests
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
 
-        var result = AppConfigBuilder.Assemble();
+        var result = AppConfigBuilder.Assemble(Array.Empty<string>());
     }
     
     #region Helpers

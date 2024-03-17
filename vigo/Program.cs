@@ -12,14 +12,7 @@ try
 
     ConfigureLogging();
 
-    Console.WriteLine($"Dumping {args.Length} command line arguments");
-    var n = 0;
-    foreach (var t in args)
-    {
-        Console.WriteLine($"args[{n++}] = {t}");
-    }
-
-    var appConfig = AppConfigBuilder.Assemble();
+    var appConfig = AppConfigBuilder.Assemble(args);
 
     Log.Information("Running the action {TheCommand} with the configuration {TheConfig}",
         appConfig.Command,
