@@ -19,7 +19,11 @@ internal static class AppConfigBuilder
         LogCommandLineArgumentsAndEnvironmentVariables(cmdArgs, envVarFacade);
         var partialArguments = ParsePartialProgramTaskArguments(cmdArgs);
         EnrichMissingArgumentsFromEnvironmentVariables(envVarFacade, partialArguments);
-        var retval =  CreateAppConfigInfo(partialArguments);
+        
+        // todo remove test helper
+        partialArguments.ShowVersion = true;
+        
+        var retval =  CreateAppConfig(partialArguments);
         retval.LogObject();
         return retval;
     }
@@ -59,7 +63,7 @@ internal static class AppConfigBuilder
         return value[..maxLength];
     }
     
-    private static AppConfig CreateAppConfigInfo(PartialProgramArguments partialArguments)
+    private static AppConfig CreateAppConfig(PartialProgramArguments partialArguments)
     {
         // Create an instance of AppConfigInfo using the
         // values from the PartialProgramTaskArguments object

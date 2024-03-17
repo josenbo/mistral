@@ -12,6 +12,11 @@ try
 
     ConfigureLogging();
 
+    for (var j = 0; j < args.Length; j++)
+    {
+        Log.Debug("args[{TheIndex}] = {TheValue}", j, args[j]);
+    }
+
     var appConfig = AppConfigBuilder.Assemble();
 
     Log.Information("Running the action {TheCommand} with the configuration {TheConfig}",
