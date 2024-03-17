@@ -12,22 +12,21 @@ try
 
     ConfigureLogging();
 
-    var settings = AppConfigBuilder.Build();
+    var appConfig = ProgramArguments.Assemble();
 
     Log.Information("Running the action {TheCommand} with the configuration {TheConfig}",
-        settings.Command,
-        settings);
+        appConfig.Command,
+        appConfig);
 
-    JobRunner jobRunner = settings switch
+    JobRunner jobRunner = appConfig switch
     {
-        AppConfigRepoDeploy appConfigRepoDeploy => new JobRunnerRepoDeploy(appConfigRepoDeploy),
-        AppConfigRepoCheck appConfigRepoCheck => new JobRunnerRepoCheck(appConfigRepoCheck),
-        AppConfigFolderExplain appConfigFolderExplain => new JobRunnerFolderExplain(appConfigFolderExplain),
-        AppConfigInfoHelp appConfigInfoHelp => new JobRunnerInfoHelp(appConfigInfoHelp),
-        AppConfigInfoVersion appConfigInfoVersion => new JobRunnerInfoVersion(appConfigInfoVersion),
+        AppConfigDeploy appConfigRepoDeploy => new JobRunnerDeploy(appConfigRepoDeploy),
+        AppConfigExplain appConfigFolderExplain => new JobRunnerExplain(appConfigFolderExplain),
+        AppConfigHelp appConfigInfoHelp => new JobRunnerHelp(appConfigInfoHelp),
+        AppConfigVersion appConfigInfoVersion => new JobRunnerVersion(appConfigInfoVersion),
         null => throw new VigoFatalException(AppEnv.Faults.Fatal(
             "FX252", 
-            $"Configuration should be valid or throw a fatal exception. Check why {nameof(settings)} could be null", 
+            $"Configuration should be valid or throw a fatal exception. Check why {nameof(appConfig)} could be null", 
             string.Empty)),
         _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
             "FX259",

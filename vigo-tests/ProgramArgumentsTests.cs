@@ -1,15 +1,20 @@
-﻿namespace vigo_tests;
+﻿using vigo;
 
-public class ProgramArgumentHandlerTests
+namespace vigo_tests;
+
+public class ProgramArgumentsTests
 {
     [Fact]
     public void Test1()
     {
+        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+
+        var result = ProgramArguments.Assemble();
     }
     
     #region Helpers
 
-    public ProgramArgumentHandlerTests(ITestOutputHelper testOutputHelper)
+    public ProgramArgumentsTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
 

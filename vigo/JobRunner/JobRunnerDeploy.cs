@@ -4,15 +4,15 @@ using vigorule;
 
 namespace vigo;
 
-internal class JobRunnerRepoCheck : JobRunner
+internal class JobRunnerDeploy : JobRunner
 {
-    public JobRunnerRepoCheck(AppConfigRepoCheck appConfigRepoCheck)
+    public JobRunnerDeploy(AppConfigDeploy appConfigDeploy)
     {
-        AppConfig = appConfigRepoCheck;
+        AppConfig = appConfigDeploy;
         AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot;
         Success = false;
         _reader = RuleBasedHandlingApi.GetReader(
-            topLevelDirectory: appConfigRepoCheck.RepositoryRoot,
+            topLevelDirectory: appConfigDeploy.RepositoryRoot,
             defaultHandling: AppEnv.DefaultFileHandlingParams,
             configFiles: AppEnv.DeployConfigRule.Filenames);
     }
@@ -30,8 +30,7 @@ internal class JobRunnerRepoCheck : JobRunner
     
     public override bool Run()
     {
-        // the check job will always build all targets. So the targets filter is always empty
-        Success = BuildTarball(_reader, new FileInfo(AppConfigRepo.OutputFileTempPath), Array.Empty<string>(), true);
+        Success = BuildTarball(_reader, AppEnv.TemporaryDeploymentBundle, AppConfig.Targets, false);
 
         return Success;
     }
@@ -40,8 +39,17 @@ internal class JobRunnerRepoCheck : JobRunner
     {
         try
         {
-            // in contrast to the deploy job, we just leave the archive in the temp folder
-            // (which will be deleted in the next step)
+            if (AppConfig.DeploymentBundle is not null)
+            {
+                AppEnv.TemporaryDeploymentBundle.Refresh();
+            
+                if (Success && AppEnv.TemporaryDeploymentBundle.Exists)
+                {
+                    Log.Debug("Moving the archive file from the temporary folder to the target destination {TheTarget}", 
+                        AppConfig.DeploymentBundle);
+                    File.Move(AppEnv.TemporaryDeploymentBundle.FullName, AppConfig.DeploymentBundle.FullName);
+                }
+            }
             
             AppEnv.TemporaryDirectory.Delete(true);
         }
@@ -51,7 +59,8 @@ internal class JobRunnerRepoCheck : JobRunner
         }
     }
 
-    private AppConfigRepoCheck AppConfig { get; }
+    private AppConfigDeploy AppConfig { get; }
 
     private readonly IRepositoryReader _reader;
+
 }

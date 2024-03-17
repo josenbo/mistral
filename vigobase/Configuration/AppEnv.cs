@@ -9,18 +9,18 @@ namespace vigobase;
 [PublicAPI]
 public static class AppEnv
 {
-    public static FileHandlingParameters DefaultFileHandlingParams { get; set; }
-    public static StandardFileHandling DeployConfigRule { get; set; }
-    public static StandardFileHandling FinalCatchAllRule { get; set; }
+    public static FileHandlingParameters DefaultFileHandlingParams { get; }
+    public static StandardFileHandling DeployConfigRule { get; }
+    public static StandardFileHandling FinalCatchAllRule { get; }
     public static DirectoryInfo TopLevelDirectory
     {
         get => _topLevelDirectory ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX266","Forgot to set this from the AppConfig in the JobRunner?", string.Empty));
         set => _topLevelDirectory = value;
     }
-
     public static FileInfo? TimingReportFile { get; set; }
-    public static DirectoryInfo TemporaryDirectory { get; set; }
-    public static FaultRegistry Faults { get; private set; }
+    public static DirectoryInfo TemporaryDirectory { get; }
+    public static FileInfo TemporaryDeploymentBundle { get; }
+    public static FaultRegistry Faults { get; }
 
     public static string GetTopLevelRelativePath(string path)
     {
@@ -58,8 +58,11 @@ public static class AppEnv
     static AppEnv()
     {
         _currentRunStopwatch.Start();
-        
+
         Faults = new FaultRegistry();
+        
+        TemporaryDirectory = GetTemporaryDirectory();
+        TemporaryDeploymentBundle = new FileInfo(Path.Combine(TemporaryDirectory.FullName, "vigo.tar.gz"));
         
         var asciiGerman = ValidCharactersHelper.ParseConfiguration("AsciiGerman");
     
@@ -97,8 +100,6 @@ public static class AppEnv
                 Permissions = FilePermission.UseDefault
             }, 
             DoCopy: false);
-
-        TemporaryDirectory = GetTemporaryDirectory();
     }
 
     public static DirectoryInfo GetTemporaryDirectory()

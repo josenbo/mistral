@@ -2,8 +2,14 @@
 
 namespace vigo;
 
-internal class JobRunnerInfoVersion(AppConfigInfoVersion appConfig) : JobRunner
+internal class JobRunnerVersion : JobRunner
 {
+    public JobRunnerVersion(AppConfigVersion appConfig)
+    {
+        AppConfig = appConfig;
+        Success = false;
+    }
+
     public override bool Prepare()
     {
         return Success = true;
@@ -40,5 +46,5 @@ internal class JobRunnerInfoVersion(AppConfigInfoVersion appConfig) : JobRunner
     }
 
     // ReSharper disable once UnusedMember.Local
-    private AppConfigInfoVersion AppConfig { get; } = appConfig;    
+    private AppConfigVersion AppConfig { get; }    
 }
