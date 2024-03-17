@@ -2,19 +2,19 @@
 
 namespace vigo_tests;
 
-public class ProgramArgumentsTests
+public class AppConfigBuilderTests
 {
     [Fact]
     public void Test1()
     {
         _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
 
-        var result = ProgramArguments.Assemble();
+        var result = AppConfigBuilder.Assemble();
     }
     
     #region Helpers
 
-    public ProgramArgumentsTests(ITestOutputHelper testOutputHelper)
+    public AppConfigBuilderTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
 

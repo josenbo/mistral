@@ -12,7 +12,7 @@ try
 
     ConfigureLogging();
 
-    var appConfig = ProgramArguments.Assemble();
+    var appConfig = AppConfigBuilder.Assemble();
 
     Log.Information("Running the action {TheCommand} with the configuration {TheConfig}",
         appConfig.Command,

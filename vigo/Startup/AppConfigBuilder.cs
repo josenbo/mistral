@@ -4,7 +4,7 @@ using vigobase;
 
 namespace vigo;
 
-internal static class ProgramArguments
+internal static class AppConfigBuilder
 {
     public static AppConfig Assemble() 
         => BuildAppConfig(cmdArgsEnum: Environment.GetCommandLineArgs(), envVarFacade: EnvVar.GetSystem());
@@ -119,8 +119,8 @@ internal static class ProgramArguments
             return;
         
         Log.Debug("Entering {TheAssembly}.{TheClass}.{TheMethod}",
-            typeof(ProgramArguments).Assembly.FullName,
-            nameof(ProgramArguments),
+            typeof(AppConfigBuilder).Assembly.FullName,
+            nameof(AppConfigBuilder),
             nameof(Assemble));
         
         Log.Debug("Command line arguments:");
