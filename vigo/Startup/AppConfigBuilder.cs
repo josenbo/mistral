@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using System.Text;
+using CommandLine;
+using Serilog;
 using Serilog.Events;
 using vigobase;
 
@@ -20,9 +22,6 @@ internal static class AppConfigBuilder
         var partialArguments = ParsePartialProgramTaskArguments(cmdArgs);
         EnrichMissingArgumentsFromEnvironmentVariables(envVarFacade, partialArguments);
         
-        // todo remove test helper
-        partialArguments.ShowVersion = true;
-        
         var retval =  CreateAppConfig(partialArguments);
         retval.LogObject();
         return retval;
@@ -33,26 +32,91 @@ internal static class AppConfigBuilder
         // Parse the command line arguments and populate
         // the PartialProgramTaskArguments object with
         // the parsed values
+
+        var sb = new StringBuilder();
+        var sw = new StringWriter(sb);
         
-        return new PartialProgramArguments();
+        var parser = new Parser(config =>
+        {
+            config.AutoHelp = false;
+            config.AutoVersion = false;
+            config.HelpWriter = sw;
+        });
+
+        var parserResult = parser.ParseArguments<PartialProgramArguments>(commandLineArguments);
+
+        if (parserResult?.Value is null)
+            throw new VigoFatalException(AppEnv.Faults.Fatal(
+                "FX651",
+                sb.ToString(),
+                "Encountered invalid command line arguments"));
+
+        var retval = parserResult.Value ?? throw new VigoFatalException(AppEnv.Faults.Fatal("FX658", "This condition was checked, handled and should never occur", string.Empty));
+        
+        Log.Debug("Parsed command line:");
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.RepositoryRootPath), retval.RepositoryRootPath);
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.DeploymentBundlePath), retval.DeploymentBundlePath);
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.TargetNames), retval.TargetNames);
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.Preview), retval.Preview);
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.MappingReportFilePath), retval.MappingReportFilePath);
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.ExplainName), retval.ExplainName);
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.ShowHelp), retval.ShowHelp);
+        Log.Debug("{TheParam} = {TheValue}", nameof(retval.ShowVersion), retval.ShowVersion);
+
+        return retval;
     }
 
     private static void EnrichMissingArgumentsFromEnvironmentVariables(EnvVar envVarFacade, PartialProgramArguments partialArguments)
     {
         if (string.IsNullOrWhiteSpace(partialArguments.RepositoryRootPath) && envVarFacade.TryGetEnvironmentVariable("VIGO_REPOSITORY_ROOT", out var parsedRepositoryRootPath))
+        {
             partialArguments.RepositoryRootPath = LimitStringLength(4096, parsedRepositoryRootPath);
+
+            Log.Debug("Copy environment variable {TheEnvVar} into {TheParam} = {TheValue}", 
+                "VIGO_REPOSITORY_ROOT",
+                nameof(partialArguments.RepositoryRootPath), 
+                partialArguments.RepositoryRootPath);
+        }
         
-        if (string.IsNullOrWhiteSpace(partialArguments.DeploymentBundlePath) && envVarFacade.TryGetEnvironmentVariable("VIGO_DEPLOYMENT_BUNDLE", out var parsedDeploymentBundlePath))
+        if (string.IsNullOrWhiteSpace(partialArguments.DeploymentBundlePath) && envVarFacade.TryGetEnvironmentVariable("VIGO_BUNDLE", out var parsedDeploymentBundlePath))
+        {
             partialArguments.DeploymentBundlePath = LimitStringLength(4096, parsedDeploymentBundlePath);
+
+            Log.Debug("Copy environment variable {TheEnvVar} into {TheParam} = {TheValue}", 
+                "VIGO_BUNDLE",
+                nameof(partialArguments.DeploymentBundlePath), 
+                partialArguments.DeploymentBundlePath);
+        }
         
         if (string.IsNullOrWhiteSpace(partialArguments.TargetNames) && envVarFacade.TryGetEnvironmentVariable("VIGO_TARGETS", out var parsedTargetNames))
+        {
             partialArguments.TargetNames = LimitStringLength(4096, parsedTargetNames);
 
-        if (partialArguments.IncludePrepared is null && envVarFacade.TryGetEnvironmentVariable("VIGO_INCLUDE_PREPARED", out var parsedIncludePrepared))
-            partialArguments.IncludePrepared = true;
+            Log.Debug("Copy environment variable {TheEnvVar} into {TheParam} = {TheValue}", 
+                "VIGO_TARGETS",
+                nameof(partialArguments.TargetNames), 
+                partialArguments.TargetNames);
+        }
 
-        if (string.IsNullOrWhiteSpace(partialArguments.MappingReportFilePath) && envVarFacade.TryGetEnvironmentVariable("VIGO_MAPPING_REPORT", out var parsedMappingReportFilePath))
+        if (!partialArguments.Preview && envVarFacade.TryGetEnvironmentVariable("VIGO_PREVIEW", out _))
+        {
+            partialArguments.Preview = true;
+
+            Log.Debug("Copy environment variable {TheEnvVar} into {TheParam} = {TheValue}", 
+                "VIGO_PREVIEW",
+                nameof(partialArguments.Preview), 
+                partialArguments.Preview);
+        }
+
+        if (string.IsNullOrWhiteSpace(partialArguments.MappingReportFilePath) && envVarFacade.TryGetEnvironmentVariable("VIGO_REPORT", out var parsedMappingReportFilePath))
+        {
             partialArguments.MappingReportFilePath = LimitStringLength(4096, parsedMappingReportFilePath);
+
+            Log.Debug("Copy environment variable {TheEnvVar} into {TheParam} = {TheValue}", 
+                "VIGO_REPORT",
+                nameof(partialArguments.MappingReportFilePath), 
+                partialArguments.MappingReportFilePath);
+        }
     }
 
     private static string? LimitStringLength(int maxLength, string? value)
@@ -68,10 +132,10 @@ internal static class AppConfigBuilder
         // Create an instance of AppConfigInfo using the
         // values from the PartialProgramTaskArguments object
 
-        if (partialArguments.ShowHelp is true)
+        if (partialArguments.ShowHelp)
             return new AppConfigHelp();
 
-        if (partialArguments.ShowVersion is true)
+        if (partialArguments.ShowVersion)
             return new AppConfigVersion();
 
         if (string.IsNullOrWhiteSpace(partialArguments.RepositoryRootPath) || !Directory.Exists(partialArguments.RepositoryRootPath))
@@ -86,33 +150,33 @@ internal static class AppConfigBuilder
 
         if (!string.IsNullOrWhiteSpace(partialArguments.DeploymentBundlePath))
         {
-            var filepath = Path.GetFullPath(partialArguments.DeploymentBundlePath);
-            var folderpath = Path.GetDirectoryName(filepath);
+            var filePath = Path.GetFullPath(partialArguments.DeploymentBundlePath);
+            var folderPath = Path.GetDirectoryName(filePath);
             
-            if (string.IsNullOrWhiteSpace(folderpath) || !Directory.Exists(folderpath))
+            if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
                 throw new VigoFatalException(AppEnv.Faults.Fatal("FX637", null, "The deployment bundle argument must be a file path in an existing directory"));
             
-            deploymentBundle = new FileInfo(filepath);
+            deploymentBundle = new FileInfo(filePath);
         }
 
         var targets = DeploymentTargetHelper.ParseTargets(partialArguments.TargetNames).ToList();
 
-        var includePrepared = (partialArguments.IncludePrepared is true);
+        var preview = partialArguments.Preview;
         
         FileInfo? mappingReport = null;
         
         if (!string.IsNullOrWhiteSpace(partialArguments.MappingReportFilePath))
         {
-            var filepath = Path.GetFullPath(partialArguments.MappingReportFilePath);
-            var folderpath = Path.GetDirectoryName(filepath);
+            var filePath = Path.GetFullPath(partialArguments.MappingReportFilePath);
+            var folderPath = Path.GetDirectoryName(filePath);
             
-            if (string.IsNullOrWhiteSpace(folderpath) || !Directory.Exists(folderpath))
+            if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
                 throw new VigoFatalException(AppEnv.Faults.Fatal("FX644", null, "The mapping report argument must be a file path in an existing directory"));
             
-            mappingReport = new FileInfo(filepath);
+            mappingReport = new FileInfo(filePath);
         }
 
-        return new AppConfigDeploy(repositoryRoot, deploymentBundle, targets, includePrepared, mappingReport);
+        return new AppConfigDeploy(repositoryRoot, deploymentBundle, targets, preview, mappingReport);
     }
 
     private static void LogCommandLineArgumentsAndEnvironmentVariables(

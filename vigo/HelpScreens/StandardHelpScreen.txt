@@ -2,8 +2,8 @@
 Copyright 2023..2024 Jochen Stein, MIT license, https://github.com/josenbo/vigo
 
 USAGE:
-  vigo -r <repo dir> [-b <tar.gz>] [-t <targets>] [-m] [-r <file>]
-  vigo -f <config file> -n <file name>
+  vigo -r <repo dir> [-b <tar.gz>] [-t <targets>] [-p] [-r <file>]
+  vigo -r <repo dir> -n <file name>
   vigo -h|--help
   vigo -v|--version
   

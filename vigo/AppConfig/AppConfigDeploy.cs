@@ -8,7 +8,7 @@ internal record AppConfigDeploy(
     DirectoryInfo RepositoryRoot,
     FileInfo? DeploymentBundle,
     IReadOnlyList<string> Targets,
-    bool IncludePrepared,
+    bool Preview,
     FileInfo? MappingReport
 ) : AppConfig
 {
@@ -25,6 +25,6 @@ internal record AppConfigDeploy(
         Log.Debug("{TheParam} = {TheValue}", nameof(DeploymentBundle), DeploymentBundle);
         Log.Debug("{TheParam} = {TheValue}", nameof(Targets), Targets);
         Log.Debug("{TheParam} = {TheValue}", nameof(MappingReport), MappingReport);
-        Log.Debug("{TheParam} = {TheValue}", nameof(IncludePrepared), IncludePrepared);
+        Log.Debug("{TheParam} = {TheValue}", nameof(Preview), Preview);
     }
 }
