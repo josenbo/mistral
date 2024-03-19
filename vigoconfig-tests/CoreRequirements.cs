@@ -498,7 +498,8 @@ public class CoreRequirements
         Assert.NotNull(folderConfig);
         Assert.Null(folderConfig.KeepEmptyFolder);
         Assert.Single(folderConfig.PartialRules);
-        Assert.Equal(FileRuleActionEnum.CheckFile, folderConfig.PartialRules[0].Action);
+        // todo: adapt from CheckFile to PreviewFile
+        Assert.Equal(FileRuleActionEnum.PreviewFile, folderConfig.PartialRules[0].Action);
         Assert.Equal(FileRuleConditionEnum.Unconditional, folderConfig.PartialRules[0].Condition);
         Assert.Null(folderConfig.PartialRules[0].CompareWith);
         Assert.Null(folderConfig.PartialRules[0].ReplaceWith);

@@ -18,8 +18,8 @@ internal class PartialProgramArguments
     [Option('r', "report")]
     public string? MappingReportFilePath { get; set; }
     
-    [Option('n', "name")]
-    public string? ExplainName { get; set; }
+    // [Option('n', "name")]
+    // public string? ExplainName { get; set; }
     
     [Option('h', "help", Default = (bool)false)]
     public bool ShowHelp { get; set; }

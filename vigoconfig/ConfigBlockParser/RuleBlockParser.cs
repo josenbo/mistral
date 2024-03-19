@@ -196,7 +196,8 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
             {
                 "IGNORE" => FileRuleActionEnum.IgnoreFile,
                 "DEPLOY" => FileRuleActionEnum.DeployFile,
-                "CHECK" => FileRuleActionEnum.CheckFile,
+                // todo: adapt from CheckFile to PreviewFile
+                "CHECK" => FileRuleActionEnum.PreviewFile,
                 _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
                     "FX189",
                     $"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}",

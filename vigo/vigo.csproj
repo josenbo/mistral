@@ -24,13 +24,9 @@
   <ItemGroup>
     <EmbeddedResource Include="HelpScreens\StandardHelpScreen.txt" />
     <None Remove="HelpScreens\HelpGeneral.txt" />
-    <EmbeddedResource Include="HelpScreens\HelpGeneral.txt" />
     <None Remove="HelpScreens\HelpDeploy.txt" />
-    <EmbeddedResource Include="HelpScreens\HelpDeploy.txt" />
     <None Remove="HelpScreens\HelpCheck.txt" />
-    <EmbeddedResource Include="HelpScreens\HelpCheck.txt" />
     <None Remove="HelpScreens\HelpExplain.txt" />
-    <EmbeddedResource Include="HelpScreens\HelpExplain.txt" />
   </ItemGroup>
   
   <PropertyGroup>

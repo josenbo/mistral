@@ -59,7 +59,7 @@ internal static class AppConfigBuilder
         Log.Debug("{TheParam} = {TheValue}", nameof(retval.TargetNames), retval.TargetNames);
         Log.Debug("{TheParam} = {TheValue}", nameof(retval.Preview), retval.Preview);
         Log.Debug("{TheParam} = {TheValue}", nameof(retval.MappingReportFilePath), retval.MappingReportFilePath);
-        Log.Debug("{TheParam} = {TheValue}", nameof(retval.ExplainName), retval.ExplainName);
+        // Log.Debug("{TheParam} = {TheValue}", nameof(retval.ExplainName), retval.ExplainName);
         Log.Debug("{TheParam} = {TheValue}", nameof(retval.ShowHelp), retval.ShowHelp);
         Log.Debug("{TheParam} = {TheValue}", nameof(retval.ShowVersion), retval.ShowVersion);
 
@@ -143,8 +143,8 @@ internal static class AppConfigBuilder
 
         var repositoryRoot = new DirectoryInfo(Path.GetFullPath(partialArguments.RepositoryRootPath));
 
-        if (!string.IsNullOrWhiteSpace(partialArguments.ExplainName))
-            return new AppConfigExplain(repositoryRoot, partialArguments.ExplainName);
+        // if (!string.IsNullOrWhiteSpace(partialArguments.ExplainName))
+        //     return new AppConfigExplain(repositoryRoot, partialArguments.ExplainName);
 
         FileInfo? deploymentBundle = null;
 

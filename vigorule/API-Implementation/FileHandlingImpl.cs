@@ -22,7 +22,8 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
         {
             if (_differentTargetFileName == value) return;
 
-            if (_appliedRule.Action == FileRuleActionEnum.CheckFile)
+            // todo: adapt from CheckFile to PreviewFile
+            if (_appliedRule.Action == FileRuleActionEnum.PreviewFile)
             {
                 _differentTargetFileName = null;
                 TargetFile = SourceFile;
@@ -96,9 +97,7 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
         set => _handling = _handling with { FixTrailingNewline = value };
     }
 
-    public IEnumerable<string> DeploymentTargets => _appliedRule.Action == FileRuleActionEnum.CheckFile
-        ? CheckTargets
-        : _handling.Targets;
+    public IEnumerable<string> DeploymentTargets => _handling.Targets;
     
     public bool HasDeploymentTarget(string target)
     {
@@ -160,7 +159,7 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
 
         if (!DeploymentTargets.Any())
         {
-            Log.Fatal("Check failed for {FileName} in {FilePath} because no targets were specified",
+            Log.Fatal("Check failed for {FileName} in {FilePath} because no targets were specified {TheHandling}",
                 SourceFile.Name,
                 AppEnv.GetTopLevelRelativePath(SourceFile.DirectoryName ?? string.Empty),
                 _handling);
@@ -226,5 +225,4 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
     private string? _differentTargetFileName;
     private FileInfo? _checkedAndTransformedTemporaryFile;
     private readonly FileRule _appliedRule;
-    private static readonly List<string> CheckTargets = ["_check_target_"];
 }

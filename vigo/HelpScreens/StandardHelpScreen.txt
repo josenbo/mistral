@@ -1,77 +1,46 @@
-﻿vigo - A cross-platform toolset for simple rule-based file deployment 
-Copyright 2023..2024 Jochen Stein, MIT license, https://github.com/josenbo/vigo
+﻿vigo - A cross-platform tool set for simple rule-based file deployment 
+Copyright 2023-2024 Jochen Stein, MIT license, https://github.com/josenbo/vigo
 
 USAGE:
-  vigo -r <repo dir> [-b <tar.gz>] [-t <targets>] [-p] [-r <file>]
-  vigo -r <repo dir> -n <file name>
+  vigo <repository-dir> [-b <file>] [-t <list>] [-r <file>] [-p]
   vigo -h|--help
   vigo -v|--version
-  
 
-EXAMPLES:
-Transform the files in the repo and create an archive with the build targets
-  vigo deploy -R ./the_repo -O v1.1.34.tar.gz -T db:web 
-Perform commit checks on the repo based on the deployment configuration
-  vigo check --repository-root ./the_repo
-Show how the configuration is applied to the folder's content
-  vigo explain --configuration-file ./the_repo/scripts
-Show how the configuration would be applied to the given filenames
-  vigo explain -C ./the_repo/scripts -N prepare-job:job-status:cleanup
-
-ACTIONS:
-  deploy                  Apply rules and tranformations to the repository 
-                          files creating an archive (.tar.gz) for deployment.
-  check                   Apply the same rules and transformations, typically 
-                          during commit checks, to detect any errors early.
-  explain                 Show how the rules are applied to the files in a 
-                          folder or for the given filenames.
-  
-  Use vigo <action> --help to get further information for the action.
-
-COMMAND LINE:
-  -H, --help              Display this help screen or action-specific help.
-  -V, --version           Display version information.
-  -R, --repository-root <directory>        (Only deploy and check actions)
-                          Set <directory> as the top-level for walking the 
+ARGUMENTS AND OPTIONS:
+  <repository-dir>        Define the top-level directory for walking the 
                           repositories directory tree and processing files.
-                          Overrides a value set in VIGO_REPOSITORY_ROOT.
-  -O, --output-file <file>                 (Only deploy action) 
-                          Create or replace thé .tar.gz archive in <file>.
-                          Overrides a value set in VIGO_OUTPUT_FILE.
-  -T, --targets <listOfTargets>            (Only deploy action)
-                          Write only the named build targets to the output
-                          file. Overrides a value set in VIGO_TARGETS.
-  -C, --configuration-file <file>          (Only explain action)
-                          Use the rules and transformations from <file> to
-                          show how this definition applies to files.
-  -N, --names <listOfFilenames>            (Only explain action)
-                          Use the filenames in <listOfFilenames> instead  
-                          of the folder's files for showing how rules and 
-                          transformations are applied.
-
-ENVIRONMENT:
-  VIGO_TEMP <directory>   Use <directory> instead of the system temp dir
-
-  VIGO_MEASUREMENTS_REPORT
+                          Required value. Directory must exist.
+                          Environment variable: VIGO_REPOSITORY_ROOT
+                           
+  -b, --bundle <file>     The name (and optional path) of the deployment
+                          bundle. The name is resolved relative to the 
+                          current working directory. The file name must 
+                          have a .tar.gz suffix and the directory must
+                          exist.
+                          Environment variable: VIGO_BUNDLE
+                            
+  -t, --targets <list>    Optional parameter to filter the build targets
+                          which are written to the deployment bundle.
+                          If missing, all build targets are present in
+                          the deployment bundle. The targets can be 
+                          separated by space, comma or semicolon.
+                          Example: -t "test,production" 
+                          Environment variable: VIGO_TARGETS
+                          
+  -r, --report <file>     Optional spreadsheet file name (with optional
+                          path) which will describe hao files were mapped
+                          to the deployment bundle. The name is resolved 
+                          relative to the current working directory. The 
+                          file name must have a .xlsx suffix and the 
+                          directory must exist.
+                          Environment variable: VIGO_REPORT
+                            
+  -p, --preview           Optional flag. If present, file PREVIEW rules 
+                          will be included in the deployment bundle.
+                          This is used primarily in commit checks.
+                          Environment variable: VIGO_PREVIEW
+                            
+  -h, --help              Display this help screen
   
-  VIGO_LOGFILE_DEBUG
-  VIGO_LOGFILE_INFORMATION
-  VIGO_LOGFILE_WARNING
-  VIGO_LOGFILE_ERROR
-  
-  VIGO_LOG_FILE <file>    Create or replace <file> to log diagnostic messages
-  VIGO_LOG_LEVEL <value>  Filters diagnostic messages by (minimum) severity.
-                          Values can be Debug, Information, Warning, Error 
-                          with Information being the default value used, 
-                          when this variable is not set.
-  VIGO_REPOSITORY_ROOT <directory>         (Only deploy and check actions)
-                          Provides a fallback, when -R or --repository-root
-                          are not found on the command line.
-  VIGO_OUTPUT_FILE <file>                  (Only deploy action)
-  VIGO_DEPLOYMENT_BUNDLE <file>                  (Only deploy action)
-                          Provides a fallback, when -O or --output-file
-                          are not found on the command line.
-  VIGO_TARGETS <listOfTargets>             (Only deploy action) 
-                          Provides a fallback, when -T or --targets are
-                          not found on the command line.
+  -v, --version           Display version information
 

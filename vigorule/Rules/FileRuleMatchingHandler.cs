@@ -28,7 +28,8 @@ internal record FileRuleMatchingHandler(
 
         transformation = new FileHandlingImpl(file, Handling, this)
         {
-            CanDeploy = Action is FileRuleActionEnum.DeployFile or FileRuleActionEnum.CheckFile,
+            // todo: adapt from CheckFile to PreviewFile
+            CanDeploy = Action is FileRuleActionEnum.DeployFile or FileRuleActionEnum.PreviewFile,
             DifferentTargetFileName = derivedFileName
         };
         return true;
