@@ -10,6 +10,8 @@ internal class DirectoryController(DirectoryInfo location, RepositoryReadRequest
 
     public bool IsTopLevelDirectory { get; } = isTopLevelDirectory;
 
+    private RepositoryReadRequest Request { get; } = request;
+
     public IMutableDirectoryHandling GetDirectoryTransformation()
     {
         return new DirectoryHandlingImpl(Location, _folderConfiguration?.KeepEmptyFolder ?? false, IsTopLevelDirectory, GetTargets);
@@ -18,11 +20,11 @@ internal class DirectoryController(DirectoryInfo location, RepositoryReadRequest
     public IMutableFileHandling GetFileTransformation(FileInfo file)
     {
         if (_rules.Count == 0)
-            AppendRules(_rules, _folderConfiguration, Location, request);
+            AppendRules(_rules, _folderConfiguration, Location, Request);
 
         foreach (var rule in _rules)
         {
-            if (rule.GetTransformation(file, out var transformation))
+            if (rule.GetTransformation(file, Request.IncludePreview, out var transformation))
                 return transformation;
         }
         

@@ -7,7 +7,8 @@ namespace vigorule;
 internal record RepositoryReadRequest(
     DirectoryInfo TopLevelDirectory,
     IReadOnlyList<ConfigurationFilename> ConfigFiles,
-    bool WalkFolderTree,
+    bool IncludePreview,
+    bool OnlyTopLevelDirectory,
     FileHandlingParameters DefaultHandling
 )
 {

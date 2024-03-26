@@ -13,6 +13,8 @@ internal class JobRunnerDeploy : JobRunner
         Success = false;
         _reader = RuleBasedHandlingApi.GetReader(
             topLevelDirectory: appConfigDeploy.RepositoryRoot,
+            includePreview: appConfigDeploy.Preview,
+            onlyTopLeveDirectory: false,
             defaultHandling: AppEnv.DefaultFileHandlingParams,
             configFiles: AppEnv.DeployConfigRule.Filenames);
     }

@@ -82,7 +82,7 @@ internal class RepositoryReader(RepositoryReadRequest request) : IRepositoryRead
             _finalItems.Add(finalFileHandling);
         }
 
-        if (request.WalkFolderTree)
+        if (!request.OnlyTopLevelDirectory)
         {
             foreach (var di in controller.Location.EnumerateDirectories())
             {

@@ -8,7 +8,9 @@ public static class RuleBasedHandlingApi
 {
     public static IRepositoryReader GetReader
     (
-        DirectoryInfo topLevelDirectory, 
+        DirectoryInfo topLevelDirectory,
+        bool includePreview,
+        bool onlyTopLeveDirectory,
         FileHandlingParameters defaultHandling,
         IReadOnlyList<ConfigurationFilename> configFiles
     )
@@ -16,27 +18,10 @@ public static class RuleBasedHandlingApi
         var request = new RepositoryReadRequest(
             TopLevelDirectory: topLevelDirectory,
             ConfigFiles: configFiles,
-            WalkFolderTree: true,
+            IncludePreview: includePreview,
+            OnlyTopLevelDirectory: onlyTopLeveDirectory,
             DefaultHandling: defaultHandling);
         
-        return new RepositoryReader(request);
-    }
-
-    public static IRepositoryReader GetReader
-    (
-        FileInfo configFile,
-        FileHandlingParameters defaultHandling
-    )
-    {
-        var request = new RepositoryReadRequest(
-            TopLevelDirectory: configFile.Directory ?? throw new VigoFatalException(AppEnv.Faults.Fatal(
-                "FX112", 
-                "File is expected to be already checked for existence, so this reference will not be null", 
-                string.Empty)),
-            ConfigFiles: new []{ new ConfigurationFilename(configFile.Name, ConfigurationFileTypeEnum.Undefined)},
-            WalkFolderTree: false,
-            DefaultHandling: defaultHandling);
-
         return new RepositoryReader(request);
     }
 }

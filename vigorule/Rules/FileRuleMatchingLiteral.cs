@@ -18,7 +18,10 @@ internal record FileRuleMatchingLiteral(
 )
 {
     internal override FileRuleConditionEnum Condition => FileRuleConditionEnum.MatchName;
-    internal override bool GetTransformation(FileInfo file, [NotNullWhen(true)] out IMutableFileHandling? transformation)
+    internal override bool GetTransformation(
+        FileInfo file, 
+        bool includePreview,
+        [NotNullWhen(true)] out IMutableFileHandling? transformation)
     {
         if (!NameToMatch.Equals(file.Name, StringComparison.Ordinal))
         {
@@ -32,8 +35,7 @@ internal record FileRuleMatchingLiteral(
 
         transformation = new FileHandlingImpl(file, Handling, this)
         {
-            // todo: adapt from CheckFile to PreviewFile
-            CanDeploy = Action is FileRuleActionEnum.DeployFile or FileRuleActionEnum.PreviewFile,
+            CanDeploy = (Action == FileRuleActionEnum.DeployFile || (includePreview && Action ==FileRuleActionEnum.PreviewFile)),
             DifferentTargetFileName = newName
         };
         return true;
