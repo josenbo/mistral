@@ -10,7 +10,7 @@ namespace vigobase;
 public static class AppEnv
 {
     public static FileHandlingParameters DefaultFileHandlingParams { get; }
-    public static StandardFileHandling DeployConfigRule { get; }
+    public static StandardFileHandling DeployConfigRule { get; private set; }
     public static StandardFileHandling FinalCatchAllRule { get; }
     public static DirectoryInfo TopLevelDirectory
     {
@@ -35,6 +35,41 @@ public static class AppEnv
     public static string GetTemporaryFilePath()
     {
         return Path.Combine(TemporaryDirectory.FullName, $"tempfile_{_tempFileSequence++}");
+    }
+
+    public static void CheckAndSetConfigurationFile(string? filenameMarkdown, string? filenameNative)
+    {
+        if (filenameMarkdown is null && filenameNative is null)
+            return;
+
+        var filenames = new List<ConfigurationFilename>();
+
+        if (filenameMarkdown is not null)
+        {
+            var filenameMarkdownClean = Path.GetFileName(filenameMarkdown);
+            if (filenameMarkdownClean != filenameMarkdown)
+                throw new VigoFatalException(AppEnv.Faults.Fatal(
+                    faultKey: "FX679",
+                    supportInfo: $"Path.GetFileName(\"{filenameMarkdown}\") -> \"{filenameMarkdownClean}\"",
+                    message: $"The configuration file name for the markdown format '{filenameMarkdown}' is not a valid file name"));
+
+            filenames.Add(new ConfigurationFilename(filenameMarkdown, ConfigurationFileTypeEnum.MarkdownFormat));
+        }
+
+        if (filenameNative is not null)
+        {
+            var filenameNativeClean = Path.GetFileName(filenameNative);
+            if (filenameNativeClean != filenameNative)
+                throw new VigoFatalException(AppEnv.Faults.Fatal(
+                    faultKey: "FX686",
+                    supportInfo: $"Path.GetFileName(\"{filenameNative}\") -> \"{filenameNativeClean}\"",
+                    message: $"The configuration file name for the native format '{filenameNative}' is not a valid file name"));
+
+            filenames.Add(new ConfigurationFilename(filenameNative, ConfigurationFileTypeEnum.NativeFormat));
+        }
+
+        if (0 < filenames.Count)
+            DeployConfigRule = DeployConfigRule with { Filenames = filenames };
     }
 
     public static void RecordTiming(

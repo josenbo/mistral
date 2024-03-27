@@ -8,6 +8,10 @@ try
 {
     AppEnv.TimingReportFile = GetFileInfoFromEnvironmentVariable("VIGO_TIMING_REPORT");
     
+    AppEnv.CheckAndSetConfigurationFile(
+        Environment.GetEnvironmentVariable("VIGO_FOLDERCONFIG_MARKDOWN"), 
+        Environment.GetEnvironmentVariable("VIGO_FOLDERCONFIG_NATIVE"));
+    
     AppEnv.RecordTiming("Application started");
 
     ConfigureLogging();
@@ -34,15 +38,7 @@ try
             string.Empty))
     };
 
-    try
-    {
-        if (jobRunner.Prepare())
-            jobRunner.Run();
-    }
-    finally
-    {
-        jobRunner.CleanUp();
-    }
+    jobRunner.Run();
 
     Log.Information("Process terminated {TheResult} after {TheTimeSpan}",
         (jobRunner.Success ? "successfully" : "with errors"),

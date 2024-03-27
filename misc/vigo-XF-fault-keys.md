@@ -30,10 +30,6 @@ Invariant violated. Notify support and provide logs
 
 
 
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX665", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX672", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX679", null, "todo"))
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX686", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX693", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX700", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX707", null, "todo"))

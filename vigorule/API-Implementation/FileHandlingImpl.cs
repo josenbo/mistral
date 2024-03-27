@@ -22,14 +22,6 @@ internal class FileHandlingImpl : IMutableFileHandling, IFinalFileHandling
         {
             if (_differentTargetFileName == value) return;
 
-            // todo: adapt from CheckFile to PreviewFile
-            if (_appliedRule.Action == FileRuleActionEnum.PreviewFile)
-            {
-                _differentTargetFileName = null;
-                TargetFile = SourceFile;
-                return;
-            }
-            
             try
             {
                 _differentTargetFileName = string.IsNullOrEmpty(value) ? null : value;

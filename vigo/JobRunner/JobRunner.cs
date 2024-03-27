@@ -1,17 +1,45 @@
-﻿using System.Data.SqlTypes;
-using Serilog;
+﻿using Serilog;
 using vigoarchive;
+using vigobase;
 using vigorule;
 
 namespace vigo;
 
 internal abstract class JobRunner
 {
-    // todo: set Success in derived classes
-    public bool Success { get; protected set; }
-    public abstract bool Prepare();
-    public abstract bool Run();
-    public abstract void CleanUp();
+    public bool Success { get; private set; }
+
+    public bool Run()
+    {
+        Success = DoPrepare();
+
+        try
+        {
+            if (Success)
+                Success = DoRun();
+        }
+        catch (Exception ex) when (ex is not VigoFatalException)
+        {
+            throw new VigoFatalException(
+                message: AppEnv.Faults.Fatal(
+                    faultKey: "FX672",
+                    supportInfo: $"Try to handle this exception at the origin. Caught unhandled {ex.GetType().Name} with message {ex.Message}",
+                    message: JobRunnerFailureMessage), 
+                innerException: ex);
+        }
+        finally
+        {
+            DoCleanUp();
+        }
+
+        return Success;
+    }
+
+    protected abstract bool DoPrepare();
+    protected abstract bool DoRun();
+    protected abstract void DoCleanUp();
+    protected abstract string JobRunnerFailureMessage { get; }
+    
     
     protected static bool BuildTarball(IRepositoryReader reader, FileInfo outputFile, IReadOnlyList<string> filterByTargets, bool writeCheckTarget)
     {

@@ -182,11 +182,13 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
         {
             string fileType;
             
-            if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["ALL"], ["TEXT", "", "BINARY"], ["FILES"]))
+            // todo: remove CHECK after all configuration have been switched from CHECK to PREVIEW
+            if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK", "PREVIEW"], ["ALL"], ["TEXT", "", "BINARY"], ["FILES"]))
             {
                 fileType = tokenizer.MatchedTokens[3];
             }
-            else if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES", "IN"], ["*"]))
+            // todo: remove CHECK after all configuration have been switched from CHECK to PREVIEW
+            else if (tokenizer.TryReadTokens(["DO"], ["IGNORE", "DEPLOY", "CHECK", "PREVIEW"], ["TEXT", "", "BINARY"], ["FILE"], ["IF"], ["NAME"], ["EQUALS", "MATCHES", "IN"], ["*"]))
             {
                 fileType = tokenizer.MatchedTokens[2];
             }
@@ -196,11 +198,12 @@ internal class RuleBlockParser(PartialFolderConfigRule partialRule, SourceBlock 
             {
                 "IGNORE" => FileRuleActionEnum.IgnoreFile,
                 "DEPLOY" => FileRuleActionEnum.DeployFile,
-                // todo: adapt from CheckFile to PreviewFile
+                "PREVIEW" => FileRuleActionEnum.PreviewFile,
+                // todo: remove CHECK after all configuration have been switched from CHECK to PREVIEW
                 "CHECK" => FileRuleActionEnum.PreviewFile,
                 _ => throw new VigoFatalException(AppEnv.Faults.Fatal(
                     "FX189",
-                    $"Expected the rule action to be in [IGNORE, DEPLOY, CHECK], but found {tokenizer.MatchedTokens[1]}",
+                    $"Expected the rule action to be in [IGNORE, DEPLOY, PREVIEW], but found {tokenizer.MatchedTokens[1]}",
                     "Failed to parse a folder configuration script. See log for details"))
             };
 

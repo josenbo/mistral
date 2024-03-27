@@ -1,20 +1,18 @@
 ﻿using System.Reflection;
 using System.Text;
 using Serilog;
-using Serilog.Events;
-using vigobase;
 
 namespace vigo;
 
 internal class JobRunnerHelp : JobRunner
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public JobRunnerHelp(AppConfigHelp appConfig)
     {
         AppConfig = appConfig;
-        Success = false;
     }
     
-    public override bool Prepare()
+    protected override bool DoPrepare()
     {
         const string name = "StandardHelpScreen.txt";
 
@@ -27,14 +25,13 @@ internal class JobRunnerHelp : JobRunner
             .SingleOrDefault(n => n.EndsWith(name));            
             
         _helpResource = resourceName ?? string.Empty;
-        Success = (resourceName is not null);
-        return Success;
+        return (resourceName is not null);
     }
 
-    public override bool Run()
+    protected override bool DoRun()
     {
         if (string.IsNullOrWhiteSpace(_helpResource))
-            return Success = false;
+            return false;
 
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(_helpResource);
         if (stream is null)
@@ -43,13 +40,15 @@ internal class JobRunnerHelp : JobRunner
         var helpText = reader.ReadToEnd();
         Console.Write(helpText);
 
-        return Success = true;
+        return true;
     }
 
-    public override void CleanUp()
+    protected override void DoCleanUp()
     {
     }
     
+    protected override string JobRunnerFailureMessage => "Failed to retrieve the help page";
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
     private AppConfigHelp AppConfig { get; }
     private string _helpResource = string.Empty;
 }

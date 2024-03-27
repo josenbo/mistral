@@ -10,7 +10,6 @@ internal class JobRunnerDeploy : JobRunner
     {
         AppConfig = appConfigDeploy;
         AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot;
-        Success = false;
         _reader = RuleBasedHandlingApi.GetReader(
             topLevelDirectory: appConfigDeploy.RepositoryRoot,
             includePreview: appConfigDeploy.Preview,
@@ -18,41 +17,41 @@ internal class JobRunnerDeploy : JobRunner
             defaultHandling: AppEnv.DefaultFileHandlingParams,
             configFiles: AppEnv.DeployConfigRule.Filenames);
     }
-    
-    public override bool Prepare()
+
+    protected override bool DoPrepare()
     {
         _reader.Read();
 
-        Success = _reader
+        return _reader
             .FinalItems<IFinalHandling>(true)
             .All(ft => ft.CheckedSuccessfully);
-
-        return Success;
     }
     
-    public override bool Run()
+    protected override bool DoRun()
     {
-        Success = BuildTarball(_reader, AppEnv.TemporaryDeploymentBundle, AppConfig.Targets, false);
+        if (!BuildTarball(_reader, AppEnv.TemporaryDeploymentBundle, AppConfig.Targets, false))
+            return false;
 
-        return Success;
+        if (AppConfig.DeploymentBundle is null) 
+            return true;
+        
+        AppEnv.TemporaryDeploymentBundle.Refresh();
+
+        if (!AppEnv.TemporaryDeploymentBundle.Exists) 
+            return true;
+        
+        Log.Debug("Moving the archive file from the temporary folder to the target destination {TheTarget}", 
+            AppConfig.DeploymentBundle);
+        
+        File.Move(AppEnv.TemporaryDeploymentBundle.FullName, AppConfig.DeploymentBundle.FullName);
+
+        return true;
     }
 
-    public override void CleanUp()
+    protected override void DoCleanUp()
     {
         try
         {
-            if (AppConfig.DeploymentBundle is not null)
-            {
-                AppEnv.TemporaryDeploymentBundle.Refresh();
-            
-                if (Success && AppEnv.TemporaryDeploymentBundle.Exists)
-                {
-                    Log.Debug("Moving the archive file from the temporary folder to the target destination {TheTarget}", 
-                        AppConfig.DeploymentBundle);
-                    File.Move(AppEnv.TemporaryDeploymentBundle.FullName, AppConfig.DeploymentBundle.FullName);
-                }
-            }
-            
             AppEnv.TemporaryDirectory.Delete(true);
         }
         catch (Exception e)
@@ -61,8 +60,8 @@ internal class JobRunnerDeploy : JobRunner
         }
     }
 
+    protected override string JobRunnerFailureMessage => "Failed to build the deployment bundle";
     private AppConfigDeploy AppConfig { get; }
 
     private readonly IRepositoryReader _reader;
-
 }

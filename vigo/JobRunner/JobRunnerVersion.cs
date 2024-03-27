@@ -4,18 +4,18 @@ namespace vigo;
 
 internal class JobRunnerVersion : JobRunner
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public JobRunnerVersion(AppConfigVersion appConfig)
     {
         AppConfig = appConfig;
-        Success = false;
     }
 
-    public override bool Prepare()
+    protected override bool DoPrepare()
     {
-        return Success = true;
+        return true;
     }
 
-    public override bool Run()
+    protected override bool DoRun()
     {
         Assembly appAssembly;
         
@@ -38,13 +38,14 @@ internal class JobRunnerVersion : JobRunner
         // Console.WriteLine($"{currentExecutable} v{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}.{appVersion.Revision}");
         Console.WriteLine($"{currentExecutable} v{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}");
 
-        return Success = true;
+        return true;
     }
 
-    public override void CleanUp()
+    protected override void DoCleanUp()
     {
     }
 
-    // ReSharper disable once UnusedMember.Local
+    protected override string JobRunnerFailureMessage => "Failed to retrieve the version information";
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
     private AppConfigVersion AppConfig { get; }    
 }

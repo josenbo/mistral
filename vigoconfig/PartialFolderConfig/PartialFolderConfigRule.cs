@@ -29,9 +29,8 @@ internal class PartialFolderConfigRule(SourceBlockRule block)
                 case FileRuleActionEnum.DeployFile:
                     sb.Append("DEPLOY");
                     break;
-                // todo: adapt from CheckFile to PreviewFile
                 case FileRuleActionEnum.PreviewFile:
-                    sb.Append("CHECK");
+                    sb.Append("PREVIEW");
                     break;
                 case FileRuleActionEnum.Undefined:
                 default:

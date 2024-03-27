@@ -8,22 +8,23 @@ internal class JobRunnerExplain : JobRunner
     {
         AppConfig = appConfig;
         AppEnv.TopLevelDirectory = AppConfig.RepositoryRoot;
-        Success = false;
     }
     
     private AppConfigExplain AppConfig { get; }    
 
-    public override bool Prepare()
+    protected override bool DoPrepare()
     {
-        return Success = true;
+        return true;
     }
 
-    public override bool Run()
+    protected override bool DoRun()
     {
-        return Success = true;
+        return true;
     }
 
-    public override void CleanUp()
+    protected override void DoCleanUp()
     {
     }
+
+    protected override string JobRunnerFailureMessage => "Failed to explain the file handling";
 }
