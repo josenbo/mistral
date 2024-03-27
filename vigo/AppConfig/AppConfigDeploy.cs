@@ -12,6 +12,7 @@ internal record AppConfigDeploy(
     FileInfo? MappingReport
 ) : AppConfig
 {
+
     public override CommandEnum Command => CommandEnum.Deploy;
     public static string OutputFileTempPath => Path.Combine(AppEnv.TemporaryDirectory.FullName, "vigo.tar.gz");
     public override void LogObject()
@@ -26,5 +27,10 @@ internal record AppConfigDeploy(
         Log.Debug("{TheParam} = {TheValue}", nameof(Targets), Targets);
         Log.Debug("{TheParam} = {TheValue}", nameof(MappingReport), MappingReport);
         Log.Debug("{TheParam} = {TheValue}", nameof(Preview), Preview);
+    }
+
+    public override string ToString()
+    {
+        return $"{nameof(AppConfigDeploy)} {{ {nameof(Command)} = {Command}, {nameof(RepositoryRoot)} = {RepositoryRoot}, {nameof(DeploymentBundle)} = {DeploymentBundle}, {nameof(Targets)} = [{string.Join(", ", Targets)}], {nameof(Preview)} = {Preview}, {nameof(MappingReport)} = {MappingReport} }}";
     }
 }

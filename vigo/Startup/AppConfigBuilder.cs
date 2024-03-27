@@ -68,12 +68,12 @@ internal static class AppConfigBuilder
 
     private static void EnrichMissingArgumentsFromEnvironmentVariables(EnvVar envVarFacade, PartialProgramArguments partialArguments)
     {
-        if (string.IsNullOrWhiteSpace(partialArguments.RepositoryRootPath) && envVarFacade.TryGetEnvironmentVariable("VIGO_REPOSITORY_ROOT", out var parsedRepositoryRootPath))
+        if (string.IsNullOrWhiteSpace(partialArguments.RepositoryRootPath) && envVarFacade.TryGetEnvironmentVariable("VIGO_REPOSITORY", out var parsedRepositoryRootPath))
         {
             partialArguments.RepositoryRootPath = LimitStringLength(4096, parsedRepositoryRootPath);
 
             Log.Debug("Copy environment variable {TheEnvVar} into {TheParam} = {TheValue}", 
-                "VIGO_REPOSITORY_ROOT",
+                "VIGO_REPOSITORY",
                 nameof(partialArguments.RepositoryRootPath), 
                 partialArguments.RepositoryRootPath);
         }

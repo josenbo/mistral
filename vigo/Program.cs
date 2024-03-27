@@ -20,7 +20,7 @@ try
 
     Log.Information("Running the action {TheCommand} with the configuration {TheConfig}",
         appConfig.Command,
-        appConfig);
+        appConfig.ToString());
 
     JobRunner jobRunner = appConfig switch
     {
@@ -101,7 +101,7 @@ return;
 
 void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 {
-    if (TryGetLogLevelFromEnvironmentVariable("VIGO_CONSOLE_LOG_LEVEL", out var parsedConsoleLogLevel))
+    if (TryGetLogLevelFromEnvironmentVariable("VIGO_CONSOLE_LOGLEVEL", out var parsedConsoleLogLevel))
         logLevelConsole = parsedConsoleLogLevel.Value;
     
     TryGetLogfileFromEnvironmentVariable(
@@ -125,7 +125,7 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
         logfile: out var logfileError);
     
     TryGetLogfileFromEnvironmentVariable(
-        environmentVariable: "VIGO_SHARED_LOG_FILE",
+        environmentVariable: "VIGO_SHARED_LOGFILE",
         deleteIfExists: false,
         logfile: out var sharedLogFile);
 
@@ -134,18 +134,24 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
     
     if (sharedLogFile is not null)
     {
-        if (TryGetLogLevelFromEnvironmentVariable("VIGO_SHARED_LOG_LEVEL", out var parsedLogLevel))
+        if (TryGetLogLevelFromEnvironmentVariable("VIGO_SHARED_LOGLEVEL", out var parsedLogLevel))
             sharedLogLevel = parsedLogLevel.Value;
 
-        var parsedRetentionDays = EnvVar.GetSystem().GetEnvironmentVariable("VIGO_SHARED_LOG_RETENTION_DAYS");
+        var parsedRetentionDays = EnvVar.GetSystem().GetEnvironmentVariable("VIGO_SHARED_RETENTION_DAYS");
         
         if (!string.IsNullOrWhiteSpace(parsedRetentionDays))
             if (int.TryParse(parsedRetentionDays, out var parsedInteger ))
                 sharedLogRetentionDays = Math.Max(Math.Min(parsedInteger, 14), 1);
     }
 
+    var debugLoggingEnabled = false;
+    var informationLoggingEnabled = false;
+    var warningLoggingEnabled = false;
+    var errorLoggingEnabled = false;
+    var sharedLoggingEnabled = false;
+    var sharedRunId = Random.Shared.Next(1000000000, 1999999999);
     
-    var minimumLevelSet = false;
+    LogEventLevel? minimumLevel = null;
     var loggerConfiguration = new LoggerConfiguration();
 
     // ----------------------------------------------------
@@ -154,7 +160,7 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
     if (logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
         loggerConfiguration.MinimumLevel.Verbose();
-        minimumLevelSet = true;
+        minimumLevel= configuredLogLevel;
         
         if (logLevelConsole == configuredLogLevel)
             loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Verbose);
@@ -165,17 +171,20 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
     
     if (logfileDebug is not null  || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
-        if (!minimumLevelSet)
+        if (minimumLevel is null)
         {
             loggerConfiguration.MinimumLevel.Debug();
-            minimumLevelSet = true;
+            minimumLevel= configuredLogLevel;
         }
         
         if (logLevelConsole == configuredLogLevel)
             loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
         if (logfileDebug is not null)
-            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
+        {
+            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);
+            debugLoggingEnabled = true;
+        }    
     }
         
     // ----------------------------------------------------
@@ -183,17 +192,20 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 
     if (logfileInformation is not null || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
-        if (!minimumLevelSet)
+        if (minimumLevel is null)
         {
             loggerConfiguration.MinimumLevel.Information();
-            minimumLevelSet = true;
+            minimumLevel= configuredLogLevel;
         }
         
         if (logLevelConsole == configuredLogLevel)
             loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
-        if (logfileDebug is not null)
-            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
+        if (logfileInformation is not null)
+        {
+            loggerConfiguration.WriteTo.File(logfileInformation.FullName, restrictedToMinimumLevel: configuredLogLevel);
+            informationLoggingEnabled = true;
+        }    
     }
         
     // ----------------------------------------------------
@@ -201,17 +213,20 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 
     if (logfileWarning is not null || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
-        if (!minimumLevelSet)
+        if (minimumLevel is null)
         {
             loggerConfiguration.MinimumLevel.Warning();
-            minimumLevelSet = true;
+            minimumLevel= configuredLogLevel;
         }
         
         if (logLevelConsole == configuredLogLevel)
             loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
-        if (logfileDebug is not null)
-            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
+        if (logfileWarning is not null)
+        {
+            loggerConfiguration.WriteTo.File(logfileWarning.FullName, restrictedToMinimumLevel: configuredLogLevel);
+            warningLoggingEnabled = true;
+        }    
     }
 
     // ----------------------------------------------------
@@ -219,17 +234,20 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 
     if (logfileError is not null || logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
-        if (!minimumLevelSet)
+        if (minimumLevel is null)
         {
             loggerConfiguration.MinimumLevel.Error();
-            minimumLevelSet = true;
+            minimumLevel= configuredLogLevel;
         }
         
         if (logLevelConsole == configuredLogLevel)
             loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
 
-        if (logfileDebug is not null)
-            loggerConfiguration.WriteTo.File(logfileDebug.FullName, restrictedToMinimumLevel: configuredLogLevel);    
+        if (logfileError is not null)
+        {
+            loggerConfiguration.WriteTo.File(logfileError.FullName, restrictedToMinimumLevel: configuredLogLevel);
+            errorLoggingEnabled = true;
+        }    
     }
 
     // ----------------------------------------------------
@@ -237,23 +255,21 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
 
     if (logLevelConsole == configuredLogLevel || (sharedLogFile is not null && sharedLogLevel == configuredLogLevel))
     {
-        if (!minimumLevelSet)
+        if (minimumLevel is null)
         {
             loggerConfiguration.MinimumLevel.Fatal();
-            minimumLevelSet = true;
+            minimumLevel= configuredLogLevel;
         }
         
         if (logLevelConsole == configuredLogLevel)
             loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: configuredLogLevel);
     }
 
-    if (!minimumLevelSet)
+    if (minimumLevel is null)
         return;
     
     if (sharedLogFile is not null)
     {
-        var runId = Random.Shared.Next(1000000000, 1999999999);
-
         loggerConfiguration.WriteTo.File(
             sharedLogFile.FullName,
             restrictedToMinimumLevel: sharedLogLevel,
@@ -261,11 +277,48 @@ void ConfigureLogging(LogEventLevel? logLevelConsole = null)
             retainedFileCountLimit: sharedLogRetentionDays,
             shared: true,
             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] #" + 
-                            runId +
+                            sharedRunId +
                             " {Message:lj}{NewLine}{Exception}");
+
+        sharedLoggingEnabled = true;
     }
     
     Log.Logger = loggerConfiguration.CreateLogger();
+    
+    Log.Information("Logging is configured with a minimum log level of {TheMinimumLogLevel}", minimumLevel);
+    
+    if (logLevelConsole is null)
+        Log.Information("Console logging is OFF");
+    else
+        Log.Information("Console logging is ON with as log level of {TheLogLevel}", logLevelConsole);
+    
+    
+    Log.Information("Debug logging is {TheState} writing to {TheLogFile}", 
+        (debugLoggingEnabled ? "ON" : "OFF"),
+        logfileDebug);
+    
+    Log.Information("Information logging is {TheState} writing to {TheLogFile}", 
+        (informationLoggingEnabled ? "ON" : "OFF"),
+        logfileInformation);
+    
+    Log.Information("Warning logging is {TheState} writing to {TheLogFile}", 
+        (warningLoggingEnabled ? "ON" : "OFF"),
+        logfileWarning);
+    
+    Log.Information("Error logging is {TheState} writing to {TheLogFile}", 
+        (errorLoggingEnabled ? "ON" : "OFF"),
+        logfileError);
+
+    if (sharedLoggingEnabled)
+    {
+        Log.Information(
+            "Shared logging is ON with log level {TheLogLevel}, {TheRetention} days retention policy and run id #{TheRunId} writing to {TheLogFile}",
+            sharedLogLevel,
+            sharedLogRetentionDays,
+            sharedRunId,
+            sharedLogFile);
+    }
+    else Log.Information("Shared logging is OFF");
 }
 
 #endregion

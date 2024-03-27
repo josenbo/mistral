@@ -16,4 +16,9 @@ internal record AppConfigVersion : AppConfig
         Log.Debug("Dumping an object of type {TheType}", this.GetType().FullName);
         Log.Debug("{TheParam} = {TheValue}", nameof(Command), Command);
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(AppConfigVersion)} {{ {nameof(Command)} = {Command} }}";
+    }
 }

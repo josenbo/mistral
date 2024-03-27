@@ -10,7 +10,7 @@ ARGUMENTS AND OPTIONS:
   <repository-dir>        Define the top-level directory for walking the 
                           repositories directory tree and processing files.
                           Required value. Directory must exist.
-                          Environment variable: VIGO_REPOSITORY_ROOT
+                          Environment variable: VIGO_REPOSITORY
                            
   -b, --bundle <file>     The name (and optional path) of the deployment
                           bundle. The name is resolved relative to the 
@@ -38,7 +38,7 @@ ARGUMENTS AND OPTIONS:
   -p, --preview           Optional flag. If present, file PREVIEW rules 
                           will be included in the deployment bundle.
                           This is used primarily in commit checks.
-                          Environment variable: VIGO_PREVIEW
+                          Environment variable: VIGO_PREVIEW (any value)
                             
   -h, --help              Display this help screen
   

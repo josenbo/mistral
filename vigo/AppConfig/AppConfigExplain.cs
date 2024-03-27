@@ -20,4 +20,9 @@ internal record AppConfigExplain(
         Log.Debug("{TheParam} = {TheValue}", nameof(RepositoryRoot), RepositoryRoot);
         Log.Debug("{TheParam} = {TheValue}", nameof(ExplainName), ExplainName);
     }
+    
+    public override string ToString()
+    {
+        return $"{nameof(AppConfigExplain)} {{ {nameof(Command)} = {Command}, {nameof(RepositoryRoot)} = {RepositoryRoot}, {nameof(ExplainName)} = {ExplainName} }}";
+    }
 }

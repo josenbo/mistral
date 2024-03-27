@@ -15,4 +15,9 @@ internal record AppConfigHelp() : AppConfig
         Log.Debug("Dumping an object of type {TheType}", this.GetType().FullName);
         Log.Debug("{TheParam} = {TheValue}", nameof(Command), Command);
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(AppConfigHelp)} {{ {nameof(Command)} = {Command} }}";
+    }
 }
