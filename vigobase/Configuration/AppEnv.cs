@@ -81,8 +81,20 @@ public static class AppEnv
         if (TimingReportFile is null)
             return;
 
+        if (_isFirstTimingEntry && TimingReportFile.Exists)
+            TimingReportFile.Delete();
+        
+        if (string.IsNullOrWhiteSpace(message))
+            message = string.Empty;
+        else if (message.Contains(';'))
+            message = message.Replace(';', '.');
+            
         using var sw = TimingReportFile.AppendText();
-        sw.WriteLine($"{_currentRunStopwatch.ElapsedMilliseconds}\t{message}\t{memberName}\t{sourceFilePath}\t{sourceLineNumber}");
+        if (_isFirstTimingEntry)
+            sw.WriteLine("MillisecondsSinceLaunch;Message;CallerMemberName;CallerFilePath;CallerLineNumber");
+        sw.WriteLine($"{_currentRunStopwatch.ElapsedMilliseconds};{message};{memberName};{sourceFilePath};{sourceLineNumber}");
+
+        _isFirstTimingEntry = false;
     }
     
     public static TimeSpan GetCurrentRunElapsedTime()
@@ -202,4 +214,5 @@ public static class AppEnv
             : null;
 
     private static Stopwatch _currentRunStopwatch = new Stopwatch();
+    private static bool _isFirstTimingEntry = true;
 }

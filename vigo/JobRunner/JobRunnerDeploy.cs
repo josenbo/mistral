@@ -20,6 +20,12 @@ internal class JobRunnerDeploy : JobRunner
 
     protected override bool DoPrepare()
     {
+        if (AppConfig.DeploymentBundle is not null && AppConfig.DeploymentBundle.Exists)
+            AppConfig.DeploymentBundle.Delete();
+        
+        if (AppConfig.MappingReport is not null && AppConfig.MappingReport.Exists)
+            AppConfig.MappingReport.Delete();
+        
         _reader.Read();
 
         return _reader

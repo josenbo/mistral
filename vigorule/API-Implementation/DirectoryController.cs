@@ -51,12 +51,16 @@ internal class DirectoryController(DirectoryInfo location, RepositoryReadRequest
             if (!configurationFile.Exists)
                 continue;
 
+            var configFileInfo = new { Path = request.GetTopLevelRelativePath(configurationFile), Type = configFile.FileType };
+            
+            Log.Information("Processing the deployment configuration file {TheConfigFile}", configFileInfo);
+            
             var configurationScript = configurationFile.OpenText().ReadToEnd();
 
             if (FolderConfigurationApi.Reader.TryParse(
                     configurationScript: configurationScript,
-                    configurationFile: request.GetTopLevelRelativePath(configurationFile),
-                    configurationType: configFile.FileType,
+                    configurationFile: configFileInfo.Path,
+                    configurationType: configFileInfo.Type,
                     initialDefaults: request.DefaultHandling,
                     out var folderConfiguration
                 ))

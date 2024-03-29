@@ -1,0 +1,59 @@
+﻿vigo - A cross-platform tool set for simple rule-based file deployment 
+Copyright 2023-2024 Jochen Stein, MIT license, https://github.com/josenbo/vigo
+
+USAGE:
+  vigo <repository-dir> [-b <file>] [-t <list>] [-r <file>] [-p]
+  vigo -h|--help
+  vigo -v|--version
+
+ARGUMENTS AND OPTIONS:
+  <repository-dir>        Define the top-level directory for walking the 
+                          repositories directory tree and processing files.
+                          Required value. Directory must exist.
+                          Environment variable: VIGO_REPOSITORY
+                           
+  -b, --bundle <file>     Optional deployment bundle file. The file name must
+                          have a .tar.gz suffix. If a relative or full path 
+                          if given, it must point to an existing directory. 
+                          Environment variable: VIGO_BUNDLE
+                            
+  -t, --targets <list>    Optional parameter to filter the build targets
+                          which are written to the deployment bundle.
+                          If missing, all build targets are present in
+                          the deployment bundle. The targets can be 
+                          separated by space, comma or semicolon.
+                          Example: -t "test,production" 
+                          Environment variable: VIGO_TARGETS
+                          
+  -r, --report <file>     Optional spreadsheet file name (with optional
+                          path) which will describe hao files were mapped
+                          to the deployment bundle. The name is resolved 
+                          relative to the current working directory. The 
+                          file name must have a .xlsx suffix and the 
+                          directory must exist.
+                          Environment variable: VIGO_REPORT
+                            
+  -p, --preview           Optional flag. If present, file PREVIEW rules 
+                          will be included in the deployment bundle.
+                          This is used primarily in commit checks.
+                          Environment variable: VIGO_PREVIEW (any value)
+                            
+  -h, --help              Display this help screen
+  
+  -v, --version           Display version information
+
+
+VIGO_TEMP
+
+VIGO_CONSOLE_LOGLEVEL
+
+VIGO_LOGFILE_DEBUG
+VIGO_LOGFILE_INFORMATION
+VIGO_LOGFILE_WARNING
+VIGO_LOGFILE_ERROR
+
+VIGO_SHARED_LOGFILE, VIGO_SHARED_LOGLEVEL, VIGO_SHARED_RETENTION_DAYS
+
+VIGO_TIMING_REPORT
+
+VIGO_FOLDERCONFIG_MARKDOWN, VIGO_FOLDERCONFIG_NATIVE
