@@ -1,34 +1,4 @@
 
-first faultKey = "FX252"
-last faultKey = "FX588",
-
-FX + thre digits
-last used number = 588
-next number = last number + 7
-
-for (int i = 0; i < 1000; i+=7)
-{
-	if (i < 100)
-		continue;
-	Console.WriteLine($"throw new VigoFatalException(AppEnv.Faults.Fatal(\"FX{i}\", \"todo\"))");
-}
-
-// Reihe mit Startwert i = 0
-
-Invariant violated. Notify support and provide logs
-
-
-            throw new VigoFatalException(AppEnv.Faults.Fatal(
-                "FX000",
-                null,
-                "Failed to parse a folder configuration script. See log for details"));
-
-
-
-
-
-
-
 
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX693", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX700", null, "todo"))
