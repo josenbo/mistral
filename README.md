@@ -2,6 +2,8 @@
 
 A toolset for simple cross-platform rule-based file deployment.
 
+[![.NET 8.x Build & Test](https://github.com/josenbo/vigo/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/josenbo/vigo/actions/workflows/dotnet.yml)
+
 # Use-Case: Checking and Bundling File Collections for Deployment
 
 The utility might serve your needs, if you intend to introduce automatic
