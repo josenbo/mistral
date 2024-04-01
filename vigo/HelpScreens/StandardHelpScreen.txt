@@ -1,0 +1,22 @@
+﻿vigo - A cross-platform tool set for simple rule-based file deployment 
+Copyright 2023-2024 Jochen Stein, MIT license, https://github.com/josenbo/vigo
+
+USAGE:
+  vigo <repository-dir> [-b <file>]
+  vigo -h|--help
+  vigo -v|--version
+
+ARGUMENTS AND OPTIONS:
+  <repository-dir>        Define the top-level directory for walking the 
+                          repositories directory tree and processing files.
+                          Required value. Directory must exist.
+                          Environment variable: VIGO_REPOSITORY
+                           
+  -b, --bundle <file>     Optional deployment bundle file. The file name must
+                          have a .tar.gz suffix. If a relative or full path 
+                          if given, it must point to an existing directory. 
+                          Environment variable: VIGO_BUNDLE
+                            
+  -h, --help              Display this help screen
+  
+  -v, --version           Display version information

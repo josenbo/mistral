@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.GuardClauses" Version="4.5.0" />
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.2" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="SpreadsheetLight" Version="3.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\vigoarchive\vigoarchive.csproj" />
+    <ProjectReference Include="..\vigobase\vigobase.csproj" />
+    <ProjectReference Include="..\vigoconfig\vigoconfig.csproj" />
+    <ProjectReference Include="..\vigorule\vigorule.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="vigo-tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="HelpScreens\StandardHelpScreen.txt" />
+    <None Remove="HelpScreens\HelpGeneral.txt" />
+    <None Remove="HelpScreens\HelpDeploy.txt" />
+    <None Remove="HelpScreens\HelpCheck.txt" />
+    <None Remove="HelpScreens\HelpExplain.txt" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12</LangVersion>
+    <AssemblyVersion>0.9.341</AssemblyVersion>
+  </PropertyGroup>
+
+</Project>
