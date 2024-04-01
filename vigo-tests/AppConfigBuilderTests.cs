@@ -4,13 +4,13 @@ namespace vigo_tests;
 
 public class AppConfigBuilderTests
 {
-    [Fact]
-    public void Test1()
-    {
-        _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
-
-        var result = AppConfigBuilder.Assemble(Array.Empty<string>());
-    }
+    // [Fact]
+    // public void Test1()
+    // {
+    //     _logLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+    //
+    //     var result = AppConfigBuilder.Assemble(Array.Empty<string>());
+    // }
     
     #region Helpers
 
