@@ -2,7 +2,7 @@
 
 A toolset for simple cross-platform rule-based file deployment.
 
-[![.NET 8.x Build & Test](https://github.com/josenbo/vigo/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/josenbo/vigo/actions/workflows/dotnet.yml)
+[![CI](https://github.com/josenbo/vigo/actions/workflows/build-and-test-net8.yml/badge.svg?branch=main)](https://github.com/josenbo/vigo/actions/workflows/build-and-test-net8.yml)
 
 # Use-Case: Checking and Bundling File Collections for Deployment
 
