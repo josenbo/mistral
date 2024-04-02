@@ -6,7 +6,7 @@ on:
       - published
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,63 +22,28 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
 
-    - name: Build linux-x64
-      run: |
-        mkdir -p "$RUNNER_TEMP/build/linux-x64"
-        dotnet build ./vigo/vigo.csproj --configuration Release --runtime linux-x64 --no-self-contained --output "$RUNNER_TEMP/build/linux-x64"
-    - name: Upload linux-x64
-      uses: actions/upload-artifact@v4
-      with:
-        name: vigo.linux-x64
-        path: "$RUNNER_TEMP/build/linux-x64/"
+  create_artifacts:
+    strategy:
+      matrix:
+        runtime: [linux-x64, linux-arm64, win-x64, win-x86, osx-x64, osx-arm64]
+    runs-on: ubuntu-latest
 
-    - name: Build linux-arm64
+    steps:
+    - name: Build ${{ matrix.runtime }}
       run: |
-        mkdir -p "$RUNNER_TEMP/build/linux-arm64"
-        dotnet build ./vigo/vigo.csproj --configuration Release --runtime linux-arm64 --no-self-contained --output "$RUNNER_TEMP/build/linux-arm64"
-    - name: Upload linux-arm64
+        export SRA9_OUTPUT_PATH="$RUNNER_TEMP/build/linux-x64"
+        echo "SRA9_OUTPUT_PATH=$SRA9_OUTPUT_PATH" >> "$GITHUB_ENV"
+        mkdir -p "$SRA9_OUTPUT_PATH"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime ${{ matrix.runtime }} --no-self-contained --output "$SRA9_OUTPUT_PATH"
+        ls -al "$SRA9_OUTPUT_PATH"
+        if [ -f "$SRA9_OUTPUT_PATH/vigo.dll" ]; then
+          export SRA9_OUTPUT_AVAILABLE="OK"
+          echo "SRA9_OUTPUT_AVAILABLE=$SRA9_OUTPUT_AVAILABLE" >> "$GITHUB_ENV"
+        fi
+    - name: Upload ${{ matrix.runtime }}
+      if: ${{ env.SRA9_OUTPUT_AVAILABLE == 'OK' }}
       uses: actions/upload-artifact@v4
       with:
-        name: vigo.linux-arm64
-        path: "$RUNNER_TEMP/build/linux-arm64/"
-  
-    - name: Build win-x64
-      run: |
-        mkdir -p "$RUNNER_TEMP/build/win-x64"
-        dotnet build ./vigo/vigo.csproj --configuration Release --runtime win-x64 --no-self-contained --output "$RUNNER_TEMP/build/win-x64"
-    - name: Upload win-x64
-      uses: actions/upload-artifact@v4
-      with:
-        name: vigo.win-x64
-        path: "$RUNNER_TEMP/build/win-x64/"
-
-    - name: Build win-x86
-      run: |
-        mkdir -p "$RUNNER_TEMP/build/win-x86"
-        dotnet build ./vigo/vigo.csproj --configuration Release --runtime win-x86 --no-self-contained --output "$RUNNER_TEMP/build/win-x86"
-    - name: Upload win-x86
-      uses: actions/upload-artifact@v4
-      with:
-        name: vigo.win-x86
-        path: "$RUNNER_TEMP/build/win-x86/"
-                  
-    - name: Build osx-x64
-      run: |
-        mkdir -p "$RUNNER_TEMP/build/osx-x64"
-        dotnet build ./vigo/vigo.csproj --configuration Release --runtime osx-x64 --no-self-contained --output "$RUNNER_TEMP/build/osx-x64"
-    - name: Upload osx-x64
-      uses: actions/upload-artifact@v4
-      with:
-        name: vigo.osx-x64
-        path: "$RUNNER_TEMP/build/osx-x64/"
-
-    - name: Build osx-arm64
-      run: |
-        mkdir -p "$RUNNER_TEMP/build/osx-arm64"
-        dotnet build ./vigo/vigo.csproj --configuration Release --runtime osx-arm64 --no-self-contained --output "$RUNNER_TEMP/build/osx-arm64"
-    - name: Upload osx-arm64
-      uses: actions/upload-artifact@v4
-      with:
-        name: vigo.osx-arm64
-        path: "$RUNNER_TEMP/build/osx-arm64/"
+        name: vigo.${{ matrix.runtime }}
+        path: ${{ env.SRA9_OUTPUT_PATH }}
 
