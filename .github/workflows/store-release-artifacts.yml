@@ -25,7 +25,7 @@ jobs:
     - name: Build linux-x64
       run: |
         mkdir -p "$RUNNER_TEMP/build/linux-x64"
-        dotnet build --configuration Release --runtime linux-x64 --no-self-contained --output "$RUNNER_TEMP/build/linux-x64"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime linux-x64 --no-self-contained --output "$RUNNER_TEMP/build/linux-x64"
     - name: Upload linux-x64
       uses: actions/upload-artifact@v4
       with:
@@ -35,7 +35,7 @@ jobs:
     - name: Build linux-arm64
       run: |
         mkdir -p "$RUNNER_TEMP/build/linux-arm64"
-        dotnet build --configuration Release --runtime linux-arm64 --no-self-contained --output "$RUNNER_TEMP/build/linux-arm64"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime linux-arm64 --no-self-contained --output "$RUNNER_TEMP/build/linux-arm64"
     - name: Upload linux-arm64
       uses: actions/upload-artifact@v4
       with:
@@ -45,7 +45,7 @@ jobs:
     - name: Build win-x64
       run: |
         mkdir -p "$RUNNER_TEMP/build/win-x64"
-        dotnet build --configuration Release --runtime win-x64 --no-self-contained --output "$RUNNER_TEMP/build/win-x64"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime win-x64 --no-self-contained --output "$RUNNER_TEMP/build/win-x64"
     - name: Upload win-x64
       uses: actions/upload-artifact@v4
       with:
@@ -55,7 +55,7 @@ jobs:
     - name: Build win-x86
       run: |
         mkdir -p "$RUNNER_TEMP/build/win-x86"
-        dotnet build --configuration Release --runtime win-x86 --no-self-contained --output "$RUNNER_TEMP/build/win-x86"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime win-x86 --no-self-contained --output "$RUNNER_TEMP/build/win-x86"
     - name: Upload win-x86
       uses: actions/upload-artifact@v4
       with:
@@ -65,7 +65,7 @@ jobs:
     - name: Build osx-x64
       run: |
         mkdir -p "$RUNNER_TEMP/build/osx-x64"
-        dotnet build --configuration Release --runtime osx-x64 --no-self-contained --output "$RUNNER_TEMP/build/osx-x64"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime osx-x64 --no-self-contained --output "$RUNNER_TEMP/build/osx-x64"
     - name: Upload osx-x64
       uses: actions/upload-artifact@v4
       with:
@@ -75,7 +75,7 @@ jobs:
     - name: Build osx-arm64
       run: |
         mkdir -p "$RUNNER_TEMP/build/osx-arm64"
-        dotnet build --configuration Release --runtime osx-arm64 --no-self-contained --output "$RUNNER_TEMP/build/osx-arm64"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime osx-arm64 --no-self-contained --output "$RUNNER_TEMP/build/osx-arm64"
     - name: Upload osx-arm64
       uses: actions/upload-artifact@v4
       with:
