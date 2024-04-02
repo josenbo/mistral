@@ -48,9 +48,9 @@ jobs:
         dotnet build ./vigo/vigo.csproj --configuration Release --runtime ${{ matrix.runtime }} --no-self-contained --output "$BUILD_OUTPUT_PATH"
 
         if [ "$BUNDLE_SUFFIX" == "zip" ]; then
-          zip -j "$BUNDLE_PATH" "$BUILD_OUTPUT_PATH/*"
+          zip -jr "$BUNDLE_PATH" "$BUILD_OUTPUT_PATH/."
         else
-          tar -cvf "$BUNDLE_PATH" "$BUILD_OUTPUT_PATH/*"
+          tar -cvf "$BUNDLE_PATH" --directory="$BUILD_OUTPUT_PATH" .
         fi
     - name: Upload ${{ matrix.runtime }}
       uses: softprops/action-gh-release@v2
