@@ -1,0 +1,84 @@
+name: Store Release Artifacts
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+
+    - name: Build linux-x64
+      run: |
+        mkdir -p "$RUNNER_TEMP/build/linux-x64"
+        dotnet build --configuration Release --runtime linux-x64 --no-self-contained --output "$RUNNER_TEMP/build/linux-x64"
+    - name: Upload linux-x64
+      uses: actions/upload-artifact@v4
+      with:
+        name: vigo.linux-x64
+        path: "$RUNNER_TEMP/build/linux-x64/"
+
+    - name: Build linux-arm64
+      run: |
+        mkdir -p "$RUNNER_TEMP/build/linux-arm64"
+        dotnet build --configuration Release --runtime linux-arm64 --no-self-contained --output "$RUNNER_TEMP/build/linux-arm64"
+    - name: Upload linux-arm64
+      uses: actions/upload-artifact@v4
+      with:
+        name: vigo.linux-arm64
+        path: "$RUNNER_TEMP/build/linux-arm64/"
+  
+    - name: Build win-x64
+      run: |
+        mkdir -p "$RUNNER_TEMP/build/win-x64"
+        dotnet build --configuration Release --runtime win-x64 --no-self-contained --output "$RUNNER_TEMP/build/win-x64"
+    - name: Upload win-x64
+      uses: actions/upload-artifact@v4
+      with:
+        name: vigo.win-x64
+        path: "$RUNNER_TEMP/build/win-x64/"
+
+    - name: Build win-x86
+      run: |
+        mkdir -p "$RUNNER_TEMP/build/win-x86"
+        dotnet build --configuration Release --runtime win-x86 --no-self-contained --output "$RUNNER_TEMP/build/win-x86"
+    - name: Upload win-x86
+      uses: actions/upload-artifact@v4
+      with:
+        name: vigo.win-x86
+        path: "$RUNNER_TEMP/build/win-x86/"
+                  
+    - name: Build osx-x64
+      run: |
+        mkdir -p "$RUNNER_TEMP/build/osx-x64"
+        dotnet build --configuration Release --runtime osx-x64 --no-self-contained --output "$RUNNER_TEMP/build/osx-x64"
+    - name: Upload osx-x64
+      uses: actions/upload-artifact@v4
+      with:
+        name: vigo.osx-x64
+        path: "$RUNNER_TEMP/build/osx-x64/"
+
+    - name: Build osx-arm64
+      run: |
+        mkdir -p "$RUNNER_TEMP/build/osx-arm64"
+        dotnet build --configuration Release --runtime osx-arm64 --no-self-contained --output "$RUNNER_TEMP/build/osx-arm64"
+    - name: Upload osx-arm64
+      uses: actions/upload-artifact@v4
+      with:
+        name: vigo.osx-arm64
+        path: "$RUNNER_TEMP/build/osx-arm64/"
+
