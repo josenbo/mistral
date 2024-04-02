@@ -1,4 +1,4 @@
-name: Store Release Artifacts
+name: CD
 
 on:
   push:
