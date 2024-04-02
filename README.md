@@ -1,6 +1,6 @@
 # Simple Rule-Based File Deployment.
 
-[![CI](https://github.com/josenbo/vigo/actions/workflows/build-and-test-net8.yml/badge.svg?branch=main)](https://github.com/josenbo/vigo/actions/workflows/build-and-test-net8.yml)
+[![CI](https://github.com/josenbo/vigo/actions/workflows/build-and-test-net8.yml/badge.svg?branch=main)](https://github.com/josenbo/vigo/actions/workflows/build-and-test-net8.yml) [![CD](https://github.com/josenbo/vigo/actions/workflows/store-release-artifacts.yml/badge.svg)](https://github.com/josenbo/vigo/actions/workflows/store-release-artifacts.yml)
 
 The vigo tool set is a minimalistic build tool with the aim of providing
 repository files filtered by name patterns and transformed to the expected encoding and format as a single archive for deployment on the target
