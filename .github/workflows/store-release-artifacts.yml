@@ -1,9 +1,9 @@
 name: Store Release Artifacts
 
 on:
-  release:
-    types:
-      - published
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build_and_test:
@@ -36,20 +36,25 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Build ${{ matrix.runtime }}
+      id: build-artifact
+      env:
+        BUNDLE_SUFFIX: ${{ startsWith(matrix.runtime, 'win') && 'zip' || 'tar.gz' }}
       run: |
-        export SRA9_OUTPUT_PATH="$RUNNER_TEMP/build/linux-x64"
-        echo "SRA9_OUTPUT_PATH=$SRA9_OUTPUT_PATH" >> "$GITHUB_ENV"
-        mkdir -p "$SRA9_OUTPUT_PATH"
-        dotnet build ./vigo/vigo.csproj --configuration Release --runtime ${{ matrix.runtime }} --no-self-contained --output "$SRA9_OUTPUT_PATH"
-        ls -al "$SRA9_OUTPUT_PATH"
-        if [ -f "$SRA9_OUTPUT_PATH/vigo.dll" ]; then
-          export SRA9_OUTPUT_AVAILABLE="OK"
-          echo "SRA9_OUTPUT_AVAILABLE=$SRA9_OUTPUT_AVAILABLE" >> "$GITHUB_ENV"
+        export BUILD_OUTPUT_PATH="$RUNNER_TEMP/build/${{ matrix.runtime }}"
+        export BUNDLE_PATH="$RUNNER_TEMP/build/${{ matrix.runtime }}.$BUNDLE_SUFFIX"
+        echo "BUNDLE_PATH=$BUNDLE_PATH" >> "$GITHUB_OUTPUT"
+
+        mkdir -p "$BUILD_OUTPUT_PATH"
+        dotnet build ./vigo/vigo.csproj --configuration Release --runtime ${{ matrix.runtime }} --no-self-contained --output "$BUILD_OUTPUT_PATH"
+
+        if [ "$BUNDLE_SUFFIX" == "zip" ]; then
+          zip -j "$BUNDLE_PATH" "$BUILD_OUTPUT_PATH/*"
+        else
+          tar -cvf "$BUNDLE_PATH" "$BUILD_OUTPUT_PATH/*"
         fi
     - name: Upload ${{ matrix.runtime }}
-      if: ${{ env.SRA9_OUTPUT_AVAILABLE == 'OK' }}
-      uses: actions/upload-artifact@v4
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        name: vigo.${{ matrix.runtime }}
-        path: ${{ env.SRA9_OUTPUT_PATH }}
+        files: ${{ steps.build-artifact.outputs.BUNDLE_PATH }}
 
