@@ -1,6 +1,5 @@
 
 
-throw new VigoFatalException(AppEnv.Faults.Fatal("FX693", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX700", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX707", null, "todo"))
 throw new VigoFatalException(AppEnv.Faults.Fatal("FX714", null, "todo"))

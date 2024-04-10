@@ -38,6 +38,9 @@ internal class JobRunnerDeploy : JobRunner
         if (!BuildTarball(_reader, AppEnv.TemporaryDeploymentBundle, AppConfig.Targets, false))
             return false;
 
+        if (HasGhostFiles(_reader.TopLevelDirectory))
+            return false;
+
         if (AppConfig.DeploymentBundle is null) 
             return true;
         
@@ -67,6 +70,44 @@ internal class JobRunnerDeploy : JobRunner
     }
 
     protected override string JobRunnerFailureMessage => "Failed to build the deployment bundle";
+    
+    private static bool HasGhostFiles(DirectoryInfo tld)
+    {
+        var retval = false;
+        
+        var query = tld.GetFiles("*.*", SearchOption.AllDirectories)
+                .Where(w => w.DirectoryName is not null)
+                .Select(p => new
+                {
+                    FilePath = Path.GetRelativePath(tld.FullName, p.FullName),
+                    DirPath = Path.GetRelativePath(tld.FullName, p.DirectoryName ?? string.Empty),
+                    FileName = p.Name
+                })
+                .Where(c => !c.DirPath.StartsWith(".git"))
+                .GroupBy(g => g.FilePath, StringComparer.InvariantCultureIgnoreCase)
+                .Select(d => new 
+                {
+                    Key = d.Key,
+                    Items = d
+                })
+                .Where(n => n.Items.Count() != 1);
+
+        foreach (var item in query)
+        {
+            retval = true;
+            
+            Log.Error("Ghost files detected in folder {FolderPath}: [{GhostFiles}]", 
+                Path.GetDirectoryName(item.Key),
+                string.Join(", ", item.Items.Select(n => n.FileName)));
+        }
+
+        if (retval)
+            AppEnv.Faults.Fatal("FX693", null,
+                "Found ghost files with identical file names except for upper-case or lower-case letters. See log for file locations.");
+
+        return retval;
+    }
+    
     private AppConfigDeploy AppConfig { get; }
 
     private readonly IRepositoryReader _reader;
