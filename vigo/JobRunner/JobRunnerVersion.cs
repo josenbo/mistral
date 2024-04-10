@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace vigo;
 
@@ -28,16 +29,15 @@ internal class JobRunnerVersion : JobRunner
                 return false;
         }
 
-        var appVersion = appAssembly.GetName().Version;
+        var fileVersionInfo = FileVersionInfo.GetVersionInfo(appAssembly.Location);
+        var productVersion = fileVersionInfo.ProductVersion;
 
-        if (appVersion is null)
+        if (productVersion is null)
             return false;
         
         var currentExecutable = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+        Console.WriteLine($"{currentExecutable} {productVersion}");
         
-        // Console.WriteLine($"{currentExecutable} v{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}.{appVersion.Revision}");
-        Console.WriteLine($"{currentExecutable} v{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}");
-
         return true;
     }
 
