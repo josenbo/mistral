@@ -14,9 +14,10 @@ ARGUMENTS AND OPTIONS:
                            
   -b, --bundle <file>     Optional deployment bundle file. The file name must
                           have a .tar.gz suffix. If a relative or full path 
-                          if given, it must point to an existing directory. 
+                          is given, it must point to an existing directory. 
                           Environment variable: VIGO_BUNDLE
                             
   -h, --help              Display this help screen
   
   -v, --version           Display version information
+
